@@ -1,11 +1,14 @@
 *main menu
 *multiplayer (local)
+*randomly determine first player for local multiplayer (coin flip)
+*Let user enter name
 *create 9 x 5 board
 *create 22 pieces
 *draw board
 *draw pieces
 *implement user interface (buttons under pieces)/virtual rectangles
 *user interface (highlight selected piece)
+*display current player turn
 *manage piece movements
 *detect adjacent pieces
 *manage piece removal
@@ -19,6 +22,8 @@
 *AI highlight movements
 *turn limit
 *time limit
+*track number of turns
+*high score (by turns)
 *user customization (piece colors)
 *sound
 *count pieces left
@@ -27,6 +32,8 @@
 *reset button
 *undo button
 *help screen
+*about screen
+*options menu
 *hint system
 *animations
 *move log
