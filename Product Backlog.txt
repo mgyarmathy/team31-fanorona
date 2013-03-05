@@ -1,0 +1,36 @@
+*main menu
+*multiplayer (local)
+*create 9 x 5 board
+*create 22 pieces
+*draw board
+*draw pieces
+*implement user interface (buttons under pieces)/virtual rectangles
+*user interface (highlight selected piece)
+*manage piece movements
+*detect adjacent pieces
+*manage piece removal
+*allow multiple moves per turn
+*board state detection
+*valid/invalid moves
+*AI determine valid moves
+*AI min/max tree
+*AI tree pruning
+*AI delay movements
+*AI highlight movements
+*turn limit
+*time limit
+*user customization (piece colors)
+*sound
+*count pieces left
+*win/lose/draw screen
+*determine win/lose/draw
+*reset button
+*undo button
+*help screen
+*hint system
+*animations
+*move log
+*client/server model
+*establish connection to server
+*send moves to server
+*receive opponent moves from server
