@@ -13,5 +13,5 @@ http://www.eclipse.org/downloads/
 Seen by David Harrison
 
 
-
+http://www.tutorialspoint.com/java/java_basic_syntax.htm
 http://www.bowdoin.edu/~ltoma/teaching/cs210/spring08/Lectures/JavaGraphics1.pdf
