@@ -8,15 +8,21 @@ public class GamePanel extends JPanel{
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
-	}	
+	}
 	
-	public void drawboard(Graphics g,int x,int y){
+	@Override
+	public void paintComponent(Graphics g) {
+		//draw ze game here
+		drawBoard(g);
+	 }
+	
+	public void drawBoard(Graphics g){
 		
 		int xstartp= 0;
 		int ystartp= 0;
 		
-		int xwidth = (x);
-		int yheight= (y);
+		int xwidth = getWidth();
+		int yheight= getHeight();
 		
 		//draw background
 		g.setColor(new Color(210,180,140));
@@ -84,14 +90,8 @@ public class GamePanel extends JPanel{
 		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
 		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
 	}
-	@Override
-	public void paintComponent(Graphics g) {
-		//draw ze game here
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-		g.setColor(Color.RED);
-		g.drawString("THIS IS THE GAME PANEL", 60, 250);
-		drawboard(g,600,500);
-	 }
+	
+
 	
 	
 }
