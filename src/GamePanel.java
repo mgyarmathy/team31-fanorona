@@ -8,12 +8,90 @@ public class GamePanel extends JPanel{
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
-	}
+	}	
 	
+	public void drawboard(Graphics g,int x,int y){
+		
+		int xstartp= 0;
+		int ystartp= 0;
+		
+		int xwidth = (x);
+		int yheight= (y);
+		
+		//draw background
+		g.setColor(new Color(210,180,140));
+		g.fillRect(xstartp, ystartp, xwidth, yheight);
+		
+		//draw vertical lines
+		g.setColor(new Color(139,69,19));
+		int y1= ystartp+ yheight/10, y2= ystartp+ yheight*9/10;
+		int x1,x2;
+		
+		for(int i=1;i<10;i++){
+			x1= xstartp+ xwidth*i/10; 
+			g.drawLine(x1, y1 , x1, y2);
+			g.drawLine(x1+1, y1 , x1+1, y2);
+			g.drawLine(x1+2, y1 , x1+2, y2);
+		}
+		
+		// draw horizontal lines
+		x1= xstartp+ xwidth/10; 
+		x2= xstartp+ xwidth*9/10;
+		for(int i=1;i<10;i+=2){
+			y1= ystartp+ yheight*i/10 ;
+			g.drawLine(x1, y1 , x2, y1);
+			g.drawLine(x1, y1+1 , x2, y1+1);
+			g.drawLine(x1, y1+2 , x2, y1+2);
+		}
+		
+		
+		// draw diagonal lines
+		y1= ystartp +yheight/10;
+		for(int i=0;i<6;i++){
+			if(i%2==0){
+				x1= xstartp+ (i+1)*xwidth/10; 
+				x2= xstartp+ (i+5)*xwidth/10;
+			}
+			else{
+				x1= xstartp+ (i+4)*xwidth/10; 
+				x2= xstartp+ (i)*xwidth/10;
+			}
+			
+			g.drawLine(x1, y1 , x2, y2);
+			g.drawLine(x1+1, y1 , x2+1, y2);
+			g.drawLine(x1+2, y1 , x2+2, y2);
+		}
+		
+		x1= xstartp+ xwidth*3/10; 
+		x2= xstartp+ xwidth/10;
+		
+		g.drawLine(x1, y1 , x2, y1+ yheight*4/10);
+		g.drawLine(x1+1, y1 , x2+1, y1+ yheight*4/10);
+		g.drawLine(x1+2, y1 , x2+2, y1+ yheight*4/10);
+		
+		g.drawLine(x2, y1+ yheight*4/10 , x1, y2);
+		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
+		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
+		
+		x1= xstartp+ xwidth*7/10; 
+		x2= xstartp+ xwidth*9/10;
+		
+		g.drawLine(x1, y1 , x2, y1+ yheight*4/10);
+		g.drawLine(x1+1, y1 , x2+1, y1+ yheight*4/10);
+		g.drawLine(x1+2, y1 , x2+2, y1+ yheight*4/10);
+		
+		g.drawLine(x2, y1+ yheight*4/10 , x1, y2);
+		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
+		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
+	}
+	@Override
 	public void paintComponent(Graphics g) {
 		//draw ze game here
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		g.setColor(Color.RED);
 		g.drawString("THIS IS THE GAME PANEL", 60, 250);
+		drawboard(g,600,500);
 	 }
+	
+	
 }

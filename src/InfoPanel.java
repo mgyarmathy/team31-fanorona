@@ -10,6 +10,7 @@ public class InfoPanel extends JPanel{
 		setVisible(true);
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		//draw the information here
 		g.drawString("This is the info panel", 20, 20);
