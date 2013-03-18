@@ -5,8 +5,7 @@ import java.awt.*;
 // GamePanel displays the current state of the board.
 public class GamePanel extends JPanel{
 	public GamePanel(){
-		setPreferredSize(new Dimension(600, 500));
-		setBackground(Color.WHITE);
+		setPreferredSize(new Dimension(600,300));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
 	}
@@ -14,6 +13,7 @@ public class GamePanel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw ze game here
+		
 		drawBoard(g);
 	 }	
 	
@@ -36,11 +36,20 @@ public class GamePanel extends JPanel{
 		
 		int xoff = 35;
 		
+		String[] letters= new String[5];
+		letters[0]= "A";
+		letters[1]= "B";
+		letters[2]= "C";
+		letters[3]= "D";
+		letters[4]= "E";
+		
 		for(int i=1;i<10;i++){
 			x1= xstartp+ xwidth*i/9 -xoff; 
 			g.drawLine(x1, y1 , x1, y2);
 			g.drawLine(x1+1, y1 , x1+1, y2);
 			g.drawLine(x1+2, y1 , x1+2, y2);
+			
+			g.drawString(Integer.toString(i), x1, y1 - 15);
 		}
 		
 		// draw horizontal lines
@@ -51,6 +60,8 @@ public class GamePanel extends JPanel{
 			g.drawLine(x1, y1 , x2, y1);
 			g.drawLine(x1, y1+1 , x2, y1+1);
 			g.drawLine(x1, y1+2 , x2, y1+2);
+			
+			g.drawString(letters[(int)(Math.ceil(i/2))], 10, y1+5);
 		}
 		
 		
@@ -93,8 +104,4 @@ public class GamePanel extends JPanel{
 		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
 		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
 	}
-	
-
-	
-	
 }

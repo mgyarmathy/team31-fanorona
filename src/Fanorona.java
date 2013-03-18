@@ -10,12 +10,12 @@ public class Fanorona extends JFrame{
 		addMenuBar();
 		Container content = getContentPane();
 		GamePanel board = new GamePanel();
-		//Grid g1 = new Grid();
+		
 		InfoPanel i1= new InfoPanel();
 		Grid g1 = new Grid(i1);
 		
 		content.add(g1,BorderLayout.SOUTH);
-		content.add(board, BorderLayout.WEST);
+		content.add(board, BorderLayout.CENTER);
 		
 		content.add(i1, BorderLayout.EAST);
 		pack();
