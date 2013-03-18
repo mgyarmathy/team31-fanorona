@@ -118,16 +118,19 @@ public class GamePanel extends JPanel{
 		int xwidth = getWidth();
 		int yheight= getHeight();
 		
+		int xoff = getWidth()/29;
+		int yoff = getHeight()/17;
+		
 		for(int row = 0; row<board.length; row++){
 			for(int col = 0; col<board[0].length; col++){
 				if(board[row][col] == Piece.EMPTY) continue;
 				if(board[row][col] == Piece.BLACK){
 					g.setColor(Color.BLACK);
-					g.fillOval(col*(xwidth/COLS)+22, row*(yheight/ROWS)+38, 25, 25);
+					g.fillOval(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
 				}
 				if(board[row][col] == Piece.WHITE){
 					g.setColor(Color.WHITE);
-					g.fillOval(col*(xwidth/COLS)+22, row*(yheight/ROWS)+38, 25, 25);
+					g.fillOval(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
 				}
 			}
 		}
