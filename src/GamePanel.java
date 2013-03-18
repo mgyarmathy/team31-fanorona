@@ -1,5 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+
+//TODO: fix bug with selecting pieces
 
 // GamePanel displays the current state of the board.
 public class GamePanel extends JPanel{
@@ -9,20 +12,46 @@ public class GamePanel extends JPanel{
 	
 	public enum Piece {WHITE, BLACK, EMPTY};
 	private Piece[][] board = new Piece[ROWS][COLS];
+	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
+	private Point selected_piece = null;
 
 	public GamePanel(){
 		setPreferredSize(new Dimension(600,300));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
 		newGame();
+		
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				Point p = e.getPoint();
+				for(int row = 0; row < buttons.length; row++){
+					for(int col = 0; col < buttons[0].length; col++){
+						if(buttons[row][col].contains(p)){
+							if(selected_piece == null){ //no piece selected
+								selected_piece = new Point(col, row); 
+								break;
+							}
+							else{
+								Piece color = board[selected_piece.y][selected_piece.x];
+								board[row][col] = color;
+								selected_piece = null;
+							}
+						}
+					}
+				}
+			}
+		});
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw ze game here
-		
+		super.paintComponent(g);
 		drawBoard(g);
 		drawPieces(g);
+		drawButtons(g);
+		repaint();
 	 }	
 	
 	public void drawBoard(Graphics g){
@@ -121,6 +150,12 @@ public class GamePanel extends JPanel{
 		int xoff = getWidth()/29;
 		int yoff = getHeight()/17;
 		
+		if(selected_piece != null){
+			g.setColor(Color.YELLOW);
+			//suspected line causing draw bug:
+			g.fillOval(selected_piece.x*(xwidth/COLS)+xoff-3, selected_piece.y*(xwidth/ROWS)+yoff-3, 30, 30);
+		}
+		
 		for(int row = 0; row<board.length; row++){
 			for(int col = 0; col<board[0].length; col++){
 				if(board[row][col] == Piece.EMPTY) continue;
@@ -137,7 +172,7 @@ public class GamePanel extends JPanel{
 	}
 
 	public void newGame(){
-		board = new Piece[5][9];
+		board = new Piece[ROWS][COLS];
 		//fill top two rows with black pieces
 		for(int i = 0; i<2; i++){
 			for(int j = 0; j<9; j++){
@@ -158,6 +193,23 @@ public class GamePanel extends JPanel{
 		for(int i = 3; i<5; i++){
 			for(int j = 0; j<9; j++){
 				board[i][j] = Piece.WHITE;
+			}
+		}
+	}
+	
+	public void drawButtons(Graphics g){
+		//debug: add Graphics g and drawRect to find button positions
+		buttons = new Rectangle[ROWS][COLS];
+		int xwidth = getWidth();
+		int yheight= getHeight();
+		
+		int xoff = getWidth()/29;
+		int yoff = getHeight()/17;
+		
+		for(int row = 0; row < buttons.length; row++){
+			for(int col = 0; col < buttons[0].length; col++){
+				g.drawRect(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
+				buttons[row][col] = new Rectangle(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
 			}
 		}
 	}
