@@ -5,10 +5,19 @@ import java.awt.*;
 public class InfoPanel extends JPanel{
 	public InfoPanel(){
 		setPreferredSize(new Dimension(200, 0));
-		setBackground(Color.RED);
+		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
 		setVisible(true);
 	}
+	
+	public void write(String s){
+		
+		Graphics g = this.getGraphics();
+		super.paintComponent(g);
+		g.drawString(s,20,20);
+		
+	}
+	
 	
 	@Override
 	public void paintComponent(Graphics g) {

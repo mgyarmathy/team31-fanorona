@@ -9,8 +9,15 @@ public class Fanorona extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addMenuBar();
 		Container content = getContentPane();
-		content.add(new GamePanel(), BorderLayout.WEST);
-		content.add(new InfoPanel(), BorderLayout.EAST);
+		GamePanel board = new GamePanel();
+		//Grid g1 = new Grid();
+		InfoPanel i1= new InfoPanel();
+		Grid g1 = new Grid(i1);
+		
+		content.add(g1,BorderLayout.SOUTH);
+		content.add(board, BorderLayout.WEST);
+		
+		content.add(i1, BorderLayout.EAST);
 		pack();
 		setVisible(true);
 	}
