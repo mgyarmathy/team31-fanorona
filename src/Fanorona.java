@@ -1,22 +1,21 @@
 import javax.swing.*;
-
 import java.awt.*;
 
 
 public class Fanorona extends JFrame{
+	
+	
+	
 	public Fanorona(){
 		super("Team 31 - Fanorona");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addMenuBar();
 		Container content = getContentPane();
 		GamePanel board = new GamePanel();
-		
 		InfoPanel i1= new InfoPanel();
 		Grid g1 = new Grid(i1);
-		
 		content.add(g1,BorderLayout.SOUTH);
 		content.add(board, BorderLayout.CENTER);
-		
 		content.add(i1, BorderLayout.EAST);
 		pack();
 		setVisible(true);
@@ -35,4 +34,6 @@ public class Fanorona extends JFrame{
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
 	}
+	
+	
 }

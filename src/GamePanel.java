@@ -1,13 +1,20 @@
 import javax.swing.*;
-
 import java.awt.*;
 
 // GamePanel displays the current state of the board.
 public class GamePanel extends JPanel{
+	
+	static final int ROWS = 5;
+	static final int COLS = 9;
+	
+	public enum Piece {WHITE, BLACK, EMPTY};
+	private Piece[][] board = new Piece[ROWS][COLS];
+
 	public GamePanel(){
 		setPreferredSize(new Dimension(600,300));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
+		newGame();
 	}
 	
 	@Override
@@ -15,6 +22,7 @@ public class GamePanel extends JPanel{
 		//draw ze game here
 		
 		drawBoard(g);
+		drawPieces(g);
 	 }	
 	
 	public void drawBoard(Graphics g){
@@ -104,4 +112,51 @@ public class GamePanel extends JPanel{
 		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
 		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
 	}
+
+	public void drawPieces(Graphics g){
+		
+		int xwidth = getWidth();
+		int yheight= getHeight();
+		
+		for(int row = 0; row<board.length; row++){
+			for(int col = 0; col<board[0].length; col++){
+				if(board[row][col] == Piece.EMPTY) continue;
+				if(board[row][col] == Piece.BLACK){
+					g.setColor(Color.BLACK);
+					g.fillOval(col*(xwidth/COLS)+22, row*(yheight/ROWS)+38, 25, 25);
+				}
+				if(board[row][col] == Piece.WHITE){
+					g.setColor(Color.WHITE);
+					g.fillOval(col*(xwidth/COLS)+22, row*(yheight/ROWS)+38, 25, 25);
+				}
+			}
+		}
+	}
+
+	public void newGame(){
+		board = new Piece[5][9];
+		//fill top two rows with black pieces
+		for(int i = 0; i<2; i++){
+			for(int j = 0; j<9; j++){
+				board[i][j] = Piece.BLACK;
+			}
+		}
+		//alternate colors in middle row, except middle space
+		board[2][0] = Piece.BLACK;
+		board[2][1] = Piece.WHITE;
+		board[2][2] = Piece.BLACK;
+		board[2][3] = Piece.WHITE;
+		board[2][4] = Piece.EMPTY;
+		board[2][5] = Piece.BLACK;
+		board[2][6] = Piece.WHITE;
+		board[2][7] = Piece.BLACK;
+		board[2][8] = Piece.WHITE;
+		//fill bottom two rows with white pieces
+		for(int i = 3; i<5; i++){
+			for(int j = 0; j<9; j++){
+				board[i][j] = Piece.WHITE;
+			}
+		}
+	}
+	
 }
