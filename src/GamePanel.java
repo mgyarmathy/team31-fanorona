@@ -14,11 +14,14 @@ public class GamePanel extends JPanel{
 	private Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
 	private Point selected_piece = null;
+	
+	public InfoPanel info;
 
-	public GamePanel(){
-		setPreferredSize(new Dimension(600,300));
+	public GamePanel(InfoPanel i){
+		setPreferredSize(new Dimension(600,400));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
+		info = i;
 		newGame();
 		
 		addMouseListener(new MouseAdapter() {
@@ -29,7 +32,8 @@ public class GamePanel extends JPanel{
 					for(int col = 0; col < buttons[0].length; col++){
 						if(buttons[row][col].contains(p)){
 							if(selected_piece == null){ //no piece selected
-								selected_piece = new Point(col, row); 
+								selected_piece = new Point(col, row);
+								info.write("piece selected");
 								break;
 							}
 							else{
@@ -148,12 +152,12 @@ public class GamePanel extends JPanel{
 		int yheight= getHeight();
 		
 		int xoff = getWidth()/29;
-		int yoff = getHeight()/17;
+		int yoff = getHeight()/15;
 		
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
 			//suspected line causing draw bug:
-			g.fillOval(selected_piece.x*(xwidth/COLS)+xoff-3, selected_piece.y*(xwidth/ROWS)+yoff-3, 30, 30);
+			g.fillOval(selected_piece.x*(xwidth/COLS)+xoff-3, selected_piece.y*(yheight/ROWS)+yoff-3, 30, 30);
 		}
 		
 		for(int row = 0; row<board.length; row++){
@@ -204,7 +208,7 @@ public class GamePanel extends JPanel{
 		int yheight= getHeight();
 		
 		int xoff = getWidth()/29;
-		int yoff = getHeight()/17;
+		int yoff = getHeight()/15;
 		
 		for(int row = 0; row < buttons.length; row++){
 			for(int col = 0; col < buttons[0].length; col++){

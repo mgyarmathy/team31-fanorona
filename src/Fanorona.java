@@ -1,9 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 
 public class Fanorona extends JFrame{
 	
+	public GamePanel board;
 	
 	
 	public Fanorona(){
@@ -11,16 +13,10 @@ public class Fanorona extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addMenuBar();
 		Container content = getContentPane();
-		content.setLayout(new GridLayout(2,2));
-		GamePanel board = new GamePanel();
-		InfoPanel i1= new InfoPanel();
-		Grid g1 = new Grid(i1);
-		content.add(board);
-		content.add(i1);
-		content.add(g1);
-		//content.add(g1,BorderLayout.SOUTH);
-		//content.add(board, BorderLayout.CENTER);
-		//content.add(i1, BorderLayout.EAST);
+		InfoPanel info = new InfoPanel();
+		board = new GamePanel(info);
+		content.add(board, BorderLayout.WEST);
+		content.add(info, BorderLayout.EAST);
 		pack();
 		setVisible(true);
 	}
@@ -29,6 +25,13 @@ public class Fanorona extends JFrame{
 		JMenuBar menuBar = 	new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem newGame = new JMenuItem("New Game");
+		newGame.addActionListener(new ActionListener() {
+			 
+            public void actionPerformed(ActionEvent e)
+            {
+                board.newGame();
+            }
+        });
 		fileMenu.add(newGame);
 		menuBar.add(fileMenu);
 		menuBar.add(Box.createHorizontalGlue());

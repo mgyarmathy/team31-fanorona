@@ -5,7 +5,7 @@ import java.awt.*;
 public class InfoPanel extends JPanel{
 	int i=0;
 	public InfoPanel(){
-		setPreferredSize(new Dimension(200, 300));
+		setPreferredSize(new Dimension(200, 0));
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
 		setVisible(true);
