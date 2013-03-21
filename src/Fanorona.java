@@ -86,7 +86,7 @@ public class Fanorona extends JFrame{
 		
 		JMenu pieceColors = new JMenu("Set Piece Colors");
 		ButtonGroup colorGroup = new ButtonGroup();
-		JRadioButtonMenuItem whiteBlack = new JRadioButtonMenuItem("white/black", true);
+		JRadioButtonMenuItem whiteBlack = new JRadioButtonMenuItem("Default", true);
 		whiteBlack.setActionCommand("whiteBlack");
 		whiteBlack.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -98,7 +98,7 @@ public class Fanorona extends JFrame{
 		});
 		colorGroup.add(whiteBlack);
 		pieceColors.add(whiteBlack);
-		JRadioButtonMenuItem blackWhite = new JRadioButtonMenuItem("black/white");
+		JRadioButtonMenuItem blackWhite = new JRadioButtonMenuItem("Black/White");
 		blackWhite.setActionCommand("blackWhite");
 		blackWhite.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -110,7 +110,7 @@ public class Fanorona extends JFrame{
 		});
 		colorGroup.add(blackWhite);
 		pieceColors.add(blackWhite);
-		JRadioButtonMenuItem blueRed = new JRadioButtonMenuItem("blue/red");
+		JRadioButtonMenuItem blueRed = new JRadioButtonMenuItem("Blue/Red");
 		blueRed.setActionCommand("blueRed");
 		blueRed.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -122,18 +122,26 @@ public class Fanorona extends JFrame{
 		});
 		colorGroup.add(blueRed);
 		pieceColors.add(blueRed);
-		JRadioButtonMenuItem redBlue = new JRadioButtonMenuItem("red/blue");
-		redBlue.setActionCommand("redBlue");
-		redBlue.addActionListener(new ActionListener(){
+		JRadioButtonMenuItem custom = new JRadioButtonMenuItem("Custom");
+		custom.setActionCommand("custom");
+		custom.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				if(e.getActionCommand().equals("redBlue")){
-					board.setPlayerColors(Color.RED, Color.BLUE);
+				if(e.getActionCommand().equals("custom")){
+					Color playerColor = JColorChooser.showDialog(
+		                     new JColorChooser(),
+		                     "Choose Player Color",
+		                     board.getPlayerColor());
+					Color opponentColor = JColorChooser.showDialog(
+		                     new JColorChooser(),
+		                     "Choose Opponent Color",
+		                     board.getOpponentColor());
+					board.setPlayerColors(playerColor, opponentColor);
 				}
 				
 			}
 		});
-		colorGroup.add(redBlue);
-		pieceColors.add(redBlue);
+		colorGroup.add(custom);
+		pieceColors.add(custom);
 		
 		JCheckBoxMenuItem mute = new JCheckBoxMenuItem("Mute Sound");
 		mute.addItemListener(new ItemListener(){

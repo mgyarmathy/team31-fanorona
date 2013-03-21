@@ -226,7 +226,6 @@ public class GamePanel extends JPanel{
 	
 
 	public void drawButtons(Graphics g){
-		//debug: add Graphics g and drawRect to find button positions
 		buttons = new Rectangle[ROWS][COLS];
 		int xwidth = getWidth();
 		int yheight= getHeight();
@@ -253,6 +252,14 @@ public class GamePanel extends JPanel{
 	public void setPlayerColors(Color player, Color opponent){
 		playerColor = player;
 		opponentColor = opponent;
+	}
+	
+	public Color getPlayerColor(){
+		return playerColor;
+	}
+	
+	public Color getOpponentColor(){
+		return opponentColor;
 	}
 	
 	public void countPieces(){
