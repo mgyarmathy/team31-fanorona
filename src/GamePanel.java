@@ -10,6 +10,9 @@ public class GamePanel extends JPanel{
 	static final int ROWS = 5;
 	static final int COLS = 9;
 	
+	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
+	int TurnCount=0;
+	
 	public enum Piece {PLAYER, OPPONENT, EMPTY};
 	private Color player_color = Color.WHITE;
 	private Color opponent_color = Color.BLACK;
@@ -19,6 +22,7 @@ public class GamePanel extends JPanel{
 	private Point selected_piece = null;
 	
 	public InfoPanel info;
+	
 
 	public GamePanel(InfoPanel i){
 		setPreferredSize(new Dimension(600,400));
@@ -105,7 +109,7 @@ public class GamePanel extends JPanel{
 			g.drawLine(x1, y1+1 , x2, y1+1);
 			g.drawLine(x1, y1+2 , x2, y1+2);
 			
-			g.drawString(letters[(int)(Math.ceil(i/2))],xwidth/20-5 , y1+5);
+			g.drawString(letters[(int)(Math.ceil(i/2))],xwidth/10/2-10 , y1+5);
 		}
 		
 		
@@ -225,5 +229,21 @@ public class GamePanel extends JPanel{
 			}
 		}
 	}
+	
+	public void countPieces(){
+		PlayerPieceCount = OppPieceCount = EmptyPieceCount = 0;
+		for(int row = 0; row<board.length; row++){
+			for(int col = 0; col<board[0].length; col++){
+				if(board[row][col]==Piece.OPPONENT) OppPieceCount++;
+				else if(board[row][col]==Piece.PLAYER) PlayerPieceCount++;
+				else EmptyPieceCount++;
+			}
+		}
+		
+		TurnCount++;
+		if(TurnCount == 50); // Draw
+		if(OppPieceCount == 0 || PlayerPieceCount == 0); //  Win/Lose
+	}
+	
 	
 }
