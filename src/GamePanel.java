@@ -10,6 +10,8 @@ public class GamePanel extends JPanel{
 	static final int ROWS = 5;
 	static final int COLS = 9;
 	
+	String[] letters;
+	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
 	int TurnCount=0;
 	
@@ -34,18 +36,27 @@ public class GamePanel extends JPanel{
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				String[] letters= new String[5];
+				letters[0]= "A";
+				letters[1]= "B";
+				letters[2]= "C";
+				letters[3]= "D";
+				letters[4]= "E";
+				
 				Point p = e.getPoint();
 				for(int row = 0; row < buttons.length; row++){
 					for(int col = 0; col < buttons[0].length; col++){
 						if(buttons[row][col].contains(p)){
 							if(selected_piece == null){ //no piece selected
 								selected_piece = new Point(col, row);
-								info.write("piece selected");
+								info.write(letters[row]+Integer.toString(col+1)+" selected");
 								break;
 							}
 							else{
 								Piece color = board[selected_piece.y][selected_piece.x];
+								info.write(letters[selected_piece.y]+Integer.toString(selected_piece.x+1)+" moved to "+letters[row]+Integer.toString(col+1));
 								board[row][col] = color;
+								board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
 								selected_piece = null;
 							}
 						}
