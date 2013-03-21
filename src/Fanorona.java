@@ -52,11 +52,25 @@ public class Fanorona extends JFrame{
             			"\n- The game ends when one player captures all stones of the opponent. " +
             			"\n- If neither player can achieve this within 50 turns, the game is a draw", 
             			"Team 31 - Fanarona",
-            			JOptionPane.PLAIN_MESSAGE);
+            			JOptionPane.QUESTION_MESSAGE);
+            }
+        });
+		JMenuItem about = new JMenuItem("About");
+		about.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+            	JOptionPane.showMessageDialog(null,
+            			"Fanarona" +
+            			"\nCreated By: David Harrison, Jeffrey Foss, and Michael Gyarmathy" +
+            			"\nCSCE 315 - Dr. John Keyser - Spring 2013" +
+            			"\nTexas A&M University", 
+            			"Team 31 - Fanarona",
+            			JOptionPane.INFORMATION_MESSAGE);
             }
         });
 		fileMenu.add(newGame);
 		fileMenu.add(help);
+		fileMenu.add(about);
 		menuBar.add(fileMenu);
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
