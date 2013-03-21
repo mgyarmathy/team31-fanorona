@@ -15,7 +15,7 @@ public class Fanorona extends JFrame{
 		Container content = getContentPane();
 		InfoPanel info = new InfoPanel();
 		board = new GamePanel(info);
-		content.add(board, BorderLayout.WEST);
+		content.add(board, BorderLayout.CENTER);
 		content.add(info, BorderLayout.EAST);
 		pack();
 		setVisible(true);

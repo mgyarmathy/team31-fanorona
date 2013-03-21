@@ -88,24 +88,24 @@ public class GamePanel extends JPanel{
 		letters[4]= "E";
 		
 		for(int i=1;i<10;i++){
-			x1= xstartp+ xwidth*i/9 -xoff; 
+			x1= xstartp+ xwidth*i/10;// -xoff; 
 			g.drawLine(x1, y1 , x1, y2);
 			g.drawLine(x1+1, y1 , x1+1, y2);
 			g.drawLine(x1+2, y1 , x1+2, y2);
 			
-			g.drawString(Integer.toString(i), x1, y1 - 15);
+			g.drawString(Integer.toString(i), x1, y1/2);
 		}
 		
 		// draw horizontal lines
-		x1= xstartp+ xwidth/9 -xoff; 
-		x2= xstartp+ xwidth -xoff;
+		x1= xstartp+ xwidth/10;// -xoff; 
+		x2= xstartp+ xwidth*9/10;// -xoff;
 		for(int i=1;i<10;i+=2){
 			y1= ystartp+ yheight*i/10 ;
 			g.drawLine(x1, y1 , x2, y1);
 			g.drawLine(x1, y1+1 , x2, y1+1);
 			g.drawLine(x1, y1+2 , x2, y1+2);
 			
-			g.drawString(letters[(int)(Math.ceil(i/2))], 10, y1+5);
+			g.drawString(letters[(int)(Math.ceil(i/2))],xwidth/20-5 , y1+5);
 		}
 		
 		
@@ -113,12 +113,12 @@ public class GamePanel extends JPanel{
 		y1= ystartp +yheight/10;
 		for(int i=0;i<6;i++){
 			if(i%2==0){
-				x1= xstartp+ (i+1)*xwidth/9 -xoff; 
-				x2= xstartp+ (i+5)*xwidth/9 -xoff;
+				x1= xstartp+ (i+1)*xwidth/10;// -xoff; 
+				x2= xstartp+ (i+5)*xwidth/10;// -xoff;
 			}
 			else{
-				x1= xstartp+ (i+4)*xwidth/9 -xoff; 
-				x2= xstartp+ (i)*xwidth/9 -xoff;
+				x1= xstartp+ (i+4)*xwidth/10;// -xoff; 
+				x2= xstartp+ (i)*xwidth/10;// -xoff;
 			}
 			
 			g.drawLine(x1, y1 , x2, y2);
@@ -126,8 +126,8 @@ public class GamePanel extends JPanel{
 			g.drawLine(x1+2, y1 , x2+2, y2);
 		}
 		
-		x1= xstartp+ xwidth*3/9 -xoff; 
-		x2= xstartp+ xwidth/9 -xoff;
+		x1= xstartp+ xwidth*3/10;// -xoff; 
+		x2= xstartp+ xwidth/10;// -xoff;
 		
 		g.drawLine(x1, y1 , x2, y1+ yheight*4/10);
 		g.drawLine(x1+1, y1 , x2+1, y1+ yheight*4/10);
@@ -137,8 +137,8 @@ public class GamePanel extends JPanel{
 		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
 		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
 		
-		x1= xstartp+ xwidth*7/9 -xoff; 
-		x2= xstartp+ xwidth -xoff;
+		x1= xstartp+ xwidth*7/10;// -xoff; 
+		x2= xstartp+ xwidth*9/10;// -xoff;
 		
 		g.drawLine(x1, y1 , x2, y1+ yheight*4/10);
 		g.drawLine(x1+1, y1 , x2+1, y1+ yheight*4/10);
@@ -157,22 +157,25 @@ public class GamePanel extends JPanel{
 		int xoff = getWidth()/29;
 		int yoff = getHeight()/15;
 		
+		int piecesize=getWidth()/24;
+		int hilightsize=getWidth()/19;
+		
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
 			//suspected line causing draw bug:
-			g.fillOval(selected_piece.x*(xwidth/COLS)+xoff-3, selected_piece.y*(yheight/ROWS)+yoff-3, 30, 30);
+			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-hilightsize/2, (2*(selected_piece.y+1)-1)*(yheight/(2*ROWS))-hilightsize/2, hilightsize, hilightsize);
 		}
 		
-		for(int row = 0; row<board.length; row++){
-			for(int col = 0; col<board[0].length; col++){
-				if(board[row][col] == Piece.EMPTY) continue;
-				if(board[row][col] == Piece.OPPONENT){
+		for(int row = 1; row<board.length+1; row++){
+			for(int col = 1; col<board[0].length+1; col++){
+				if(board[row-1][col-1] == Piece.EMPTY) continue;
+				if(board[row-1][col-1] == Piece.OPPONENT){
 					g.setColor(opponent_color);
-					g.fillOval(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
+					g.fillOval(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 				}
-				if(board[row][col] == Piece.PLAYER){
+				if(board[row-1][col-1] == Piece.PLAYER){
 					g.setColor(player_color);
-					g.fillOval(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
+					g.fillOval(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 				}
 			}
 		}
@@ -213,10 +216,12 @@ public class GamePanel extends JPanel{
 		int xoff = getWidth()/29;
 		int yoff = getHeight()/15;
 		
-		for(int row = 0; row < buttons.length; row++){
-			for(int col = 0; col < buttons[0].length; col++){
-				g.drawRect(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
-				buttons[row][col] = new Rectangle(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
+		int piecesize=getWidth()/24;
+		
+		for(int row = 1; row < buttons.length+1; row++){
+			for(int col = 1; col < buttons[0].length+1; col++){
+				g.drawRect(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2,piecesize, piecesize);
+				buttons[row-1][col-1] = new Rectangle(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 			}
 		}
 	}
