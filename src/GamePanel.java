@@ -10,7 +10,10 @@ public class GamePanel extends JPanel{
 	static final int ROWS = 5;
 	static final int COLS = 9;
 	
-	public enum Piece {WHITE, BLACK, EMPTY};
+	public enum Piece {PLAYER, OPPONENT, EMPTY};
+	private Color player_color = Color.WHITE;
+	private Color opponent_color = Color.BLACK;
+	
 	private Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
 	private Point selected_piece = null;
@@ -163,12 +166,12 @@ public class GamePanel extends JPanel{
 		for(int row = 0; row<board.length; row++){
 			for(int col = 0; col<board[0].length; col++){
 				if(board[row][col] == Piece.EMPTY) continue;
-				if(board[row][col] == Piece.BLACK){
-					g.setColor(Color.BLACK);
+				if(board[row][col] == Piece.OPPONENT){
+					g.setColor(opponent_color);
 					g.fillOval(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
 				}
-				if(board[row][col] == Piece.WHITE){
-					g.setColor(Color.WHITE);
+				if(board[row][col] == Piece.PLAYER){
+					g.setColor(player_color);
 					g.fillOval(col*(xwidth/COLS)+xoff, row*(yheight/ROWS)+yoff, 25, 25);
 				}
 			}
@@ -177,26 +180,26 @@ public class GamePanel extends JPanel{
 
 	public void newGame(){
 		board = new Piece[ROWS][COLS];
-		//fill top two rows with black pieces
+		//fill top two rows with OPPONENT pieces
 		for(int i = 0; i<2; i++){
 			for(int j = 0; j<9; j++){
-				board[i][j] = Piece.BLACK;
+				board[i][j] = Piece.OPPONENT;
 			}
 		}
 		//alternate colors in middle row, except middle space
-		board[2][0] = Piece.BLACK;
-		board[2][1] = Piece.WHITE;
-		board[2][2] = Piece.BLACK;
-		board[2][3] = Piece.WHITE;
+		board[2][0] = Piece.OPPONENT;
+		board[2][1] = Piece.PLAYER;
+		board[2][2] = Piece.OPPONENT;
+		board[2][3] = Piece.PLAYER;
 		board[2][4] = Piece.EMPTY;
-		board[2][5] = Piece.BLACK;
-		board[2][6] = Piece.WHITE;
-		board[2][7] = Piece.BLACK;
-		board[2][8] = Piece.WHITE;
-		//fill bottom two rows with white pieces
+		board[2][5] = Piece.OPPONENT;
+		board[2][6] = Piece.PLAYER;
+		board[2][7] = Piece.OPPONENT;
+		board[2][8] = Piece.PLAYER;
+		//fill bottom two rows with PLAYER pieces
 		for(int i = 3; i<5; i++){
 			for(int j = 0; j<9; j++){
-				board[i][j] = Piece.WHITE;
+				board[i][j] = Piece.PLAYER;
 			}
 		}
 	}
