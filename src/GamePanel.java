@@ -47,18 +47,20 @@ public class GamePanel extends JPanel{
 				for(int row = 0; row < buttons.length; row++){
 					for(int col = 0; col < buttons[0].length; col++){
 						if(buttons[row][col].contains(p)){
-							if(selected_piece == null){ //no piece selected
+							if(selected_piece == null && board[row][col]!=Piece.EMPTY){ //no piece selected
 								selected_piece = new Point(col, row);
 								info.write(letters[row]+Integer.toString(col+1)+" selected");
 								break;
 							}
-							else{
+							else if(selected_piece != null && board[row][col]==Piece.EMPTY){
 								Piece color = board[selected_piece.y][selected_piece.x];
 								info.write(letters[selected_piece.y]+Integer.toString(selected_piece.x+1)+" moved to "+letters[row]+Integer.toString(col+1));
 								board[row][col] = color;
 								board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
 								selected_piece = null;
 							}
+							else if(board[row][col]!=Piece.EMPTY) info.write("There is a piece There!");
+							else info.write("This spot is empty!");
 						}
 					}
 				}
@@ -235,6 +237,7 @@ public class GamePanel extends JPanel{
 		
 		for(int row = 1; row < buttons.length+1; row++){
 			for(int col = 1; col < buttons[0].length+1; col++){
+				g.setColor(new Color(0,0,0,0));
 				g.drawRect(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2,piecesize, piecesize);
 				buttons[row-1][col-1] = new Rectangle(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 			}
