@@ -16,8 +16,9 @@ public class GamePanel extends JPanel{
 	int TurnCount=0;
 	
 	public enum Piece {PLAYER, OPPONENT, EMPTY};
-	private Color player_color = Color.WHITE;
-	private Color opponent_color = Color.BLACK;
+	private Color playerColor = Color.WHITE;
+	private Color opponentColor = Color.BLACK;
+	private String playerName = "Player 1";
 	
 	private Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
@@ -179,7 +180,6 @@ public class GamePanel extends JPanel{
 		
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
-			//suspected line causing draw bug:
 			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-hilightsize/2, (2*(selected_piece.y+1)-1)*(yheight/(2*ROWS))-hilightsize/2, hilightsize, hilightsize);
 		}
 		
@@ -187,11 +187,11 @@ public class GamePanel extends JPanel{
 			for(int col = 1; col<board[0].length+1; col++){
 				if(board[row-1][col-1] == Piece.EMPTY) continue;
 				if(board[row-1][col-1] == Piece.OPPONENT){
-					g.setColor(opponent_color);
+					g.setColor(opponentColor);
 					g.fillOval(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 				}
 				if(board[row-1][col-1] == Piece.PLAYER){
-					g.setColor(player_color);
+					g.setColor(playerColor);
 					g.fillOval(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 				}
 			}
@@ -224,6 +224,7 @@ public class GamePanel extends JPanel{
 		}
 	}
 	
+
 	public void drawButtons(Graphics g){
 		//debug: add Graphics g and drawRect to find button positions
 		buttons = new Rectangle[ROWS][COLS];
@@ -242,6 +243,16 @@ public class GamePanel extends JPanel{
 				buttons[row-1][col-1] = new Rectangle(col*(xwidth/(COLS+1))-piecesize/2, (2*row-1)*(yheight/(2*ROWS))-piecesize/2, piecesize, piecesize);
 			}
 		}
+	}
+
+	public void setPlayerName(String s){
+		playerName = s;
+		info.write("Name changed to: "+ s);
+	}
+	
+	public void setPlayerColors(Color player, Color opponent){
+		playerColor = player;
+		opponentColor = opponent;
 	}
 	
 	public void countPieces(){

@@ -71,7 +71,84 @@ public class Fanorona extends JFrame{
 		fileMenu.add(newGame);
 		fileMenu.add(help);
 		fileMenu.add(about);
+		JMenu options = new JMenu("Options");
+		JMenuItem playerName = new JMenuItem("Set Player Name");
+		playerName.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+            	String playername = JOptionPane.showInputDialog(null,
+            						"Input Player Name: ", 
+            						"Team 31 - Fanarona",
+            						JOptionPane.INFORMATION_MESSAGE);
+            	board.setPlayerName(playername);
+            }
+        });
+		
+		JMenu pieceColors = new JMenu("Set Piece Colors");
+		ButtonGroup colorGroup = new ButtonGroup();
+		JRadioButtonMenuItem whiteBlack = new JRadioButtonMenuItem("white/black", true);
+		whiteBlack.setActionCommand("whiteBlack");
+		whiteBlack.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("whiteBlack")){
+					board.setPlayerColors(Color.WHITE, Color.BLACK);
+				}
+				
+			}
+		});
+		colorGroup.add(whiteBlack);
+		pieceColors.add(whiteBlack);
+		JRadioButtonMenuItem blackWhite = new JRadioButtonMenuItem("black/white");
+		blackWhite.setActionCommand("blackWhite");
+		blackWhite.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("blackWhite")){
+					board.setPlayerColors(Color.BLACK, Color.WHITE);
+				}
+				
+			}
+		});
+		colorGroup.add(blackWhite);
+		pieceColors.add(blackWhite);
+		JRadioButtonMenuItem blueRed = new JRadioButtonMenuItem("blue/red");
+		blueRed.setActionCommand("blueRed");
+		blueRed.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("blueRed")){
+					board.setPlayerColors(Color.BLUE, Color.RED);
+				}
+				
+			}
+		});
+		colorGroup.add(blueRed);
+		pieceColors.add(blueRed);
+		JRadioButtonMenuItem redBlue = new JRadioButtonMenuItem("red/blue");
+		redBlue.setActionCommand("redBlue");
+		redBlue.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("redBlue")){
+					board.setPlayerColors(Color.RED, Color.BLUE);
+				}
+				
+			}
+		});
+		colorGroup.add(redBlue);
+		pieceColors.add(redBlue);
+		
+		JCheckBoxMenuItem mute = new JCheckBoxMenuItem("Mute Sound");
+		mute.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					board.setPlayerName("mute");
+				}
+			}
+		});
+		
+		options.add(playerName);
+		options.add(pieceColors);
+		options.add(mute);
 		menuBar.add(fileMenu);
+		menuBar.add(options);
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
