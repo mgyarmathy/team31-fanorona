@@ -115,7 +115,6 @@ public class GamePanel extends JPanel{
 		int y1= ystartp+ yheight/10, y2= ystartp+ yheight*9/10;
 		int x1,x2;
 		
-		int xoff = 35;
 		
 		String[] letters= new String[5];
 		letters[0]= "A";
@@ -124,25 +123,27 @@ public class GamePanel extends JPanel{
 		letters[3]= "D";
 		letters[4]= "E";
 		
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (getHeight()+getWidth())/50));
+		
 		for(int i=1;i<10;i++){
-			x1= xstartp+ xwidth*i/10;// -xoff; 
+			x1= xstartp+ xwidth*i/10; 
 			g.drawLine(x1, y1 , x1, y2);
 			g.drawLine(x1+1, y1 , x1+1, y2);
 			g.drawLine(x1+2, y1 , x1+2, y2);
 			
-			g.drawString(Integer.toString(i), x1, y1/2);
+			g.drawString(Integer.toString(i), x1-getWidth()/70, y1/2);
 		}
 		
 		// draw horizontal lines
-		x1= xstartp+ xwidth/10;// -xoff; 
-		x2= xstartp+ xwidth*9/10;// -xoff;
+		x1= xstartp+ xwidth/10; 
+		x2= xstartp+ xwidth*9/10;
 		for(int i=1;i<10;i+=2){
 			y1= ystartp+ yheight*i/10 ;
 			g.drawLine(x1, y1 , x2, y1);
 			g.drawLine(x1, y1+1 , x2, y1+1);
 			g.drawLine(x1, y1+2 , x2, y1+2);
 			
-			g.drawString(letters[(int)(Math.ceil(i/2))],xwidth/10/2-10 , y1+5);
+			g.drawString(letters[(int)(Math.ceil(i/2))],xwidth/10/2-getWidth()/40 , y1+getHeight()/50);
 		}
 		
 		
@@ -151,12 +152,12 @@ public class GamePanel extends JPanel{
 		y1= ystartp +yheight/10;
 		for(int i=0;i<6;i++){
 			if(i%2==0){
-				x1= xstartp+ (i+1)*xwidth/10;// -xoff; 
-				x2= xstartp+ (i+5)*xwidth/10;// -xoff;
+				x1= xstartp+ (i+1)*xwidth/10;
+				x2= xstartp+ (i+5)*xwidth/10;
 			}
 			else{
-				x1= xstartp+ (i+4)*xwidth/10;// -xoff; 
-				x2= xstartp+ (i)*xwidth/10;// -xoff;
+				x1= xstartp+ (i+4)*xwidth/10;
+				x2= xstartp+ (i)*xwidth/10;
 			}
 			
 			g.drawLine(x1, y1 , x2, y2);
@@ -164,8 +165,8 @@ public class GamePanel extends JPanel{
 			g.drawLine(x1+2, y1 , x2+2, y2);
 		}
 		
-		x1= xstartp+ xwidth*3/10;// -xoff; 
-		x2= xstartp+ xwidth/10;// -xoff;
+		x1= xstartp+ xwidth*3/10;
+		x2= xstartp+ xwidth/10;
 		
 		g.drawLine(x1, y1 , x2, y1+ yheight*4/10);
 		g.drawLine(x1+1, y1 , x2+1, y1+ yheight*4/10);
@@ -175,8 +176,8 @@ public class GamePanel extends JPanel{
 		g.drawLine(x2+1, y1+ yheight*4/10 , x1+1, y2);
 		g.drawLine(x2+2, y1+ yheight*4/10 , x1+2, y2);
 		
-		x1= xstartp+ xwidth*7/10;// -xoff; 
-		x2= xstartp+ xwidth*9/10;// -xoff;
+		x1= xstartp+ xwidth*7/10; 
+		x2= xstartp+ xwidth*9/10;
 		
 		g.drawLine(x1, y1 , x2, y1+ yheight*4/10);
 		g.drawLine(x1+1, y1 , x2+1, y1+ yheight*4/10);

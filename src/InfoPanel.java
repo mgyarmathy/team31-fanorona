@@ -23,6 +23,7 @@ public class InfoPanel extends JPanel{
 		i=0;
 		super.paintComponent(g);
 		g.drawString(s,20,20 + i);
+		i+=20;
 	}
 	
 	@Override
