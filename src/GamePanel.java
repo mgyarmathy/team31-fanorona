@@ -29,7 +29,7 @@ public class GamePanel extends JPanel{
 	
 
 	public GamePanel(InfoPanel i){
-		setPreferredSize(new Dimension(600,400));
+		setPreferredSize(new Dimension(800,500));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
 		info = i;
@@ -55,6 +55,7 @@ public class GamePanel extends JPanel{
 					for(int col = 0; col < buttons[0].length; col++){
 						if(buttons[row][col].contains(p)){
 							emptyClick=false;
+							//select piece
 							if(selected_piece == null && board[row][col]!=Piece.EMPTY){ //no piece selected
 								selected_piece = new Point(col, row);
 								Piece color = board[selected_piece.y][selected_piece.x];
@@ -63,7 +64,8 @@ public class GamePanel extends JPanel{
 								//info.write(letters[row]+Integer.toString(col+1)+" selected");
 								break;
 							}
-							else if(selected_piece != null && board[row][col]==Piece.EMPTY){
+							//move selected piece
+							else if(selected_piece != null && board[row][col]==Piece.EMPTY){ 
 								Piece color = board[selected_piece.y][selected_piece.x];
 								info.write(letters[selected_piece.y]+Integer.toString(selected_piece.x+1)+" moved to "+letters[row]+Integer.toString(col+1));
 								board[row][col] = color;
@@ -77,12 +79,12 @@ public class GamePanel extends JPanel{
 								selected_piece = null;
 								break;
 							}
-							else if(board[row][col]!=Piece.EMPTY) { info.write("There is a piece There!"); break;}
-							else { info.write("This spot is empty!");  break; }
+							else if(board[row][col]!=Piece.EMPTY) { info.write("There is a piece There!"); break;} //Spot taken
+							else { info.write("This spot is empty!");  break; } //Spot empty
 						}
 					}
 				}
-				if(emptyClick) { selected_piece = null; }
+				if(emptyClick) { selected_piece = null; } // deselect piece
 				TurnPrior = TurnCount;
 			}
 		});
