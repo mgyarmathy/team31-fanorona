@@ -6,6 +6,7 @@ import java.awt.event.*;
 public class Fanorona extends JFrame{
 	
 	GamePanel board;
+	InfoPanel info;
 	
 	
 	public Fanorona(){
@@ -13,7 +14,7 @@ public class Fanorona extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addMenuBar();
 		Container content = getContentPane();
-		InfoPanel info = new InfoPanel();
+		info = new InfoPanel();
 		board = new GamePanel(info);
 		content.add(board, BorderLayout.CENTER);
 		content.add(info, BorderLayout.EAST);
@@ -29,6 +30,7 @@ public class Fanorona extends JFrame{
             public void actionPerformed(ActionEvent e)
             {
                 board.newGame();
+                info.clear(board.printTurn());
             }
         });
 		

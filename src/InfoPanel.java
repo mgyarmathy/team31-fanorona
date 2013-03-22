@@ -18,6 +18,13 @@ public class InfoPanel extends JPanel{
 		i += 20;
 	}
 	
+	public void clear(String s){
+		Graphics g = this.getGraphics();
+		i=0;
+		super.paintComponent(g);
+		g.drawString(s,20,20 + i);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw the information here
