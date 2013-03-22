@@ -23,7 +23,7 @@ public class InfoPanel extends JPanel{
 		//draw the information here
 		i=0;
 		super.paintComponent(g);
-		g.drawString("This is the info panel", 20, 20);
+		g.drawString("Player 1's turn", 20, 20);
 		i+=20;
 	 }
 }

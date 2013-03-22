@@ -13,7 +13,8 @@ public class GamePanel extends JPanel{
 	String[] letters;
 	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
-	int TurnCount=0;
+	int TurnCount;
+	int TurnPrior;
 	
 	public enum Piece {PLAYER, OPPONENT, EMPTY};
 	private Color playerColor = Color.WHITE;
@@ -34,6 +35,8 @@ public class GamePanel extends JPanel{
 		info = i;
 		newGame();
 		
+		TurnCount = TurnPrior = 0;
+		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -44,13 +47,23 @@ public class GamePanel extends JPanel{
 				letters[3]= "D";
 				letters[4]= "E";
 				
+				if(TurnPrior!=TurnCount) printTurn();
+				
+				
+				
+				boolean emptyClick=true;
+				
 				Point p = e.getPoint();
 				for(int row = 0; row < buttons.length; row++){
 					for(int col = 0; col < buttons[0].length; col++){
 						if(buttons[row][col].contains(p)){
+							emptyClick=false;
 							if(selected_piece == null && board[row][col]!=Piece.EMPTY){ //no piece selected
 								selected_piece = new Point(col, row);
-								info.write(letters[row]+Integer.toString(col+1)+" selected");
+								Piece color = board[selected_piece.y][selected_piece.x];
+								if(TurnCount%2==0 && color != Piece.PLAYER) {info.write("It's Player 1's Turn"); selected_piece =null; }
+								if(TurnCount%2==1 && color != Piece.OPPONENT) {info.write("It's Player 2's Turn"); selected_piece =null; }
+								//info.write(letters[row]+Integer.toString(col+1)+" selected");
 								break;
 							}
 							else if(selected_piece != null && board[row][col]==Piece.EMPTY){
@@ -58,13 +71,23 @@ public class GamePanel extends JPanel{
 								info.write(letters[selected_piece.y]+Integer.toString(selected_piece.x+1)+" moved to "+letters[row]+Integer.toString(col+1));
 								board[row][col] = color;
 								board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
+								
+								//Move detection goes here
+								// if move is valid and no more moves to make TurnCount++
+								
+								TurnCount++;
+								countPieces();
+								
 								selected_piece = null;
+								break;
 							}
-							else if(board[row][col]!=Piece.EMPTY) info.write("There is a piece There!");
-							else info.write("This spot is empty!");
+							else if(board[row][col]!=Piece.EMPTY) { info.write("There is a piece There!"); break;}
+							else { info.write("This spot is empty!");  break; }
 						}
 					}
 				}
+				if(emptyClick) { selected_piece = null; }
+				TurnPrior= TurnCount;
 			}
 		});
 	}
@@ -72,7 +95,7 @@ public class GamePanel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw ze game here
-		super.paintComponent(g);
+		//super.paintComponent(g);
 		drawBoard(g);
 		drawPieces(g);
 		drawButtons(g);
@@ -128,6 +151,7 @@ public class GamePanel extends JPanel{
 		
 		
 		// draw diagonal lines
+		g.setColor(Color.GRAY);
 		y1= ystartp +yheight/10;
 		for(int i=0;i<6;i++){
 			if(i%2==0){
@@ -222,6 +246,8 @@ public class GamePanel extends JPanel{
 				board[i][j] = Piece.PLAYER;
 			}
 		}
+		
+		TurnCount = TurnPrior = 0;
 	}
 	
 
@@ -262,6 +288,14 @@ public class GamePanel extends JPanel{
 		return opponentColor;
 	}
 	
+	public void printTurn(){
+		if(TurnCount%2==0) {
+			if(playerName!=null) {info.write(playerName+"'s Turn");}
+			else info.write("Player 1's Turn");
+		}
+		else info.write("Player 2's Turn");
+	}
+	
 	public void countPieces(){
 		PlayerPieceCount = OppPieceCount = EmptyPieceCount = 0;
 		for(int row = 0; row<board.length; row++){
@@ -271,10 +305,9 @@ public class GamePanel extends JPanel{
 				else EmptyPieceCount++;
 			}
 		}
-		
-		TurnCount++;
 		if(TurnCount == 50); // Draw
 		if(OppPieceCount == 0 || PlayerPieceCount == 0); //  Win/Lose
+		printTurn();
 	}
 	
 	
