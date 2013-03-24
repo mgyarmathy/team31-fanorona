@@ -1323,6 +1323,7 @@ public class GamePanel extends JPanel{
 		}
 		
 		TurnCount = TurnPrior = 0;
+		selected_piece = null;
 	}
 	
 
