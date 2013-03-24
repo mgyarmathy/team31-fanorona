@@ -107,11 +107,10 @@ public class GamePanel extends JPanel{
 								boolean repeat = false;
 								if(chain_piece == true){
 									for (int k = 0; k < chained_spots.size(); k++){
-										if(chained_spots.get(k) != null){
+											info.write(letters[chained_spots.get(k).y]+Integer.toString(chained_spots.get(k).x+1));
 											if(chained_spots.get(k).y == row && chained_spots.get(k).x == col){
 												repeat = true;
 												break;
-											}
 										}
 									}
 								}
@@ -405,7 +404,7 @@ public class GamePanel extends JPanel{
 									info.write(letters[selected_piece.y]+Integer.toString(selected_piece.x+1)+" moved to "+letters[row]+Integer.toString(col+1));
 									board[row][col] = color;
 									board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
-									chained_spots.add(new Point(selected_piece.y, selected_piece.x));
+									chained_spots.add(new Point(selected_piece.x, selected_piece.y));
 							//WHY DOES THIS NOT WORK?
 									//info.write(letters[chained_spots[marker].y]+Integer.toString(chained_spots[marker].x+1));
 									//remove pieces in line
