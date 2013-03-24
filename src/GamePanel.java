@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -29,7 +30,7 @@ public class GamePanel extends JPanel{
 	private Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
 	private Point selected_piece = null;
-	private Point[] chained_spots = new Point[10];
+	private ArrayList<Point> chained_spots = new ArrayList<Point>();
 	private boolean chain_piece = false;
 	private Direction previous_direction = Direction.DUMMY;
 	
@@ -105,9 +106,9 @@ public class GamePanel extends JPanel{
 								
 								boolean repeat = false;
 								if(chain_piece == true){
-									for (int k = 0; k < chained_spots.length; k++){
-										if(chained_spots[k] != null){
-											if(chained_spots[k].y == row && chained_spots[k].x == col){
+									for (int k = 0; k < chained_spots.size(); k++){
+										if(chained_spots.get(k) != null){
+											if(chained_spots.get(k).y == row && chained_spots.get(k).x == col){
 												repeat = true;
 												break;
 											}
@@ -181,9 +182,7 @@ public class GamePanel extends JPanel{
 													info.write("Chain ended.");
 													countPieces();
 													chain_piece = false;
-													for(int i = 0; i < chained_spots.length; i++){
-														chained_spots[i] = null;
-													}
+													chained_spots.clear();
 												}
 												break;
 								case UPLEFT: 	if(selected_piece.y > 1 && selected_piece.x > 1){
@@ -406,14 +405,7 @@ public class GamePanel extends JPanel{
 									info.write(letters[selected_piece.y]+Integer.toString(selected_piece.x+1)+" moved to "+letters[row]+Integer.toString(col+1));
 									board[row][col] = color;
 									board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
-									int marker = 0;
-									for (int i = 0; i < chained_spots.length; i++){
-										if (chained_spots[i] == null){
-											marker = i;
-											break;
-										}
-									}
-									chained_spots[marker] = new Point(selected_piece.y, selected_piece.x);
+									chained_spots.add(new Point(selected_piece.y, selected_piece.x));
 							//WHY DOES THIS NOT WORK?
 									//info.write(letters[chained_spots[marker].y]+Integer.toString(chained_spots[marker].x+1));
 									//remove pieces in line
@@ -438,9 +430,7 @@ public class GamePanel extends JPanel{
 										previous_direction = dir;
 									} else {
 										chain_piece = false;
-										for (int i = 0; i < chained_spots.length; i++){
-											chained_spots[i] = null;
-										}
+										chained_spots.clear();
 										previous_direction = Direction.DUMMY;
 									}
 								}
@@ -1145,9 +1135,9 @@ public class GamePanel extends JPanel{
 			if (points[i] != null){
 				boolean newspot = true;
 				//check if the spot has been used during a chain move.
-				for(int j = 0; j < chained_spots.length; j++){
-					if(chained_spots[j] != null){
-						if(chained_spots[j].y == points[i].y && chained_spots[j].x == points[i].x){
+				for(int j = 0; j < chained_spots.size(); j++){
+					if(chained_spots.get(j) != null){
+						if(chained_spots.get(j).y == points[i].y && chained_spots.get(j).x == points[i].x){
 							newspot = false;
 						}
 					}
