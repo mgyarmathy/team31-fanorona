@@ -3,8 +3,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//TODO: fix bug with selecting pieces
-//TODO: prevent moving to same spot (bug with chained_spots)
 //TODO: correct movement checking at columns 1 and COLS-2
 //TODO: Figure out how to select between pieces to eliminate
 //TODO: Allow for moving to spaces without eliminating pieces
@@ -107,7 +105,6 @@ public class GamePanel extends JPanel{
 								boolean repeat = false;
 								if(chain_piece == true){
 									for (int k = 0; k < chained_spots.size(); k++){
-											info.write(letters[chained_spots.get(k).y]+Integer.toString(chained_spots.get(k).x+1));
 											if(chained_spots.get(k).y == row && chained_spots.get(k).x == col){
 												repeat = true;
 												break;
@@ -405,9 +402,7 @@ public class GamePanel extends JPanel{
 									board[row][col] = color;
 									board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
 									chained_spots.add(new Point(selected_piece.x, selected_piece.y));
-							//WHY DOES THIS NOT WORK?
-									//info.write(letters[chained_spots[marker].y]+Integer.toString(chained_spots[marker].x+1));
-									//remove pieces in line
+
 									while(cur_x < COLS && cur_x > -1 && cur_y < ROWS && cur_y > -1){
 										if(board[cur_y][cur_x] != opposite){
 											break;
@@ -421,9 +416,7 @@ public class GamePanel extends JPanel{
 									
 									//CHECK FOR OTHER MOVES
 									boolean next_move = false;
-									Point[] checkParams = new Point[24];
-									checkParams = makeMoveArray(col, row, checkParams, dir);
-									next_move = checkFor(opposite, checkParams);
+									next_move = detectMove(selected_piece, dir, opposite);
 									if(next_move){
 										chain_piece = true;
 										previous_direction = dir;
@@ -454,715 +447,330 @@ public class GamePanel extends JPanel{
 		});
 	}
 	
-	public Point[] makeMoveArray(int col, int row, Point[] checkParams, Direction dir){
-		if (col == 0){
-			if (row == 0){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[3] = new Point(col,row+1);
-					checkParams[4] = new Point(col,row+2);
-					checkParams[5] = null;
-				}
-				//downright
-				//(row+col)%2 == 0 checks if the sum of the x and y position is even.
-				//Only pieces with an even sum can move diagonally
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					checkParams[6] = new Point(col+1,row+1);
-					checkParams[7] = new Point(col+2,row+2);
-					checkParams[8] = null;
-				}
-			} else if (row == ROWS-1){
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-2);
-					checkParams[2] = null;
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					checkParams[3] = new Point(col+1,row-1);
-					checkParams[4] = new Point(col+2,row-2);
-					checkParams[5] = null;
-				}
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[6] = new Point(col+1,row);
-					checkParams[7] = new Point(col+2,row);
-					checkParams[8] = null;
-				}
-			} else  if (row == 1){
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-1); //dummy value
-					checkParams[2] = new Point(col,row+1);
-				}
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[6] = new Point(col+1,row);
-					checkParams[7] = new Point(col+2,row);
-					checkParams[8] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[9] = new Point(col,row+1);
-					checkParams[10] = new Point(col,row+2);
-					checkParams[11] = new Point(col,row-1);
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col+1,row+1);
-					checkParams[13] = new Point(col+2,row+2);
-					checkParams[14] = null;
-				}
-			} else if (row == ROWS - 2){
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-2);
-					checkParams[2] = new Point(col,row+1);
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					checkParams[3] = new Point(col+1,row-1);
-					checkParams[4] = new Point(col+2,row-2);
-					checkParams[5] = null;
-				}
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[6] = new Point(col+1,row);
-					checkParams[7] = new Point(col+2,row);
-					checkParams[8] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[9] = new Point(col,row+1);
-					checkParams[10] = new Point(col,row+1); //dummy value
-					checkParams[11] = new Point(col,row-1);
-				}
-			} else {
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-2);
-					checkParams[2] = new Point(col,row+1);
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					checkParams[3] = new Point(col+1,row-1);
-					checkParams[4] = new Point(col+2,row-2);
-					checkParams[5] = null;
-				}
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[6] = new Point(col+1,row);
-					checkParams[7] = new Point(col+2,row);
-					checkParams[8] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[9] = new Point(col,row+1);
-					checkParams[10] = new Point(col,row+2);
-					checkParams[11] = new Point(col,row-1);
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col+1,row+1);
-					checkParams[13] = new Point(col+2,row+2);
-					checkParams[14] = null;
-				}
-			}
-		} else if (col == COLS-1){
-			if (row == 0){
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[0] = new Point(col-1,row);
-					checkParams[1] = new Point(col-2,row);
-					checkParams[2] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[3] = new Point(col,row+1);
-					checkParams[4] = new Point(col,row+2);
-					checkParams[5] = null;
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					checkParams[6] = new Point(col-1,row+1);
-					checkParams[7] = new Point(col-2,row+2);
-					checkParams[8] = null;
-				}
-			} else if (row == ROWS-1){
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-2);
-					checkParams[2] = null;
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					checkParams[3] = new Point(col-1,row-1);
-					checkParams[4] = new Point(col-2,row-2);
-					checkParams[5] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[6] = new Point(col-1,row);
-					checkParams[7] = new Point(col-2,row);
-					checkParams[8] = null;
-				}
-			} else  if (row == 1){
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-1); //dummy value
-					checkParams[2] = new Point(col,row+1);
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[6] = new Point(col-1,row);
-					checkParams[7] = new Point(col-2,row);
-					checkParams[8] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[9] = new Point(col,row+1);
-					checkParams[10] = new Point(col,row+2);
-					checkParams[11] = new Point(col,row-1);
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col-1,row+1);
-					checkParams[13] = new Point(col-2,row+2);
-					checkParams[14] = null;
-				}
-			} else if (row == ROWS - 2){
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-2);
-					checkParams[2] = new Point(col,row+1);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					checkParams[3] = new Point(col-1,row-1);
-					checkParams[4] = new Point(col-2,row-2);
-					checkParams[5] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[6] = new Point(col-1,row);
-					checkParams[7] = new Point(col-2,row);
-					checkParams[8] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[9] = new Point(col,row+1);
-					checkParams[10] = new Point(col,row+1); //dummy value
-					checkParams[11] = new Point(col,row-1);
-				}
-			} else {
-				//up
-				if(dir != Direction.UP){
-					checkParams[0] = new Point(col,row-1);
-					checkParams[1] = new Point(col,row-2);
-					checkParams[2] = new Point(col,row+1);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					checkParams[3] = new Point(col-1,row-1);
-					checkParams[4] = new Point(col-2,row-2);
-					checkParams[5] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[6] = new Point(col-1,row);
-					checkParams[7] = new Point(col-2,row);
-					checkParams[8] = null;
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[9] = new Point(col,row+1);
-					checkParams[10] = new Point(col,row+2);
-					checkParams[11] = new Point(col,row-1);
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col-1,row+1);
-					checkParams[13] = new Point(col-2,row+2);
-					checkParams[14] = null;
-				}
-			}
-		} else if (col == 1){
-			if (row == 0){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = new Point(col-1,row);
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[3] = new Point(col,row+1);
-					checkParams[4] = new Point(col,row+2);
-					checkParams[5] = null;
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					checkParams[6] = new Point(col+1,row+1);
-					checkParams[7] = new Point(col+2,row+2);
-					checkParams[8] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-1,row); //dummy value
-					checkParams[11] = new Point(col+1,row);
-				}
-			} else if (row == ROWS-1){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = new Point(col-1,row);
-				}
-				//up
-				if(dir != Direction.UP){
-					checkParams[3] = new Point(col,row-1);
-					checkParams[4] = new Point(col,row-2);
-					checkParams[5] = null;
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					checkParams[6] = new Point(col+1,row-1);
-					checkParams[7] = new Point(col+2,row-2);
-					checkParams[8] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-1,row); //dummy value
-					checkParams[11] = new Point(col+1,row);
-				}
-			} else {
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = new Point(col-1,row);
-				}
-				//up
-				if(dir != Direction.UP){
-					if(row > 1){
-						checkParams[3] = new Point(col,row-1);
-						checkParams[4] = new Point(col,row-2);
-						checkParams[5] = new Point(col,row+1);
-					} else {
-						checkParams[3] = new Point(col,row-1);
-						checkParams[4] = new Point(col,row-1); //dummy value, should pass through safely
-						checkParams[5] = new Point(col,row+1);
-					}
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					if(row > 1){
-						checkParams[6] = new Point(col+1,row-1);
-						checkParams[7] = new Point(col+2,row-2);
-						checkParams[8] = new Point(col-1,row+1);
-					} else {
-						checkParams[6] = new Point(col+1,row-1);
-						checkParams[7] = new Point(col+1,row-1); //dummy value
-						checkParams[8] = new Point(col-1,row+1);
-					}
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-1,row); //dummy value
-					checkParams[11] = new Point(col+1,row);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					if(row > 1){
-						checkParams[12] = new Point(col-1,row-1);
-						checkParams[13] = new Point(col-1,row-1); //dummy value
-						checkParams[14] = new Point(col+1,row+1);
-					} else {
-						checkParams[12] = new Point(col-1,row-1);
-						checkParams[13] = new Point(col-1,row-1); //dummy value
-						checkParams[14] = new Point(col+1,row+1);
-					}
-				}
-				//down
-				if(dir != Direction.DOWN){
-					if(row < ROWS - 2){
-						checkParams[15] = new Point(col,row+1);
-						checkParams[16] = new Point(col,row+2);
-						checkParams[17] = new Point(col,row-1);
-					} else {
-						checkParams[15] = new Point(col,row+1);
-						checkParams[16] = new Point(col,row+1); //dummy value
-						checkParams[17] = new Point(col,row-1);
-					}
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					if(row < ROWS - 2){
-						checkParams[18] = new Point(col+1,row+1);
-						checkParams[19] = new Point(col+2,row+2);
-						checkParams[20] = new Point(col-1,row-1);
-					} else {
-						checkParams[18] = new Point(col+1,row+1);
-						checkParams[19] = new Point(col+1,row+1); //dummy value
-						checkParams[20] = new Point(col-1,row-1);
-					}
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					if (row < ROWS - 2){
-						checkParams[21] = new Point(col-1,row+1);
-						checkParams[22] = new Point(col-1,row+1); //dummy value
-						checkParams[23] = new Point(col+1,row-1);
-					} else {
-						checkParams[21] = new Point(col-1,row+1);
-						checkParams[22] = new Point(col-1,row+1); //dummy value
-						checkParams[23] = new Point(col+1,row-1);
-					}
-				}
-			}
-		} else  if (col == COLS - 2){
-			if (row == 0){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+1,row); //dummy value
-					checkParams[2] = new Point(col-1,row);
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[3] = new Point(col,row+1);
-					checkParams[4] = new Point(col,row+2);
-					checkParams[5] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-2,row);
-					checkParams[11] = new Point(col+1,row);
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col-1,row+1);
-					checkParams[13] = new Point(col-2,row+2);
-					checkParams[14] = null;
-				}
-			} else if (row == ROWS-1){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+1,row); //dummy value
-					checkParams[2] = new Point(col-1,row);
-				}
-				//up
-				if(dir != Direction.UP){
-					checkParams[3] = new Point(col,row-1);
-					checkParams[4] = new Point(col,row-2);
-					checkParams[5] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-2,row);
-					checkParams[11] = new Point(col+1,row);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col-1,row-1);
-					checkParams[13] = new Point(col-2,row-2);
-					checkParams[14] = null;
-				}
-			} else {
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+1,row); //dummy value
-					checkParams[2] = new Point(col-1,row);
-				}
-				//up
-				if(dir != Direction.UP){
-					if(row > 1){
-						checkParams[3] = new Point(col,row-1);
-						checkParams[4] = new Point(col,row-2);
-						checkParams[5] = new Point(col,row+1);
-					} else {
-						checkParams[3] = new Point(col,row-1);
-						checkParams[4] = new Point(col,row-1); //dummy value, should pass through safely
-						checkParams[5] = new Point(col,row+1);
-					}
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					if(row > 1){
-						checkParams[6] = new Point(col+1,row-1);
-						checkParams[7] = new Point(col+1,row-1); //dummy value
-						checkParams[8] = new Point(col-1,row+1);
-					} else {
-						checkParams[6] = new Point(col+1,row-1);
-						checkParams[7] = new Point(col+1,row-1); //dummy value
-						checkParams[8] = new Point(col-1,row+1);
-					}
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-2,row);
-					checkParams[11] = new Point(col+1,row);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					if(row > 1){
-						checkParams[12] = new Point(col-1,row-1);
-						checkParams[13] = new Point(col-2,row-2);
-						checkParams[14] = new Point(col+1,row+1);
-					} else {
-						checkParams[12] = new Point(col-1,row-1);
-						checkParams[13] = new Point(col-1,row-1); //dummy value
-						checkParams[14] = new Point(col+1,row+1);
-					}
-				}
-				//down
-				if(dir != Direction.DOWN){
-					if(row < ROWS - 2){
-						checkParams[15] = new Point(col,row+1);
-						checkParams[16] = new Point(col,row+2);
-						checkParams[17] = new Point(col,row-1);
-					} else {
-						checkParams[15] = new Point(col,row+1);
-						checkParams[16] = new Point(col,row+1); //dummy value
-						checkParams[17] = new Point(col,row-1);
-					}
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					if(row < ROWS - 2){
-						checkParams[18] = new Point(col+1,row+1);
-						checkParams[19] = new Point(col+1,row+1); //dummy value
-						checkParams[20] = new Point(col-1,row-1);
-					} else {
-						checkParams[18] = new Point(col+1,row+1);
-						checkParams[19] = new Point(col+1,row+1); //dummy value
-						checkParams[20] = new Point(col-1,row-1);
-					}
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					if (row < ROWS - 2){
-						checkParams[21] = new Point(col-1,row+1);
-						checkParams[22] = new Point(col-2,row+2);
-						checkParams[23] = new Point(col+1,row-1);
-					} else {
-						checkParams[21] = new Point(col-1,row+1);
-						checkParams[22] = new Point(col-1,row+1); //dummy value
-						checkParams[23] = new Point(col+1,row-1);
-					}
-				}
-			}
-		} else {
-			if (row == 0){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = new Point(col-1,row);
-				}
-				//down
-				if(dir != Direction.DOWN){
-					checkParams[3] = new Point(col,row+1);
-					checkParams[4] = new Point(col,row+2);
-					checkParams[5] = null;
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					checkParams[6] = new Point(col+1,row+1);
-					checkParams[7] = new Point(col+2,row+2);
-					checkParams[8] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-2,row);
-					checkParams[11] = new Point(col+1,row);
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col-1,row+1);
-					checkParams[13] = new Point(col-2,row+2);
-					checkParams[14] = null;
-				}
-			} else if (row == ROWS-1){
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = new Point(col-1,row);
-				}
-				//up
-				if(dir != Direction.UP){
-					checkParams[3] = new Point(col,row-1);
-					checkParams[4] = new Point(col,row-2);
-					checkParams[5] = null;
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					checkParams[6] = new Point(col+1,row-1);
-					checkParams[7] = new Point(col+2,row-2);
-					checkParams[8] = null;
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-2,row);
-					checkParams[11] = new Point(col+1,row);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					checkParams[12] = new Point(col-1,row-1);
-					checkParams[13] = new Point(col-2,row-2);
-					checkParams[14] = null;
-				}
-			} else {
-				//right
-				if(dir != Direction.RIGHT){
-					checkParams[0] = new Point(col+1,row);
-					checkParams[1] = new Point(col+2,row);
-					checkParams[2] = new Point(col-1,row);
-				}
-				//up
-				if(dir != Direction.UP){
-					if(row > 1){
-						checkParams[3] = new Point(col,row-1);
-						checkParams[4] = new Point(col,row-2);
-						checkParams[5] = new Point(col,row+1);
-					} else {
-						checkParams[3] = new Point(col,row-1);
-						checkParams[4] = new Point(col,row-1); //dummy value, should pass through safely
-						checkParams[5] = new Point(col,row+1);
-					}
-				}
-				//upright
-				if(dir != Direction.UPRIGHT && (row+col)%2 == 0){
-					if(row > 1){
-						checkParams[6] = new Point(col+1,row-1);
-						checkParams[7] = new Point(col+2,row-2);
-						checkParams[8] = new Point(col-1,row+1);
-					} else {
-						checkParams[6] = new Point(col+1,row-1);
-						checkParams[7] = new Point(col+1,row-1); //dummy value
-						checkParams[8] = new Point(col-1,row+1);
-					}
-				}
-				//left
-				if(dir != Direction.LEFT){
-					checkParams[9] = new Point(col-1,row);
-					checkParams[10] = new Point(col-2,row);
-					checkParams[11] = new Point(col+1,row);
-				}
-				//upleft
-				if(dir != Direction.UPLEFT && (row+col)%2 == 0){
-					if(row > 1){
-						checkParams[12] = new Point(col-1,row-1);
-						checkParams[13] = new Point(col-2,row-2);
-						checkParams[14] = new Point(col+1,row+1);
-					} else {
-						checkParams[12] = new Point(col-1,row-1);
-						checkParams[13] = new Point(col-1,row-1); //dummy value
-						checkParams[14] = new Point(col+1,row+1);
-					}
-				}
-				//down
-				if(dir != Direction.DOWN){
-					if(row < ROWS - 2){
-						checkParams[15] = new Point(col,row+1);
-						checkParams[16] = new Point(col,row+2);
-						checkParams[17] = new Point(col,row-1);
-					} else {
-						checkParams[15] = new Point(col,row+1);
-						checkParams[16] = new Point(col,row+1); //dummy value
-						checkParams[17] = new Point(col,row-1);
-					}
-				}
-				//downright
-				if(dir != Direction.DOWNRIGHT && (row+col)%2 == 0){
-					if(row < ROWS - 2){
-						checkParams[18] = new Point(col+1,row+1);
-						checkParams[19] = new Point(col+2,row+2);
-						checkParams[20] = new Point(col-1,row-1);
-					} else {
-						checkParams[18] = new Point(col+1,row+1);
-						checkParams[19] = new Point(col+1,row+1); //dummy value
-						checkParams[20] = new Point(col-1,row-1);
-					}
-				}
-				//downleft
-				if(dir != Direction.DOWNLEFT && (row+col)%2 == 0){
-					if (row < ROWS - 2){
-						checkParams[21] = new Point(col-1,row+1);
-						checkParams[22] = new Point(col-2,row+2);
-						checkParams[23] = new Point(col+1,row-1);
-					} else {
-						checkParams[21] = new Point(col-1,row+1);
-						checkParams[22] = new Point(col-1,row+1); //dummy value
-						checkParams[23] = new Point(col+1,row-1);
-					}
-				}
-			}
+	public boolean detectMove(Point start, Direction dir, Piece color){
+		boolean ULafter = false;
+		boolean ULbefore = false;
+		boolean Uafter = false;
+		boolean Ubefore = false;
+		boolean URafter = false;
+		boolean URbefore = false;
+		boolean Lafter = false;
+		boolean Lbefore = false;
+		boolean Rafter = false;
+		boolean Rbefore = false;
+		boolean DLafter = false;
+		boolean DLbefore = false;
+		boolean Dafter = false;
+		boolean Dbefore = false;
+		boolean DRafter = false;
+		boolean DRbefore = false;
+		
+		//Determine which directions to take into account, based on position
+		
+		if ((start.y+start.x)%2 == 0){
+			if(start.y > 1 && start.x > 1)					ULafter = true;
+			if(start.y > 0 && start.x > 0 && 
+				start.y < ROWS - 1 && start.x < COLS - 1)	ULbefore = true;
+			if(start.y > 1 && start.x < COLS - 2) 			URafter = true;
+			if(start.y > 0 && start.x < COLS - 1 &&
+				start.y < ROWS - 1 && start.x > 0) 			URbefore = true;
+			if(start.y < ROWS - 2 && start.x > 1) 		  	DLafter = true;
+			if(start.y < ROWS - 1 && start.x > 0 &&
+				start.y > 0 && start.x < COLS - 1) 			DLbefore = true;
+			if(start.y < ROWS - 2 && start.x < COLS - 2)	DRafter = true;
+			if(start.y < ROWS - 1 && start.x < COLS - 1 &&
+				start.y > 0 && start.x > 0)					DRbefore = true;
 		}
-		return checkParams;
-	}
-	
-	public boolean checkFor(Piece color, Point[] points) {
-		//Array needs points in sets of 3: an space that might be moved to,
-		//the space after that, and the space before the starting point.
-		//Checks if the move will allow player to take out an enemy piece.
-		for(int i = 0;i < points.length; i = i+3){
-			if (points[i] != null){
-				boolean newspot = true;
-				//check if the spot has been used during a chain move.
-				for(int j = 0; j < chained_spots.size(); j++){
-					if(chained_spots.get(j) != null){
-						if(chained_spots.get(j).y == points[i].y && chained_spots.get(j).x == points[i].x){
-							newspot = false;
-						}
-					}
-				}
-				if(newspot){
-					//Check if moving eliminates a forward piece
-					if (board[points[i].y][points[i].x] == Piece.EMPTY){
-						if (board[points[i+1].y][points[i+1].x] == color){
-							return true;
-						}
-						if(points[i+2] != null){
-							//Check if moving eliminates a preceding piece
-							if (board[points[i+2].y][points[i+2].x] == color){
-								
-								return true;
+		if(start.y > 1)										Uafter = true;
+		if(start.y > 0 && start.y < ROWS - 1)				Ubefore = true; 
+		
+		if(start.x > 1)										Lafter = true;
+		if(start.x > 0 && start.x < COLS - 1)				Lbefore = true;
+		if(start.x < COLS - 2)								Rafter = true;
+		if(start.x < COLS - 1 && start.x > 0)				Rbefore = true;
+		
+		if(start.y < ROWS - 2)								Dafter = true;
+		if(start.y < ROWS - 1 && start.y > 0)				Dbefore = true;
+		
+		
+		//For each direction, test if the next piece is empty, if the appropriate
+		//piece is the opponent color, if the direction from the last move was
+		//not the same as this move, and if this space has been traveled to during
+		//the current chain.
+		if(ULafter){
+			boolean valid = true;
+			if(board[start.y-1][start.x-1] == Piece.EMPTY){
+				if(board[start.y-2][start.x-2] == color){
+					if (dir != Direction.UPLEFT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y-1){
+								if(chained_spots.get(i).x == start.x-1){
+									valid = false;
+								}
 							}
 						}
+						if(valid) return true;
 					}
 				}
 			}
 		}
+		if(ULbefore){
+			boolean valid = true;
+			if(board[start.y-1][start.x-1] == Piece.EMPTY){
+				if(board[start.y+1][start.x+1] == color){
+					if (dir != Direction.UPLEFT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y-1){
+								if(chained_spots.get(i).x == start.x-1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Uafter){
+			boolean valid = true;
+			if(board[start.y-1][start.x] == Piece.EMPTY){
+				if(board[start.y-2][start.x] == color){
+					if (dir != Direction.UP){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y-1){
+								if(chained_spots.get(i).x == start.x){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Ubefore){
+			boolean valid = true;
+			if(board[start.y-1][start.x] == Piece.EMPTY){
+				if(board[start.y+1][start.x] == color){
+					if (dir != Direction.UP){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y-1){
+								if(chained_spots.get(i).x == start.x){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(URafter){
+			boolean valid = true;
+			if(board[start.y-1][start.x+1] == Piece.EMPTY){
+				if(board[start.y-2][start.x+2] == color){
+					if (dir != Direction.UPRIGHT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y-1){
+								if(chained_spots.get(i).x == start.x+1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(URbefore){
+			boolean valid = true;
+			if(board[start.y-1][start.x+1] == Piece.EMPTY){
+				if(board[start.y+1][start.x-1] == color){
+					if (dir != Direction.UPRIGHT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y-1){
+								if(chained_spots.get(i).x == start.x+1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Lafter){
+			boolean valid = true;
+			if(board[start.y][start.x-1] == Piece.EMPTY){
+				if(board[start.y][start.x-2] == color){
+					if (dir != Direction.LEFT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y){
+								if(chained_spots.get(i).x == start.x-1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Lbefore){
+			boolean valid = true;
+			if(board[start.y][start.x-1] == Piece.EMPTY){
+				if(board[start.y][start.x+1] == color){
+					if (dir != Direction.LEFT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y){
+								if(chained_spots.get(i).x == start.x-1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Rafter){
+			boolean valid = true;
+			if(board[start.y][start.x+1] == Piece.EMPTY){
+				if(board[start.y][start.x+2] == color){
+					if (dir != Direction.RIGHT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y){
+								if(chained_spots.get(i).x == start.x+1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Rbefore){
+			boolean valid = true;
+			if(board[start.y][start.x+1] == Piece.EMPTY){
+				if(board[start.y][start.x-1] == color){
+					if (dir != Direction.RIGHT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y){
+								if(chained_spots.get(i).x == start.x+1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(DLafter){
+			boolean valid = true;
+			if(board[start.y+1][start.x-1] == Piece.EMPTY){
+				if(board[start.y+2][start.x-2] == color){
+					if (dir != Direction.DOWNLEFT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y+1){
+								if(chained_spots.get(i).x == start.x-1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(DLbefore){
+			boolean valid = true;
+			if(board[start.y+1][start.x-1] == Piece.EMPTY){
+				if(board[start.y-1][start.x+1] == color){
+					if (dir != Direction.DOWNLEFT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y+1){
+								if(chained_spots.get(i).x == start.x-1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Dafter){
+			boolean valid = true;
+			if(board[start.y+1][start.x] == Piece.EMPTY){
+				if(board[start.y+2][start.x] == color){
+					if (dir != Direction.DOWN){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y+1){
+								if(chained_spots.get(i).x == start.x){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(Dbefore){
+			boolean valid = true;
+			if(board[start.y+1][start.x] == Piece.EMPTY){
+				if(board[start.y-1][start.x] == color){
+					if (dir != Direction.DOWN){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y+1){
+								if(chained_spots.get(i).x == start.x){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(DRafter){
+			boolean valid = true;
+			if(board[start.y+1][start.x+1] == Piece.EMPTY){
+				if(board[start.y+2][start.x+2] == color){
+					if (dir != Direction.DOWNRIGHT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y+1){
+								if(chained_spots.get(i).x == start.x+1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		if(DRbefore){
+			boolean valid = true;
+			if(board[start.y+1][start.x+1] == Piece.EMPTY){
+				if(board[start.y-1][start.x-1] == color){
+					if (dir != Direction.DOWNRIGHT){
+						for (int i = 0; i < chained_spots.size(); i++){
+							if(chained_spots.get(i).y == start.y+1){
+								if(chained_spots.get(i).x == start.x+1){
+									valid = false;
+								}
+							}
+						}
+						if(valid) return true;
+					}
+				}
+			}
+		}
+		
 		return false;
-	}
-	
-	public boolean checkMoves(Point start){
-		return true;
 	}
 	
 	@Override
