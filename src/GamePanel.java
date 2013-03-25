@@ -3,7 +3,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//TODO: correct movement checking at columns 1 and COLS-2
 //TODO: Figure out how to select between pieces to eliminate
 //TODO: Allow for moving to spaces without eliminating pieces
 
@@ -172,6 +171,7 @@ public class GamePanel extends JPanel{
 								}
 								
 								boolean innate = false;
+								boolean blank = false;
 								switch(dir){
 								case NEUTRAL:		innate = true;
 													if(chain_piece == true){
@@ -192,7 +192,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -219,7 +226,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -244,7 +258,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -271,7 +292,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -296,7 +324,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -321,7 +356,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -348,7 +390,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -373,7 +422,14 @@ public class GamePanel extends JPanel{
 													}
 												}	
 												if(!(before) && !(after)){
-													valid_move = false;
+													valid_move = checkForBlank(opposite,dir,selected_piece);
+													if(!valid_move){
+														blank = true;
+														innate = true;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y;
+													}
 													break;
 												} else if(before && after){
 													//HANDLE CHOICE
@@ -393,7 +449,12 @@ public class GamePanel extends JPanel{
 								}
 								
 								if(innate){
-									selected_piece = null;
+									if(!chain_piece){
+										selected_piece = null;
+									}
+									if(blank){
+										info.write("Must take opponent piece off board.");
+									}
 									break;
 								}
 								
@@ -402,11 +463,13 @@ public class GamePanel extends JPanel{
 									board[row][col] = color;
 									board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
 									chained_spots.add(new Point(selected_piece.x, selected_piece.y));
-
+									
+									boolean thingsEliminated = false;
 									while(cur_x < COLS && cur_x > -1 && cur_y < ROWS && cur_y > -1){
 										if(board[cur_y][cur_x] != opposite){
 											break;
 										}
+										thingsEliminated = true;
 										board[cur_y][cur_x] = Piece.EMPTY;
 										cur_y += y_inc;
 										cur_x += x_inc;
@@ -416,7 +479,9 @@ public class GamePanel extends JPanel{
 									
 									//CHECK FOR OTHER MOVES
 									boolean next_move = false;
-									next_move = detectMove(selected_piece, dir, opposite);
+									if(thingsEliminated){
+										next_move = detectMove(selected_piece, dir, opposite);
+									}
 									if(next_move){
 										chain_piece = true;
 										previous_direction = dir;
@@ -447,7 +512,26 @@ public class GamePanel extends JPanel{
 		});
 	}
 	
+	public boolean checkForBlank(Piece color, Direction dir,Point p){
+		if(chain_piece){
+			return detectMove(p,dir,color);
+		}
+		for(int col = 0; col < COLS; col++){
+			for(int row = 0; row < ROWS; row++){
+				if(detectMove(new Point(col,row),Direction.DUMMY, color)){
+					info.write((col+1)+" "+(row+1)+" has a valid move");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	public boolean detectMove(Point start, Direction dir, Piece color){
+
+		if(board[start.y][start.x] == Piece.EMPTY || board[start.y][start.x] == color){
+			return false;
+		}
 		boolean ULafter = false;
 		boolean ULbefore = false;
 		boolean Uafter = false;
@@ -509,7 +593,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("ULA"); return true;}
 					}
 				}
 			}
@@ -526,7 +610,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("ULB"); return true;}
 					}
 				}
 			}
@@ -543,7 +627,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("UA"); return true;}
 					}
 				}
 			}
@@ -560,7 +644,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("UB"); return true;}
 					}
 				}
 			}
@@ -577,7 +661,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("URA"); return true;}
 					}
 				}
 			}
@@ -594,7 +678,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("URB"); return true;}
 					}
 				}
 			}
@@ -611,7 +695,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("LA"); return true;}
 					}
 				}
 			}
@@ -628,7 +712,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("LB"); return true;}
 					}
 				}
 			}
@@ -645,7 +729,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("RA"); return true;}
 					}
 				}
 			}
@@ -662,7 +746,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("RB"); return true;}
 					}
 				}
 			}
@@ -679,7 +763,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("DLA"); return true;}
 					}
 				}
 			}
@@ -696,7 +780,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("DLB"); return true;}
 					}
 				}
 			}
@@ -713,7 +797,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("DA"); return true;}
 					}
 				}
 			}
@@ -730,7 +814,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("DB"); return true;}
 					}
 				}
 			}
@@ -747,7 +831,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("DRA"); return true;}
 					}
 				}
 			}
@@ -764,7 +848,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) return true;
+						if(valid) {info.write("DRB"); return true;}
 					}
 				}
 			}
