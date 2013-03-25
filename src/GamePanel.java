@@ -29,9 +29,13 @@ public class GamePanel extends JPanel{
 	private Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
 	private Point selected_piece = null;
+	private Point choice1 = null;
+	private Point choice2 = null;
 	private ArrayList<Point> chained_spots = new ArrayList<Point>();
 	private boolean chain_piece = false;
 	private Direction previous_direction = Direction.DUMMY;
+	private boolean overrideMode = false;
+	private Direction overrideDir = Direction.DUMMY;
 	
 	public InfoPanel info;
 	
@@ -66,8 +70,15 @@ public class GamePanel extends JPanel{
 					for(int col = 0; col < buttons[0].length; col++){
 						if(buttons[row][col].contains(p) && !win && !draw){
 							emptyClick=false;
+							
+							if(overrideMode){
+								if((choice1.x != col || choice1.y != row) &&
+									(choice2.x != col || choice2.y != row)){
+										info.write("Must choose which direction to eliminate pieces");
+								}
+							}
 							//select piece
-							if(selected_piece == null && board[row][col]!=Piece.EMPTY){ //no piece selected
+							if((selected_piece == null && board[row][col]!=Piece.EMPTY) && !overrideMode){ //no piece selected
 								selected_piece = new Point(col, row);
 								Piece color = board[selected_piece.y][selected_piece.x];
 								if(TurnCount%2==0 && color != Piece.PLAYER) {
@@ -84,81 +95,8 @@ public class GamePanel extends JPanel{
 								break;
 							}
 							//move selected piece
-							else if(selected_piece != null && (board[row][col]==Piece.EMPTY || (selected_piece.x == col && selected_piece.y == row))){ 
-								//Check if not moving to adjacent piece
-								if(Math.abs(selected_piece.y - row) > 1 || Math.abs(selected_piece.x - col) > 1){
-									info.write("Can only move to adjacent pieces.");
-									if(!chain_piece){
-										selected_piece = null;
-									}
-									break;
-								}
-								//Check if the piece cannot move diagonally
-								if((row + col)%2 == 1){
-									int x_dif = Math.abs(selected_piece.x - col);
-									int y_dif = Math.abs(selected_piece.y - row);
-									if(x_dif != 0 && y_dif != 0){
-										info.write("This piece cannot move diagonally.");
-										if(!chain_piece){
-											selected_piece = null;
-										}
-										break;
-									}
-								}
-								
-								boolean repeat = false;
-								if(chain_piece == true){
-									for (int k = 0; k < chained_spots.size(); k++){
-											if(chained_spots.get(k).y == row && chained_spots.get(k).x == col){
-												repeat = true;
-												break;
-										}
-									}
-								}
-								
-								if(repeat){
-									info.write("Cannot move to the same place during a chain.");
-									break;
-								}
-								//Move detection goes here
-								Direction dir = Direction.NEUTRAL;
-								
-								if(col - selected_piece.x == -1){
-									switch(row - selected_piece.y){
-									case -1: dir = Direction.UPLEFT;
-											 break;
-									case 0:	 dir = Direction.LEFT;
-											 break;
-									case 1:  dir = Direction.DOWNLEFT;
-											 break;
-									default: break;
-									}
-								} else if (col - selected_piece.x == 0){
-									switch(row - selected_piece.y){
-									case -1: dir = Direction.UP;
-											 break;
-									case 0:	 dir = Direction.NEUTRAL;
-											 break;
-									case 1:  dir = Direction.DOWN;
-											 break;
-									default: break;
-									}
-								} else if (col - selected_piece.x == 1){
-									switch(row - selected_piece.y){
-									case -1: dir = Direction.UPRIGHT;
-											 break;
-									case 0:	 dir = Direction.RIGHT;
-											 break;
-									case 1:  dir = Direction.DOWNRIGHT;
-											 break;
-									default: break;
-									}
-								}
-								
-								if(chain_piece && dir == previous_direction){
-									info.write("Cannot move in same direction twice");
-									break;
-								}
+							else if((selected_piece != null && (board[row][col]==Piece.EMPTY || (selected_piece.x == col && selected_piece.y == row)))
+										|| overrideMode){ 
 								
 								boolean valid_move = true;
 								boolean before = false;
@@ -174,293 +112,529 @@ public class GamePanel extends JPanel{
 								} else {
 									opposite = Piece.PLAYER;
 								}
+								Direction dir = Direction.NEUTRAL;
 								
-								boolean innate = false;
-								boolean blank = false;
-								switch(dir){
-								case NEUTRAL:		innate = true;
-													if(chain_piece == true){
-													info.write("Chain ended.");
-													countPieces();
-													chain_piece = false;
-													chained_spots.clear();
-												}
-												break;
-								case UPLEFT: 	if(selected_piece.y > 1 && selected_piece.x > 1){
-													if(board[selected_piece.y-2][selected_piece.x-2] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.y < ROWS - 1 && selected_piece.x < COLS - 1){
-													if(board[selected_piece.y+1][selected_piece.x+1] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x + 1;
-													cur_y = selected_piece.y + 1;
-													x_inc++;
-													y_inc++;
-												} else {
-													cur_x = selected_piece.x - 2;
-													cur_y = selected_piece.y - 2;
-													x_inc--;
-													y_inc--;
-												}
-												break;
-								case UP:		if(selected_piece.y > 1){
-													if(board[selected_piece.y-2][selected_piece.x] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.y < ROWS - 1){
-													if(board[selected_piece.y+1][selected_piece.x] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x;
-													cur_y = selected_piece.y + 1;
-													y_inc++;
-												} else {
-													cur_x = selected_piece.x;
-													cur_y = selected_piece.y - 2;
-													y_inc--;
-												}
-												break;
-								case UPRIGHT:	if(selected_piece.y > 1 && selected_piece.x < COLS - 2){
-													if(board[selected_piece.y-2][selected_piece.x+2] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.y < ROWS - 1 && selected_piece.x > 0){
-													if(board[selected_piece.y+1][selected_piece.x-1] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x - 1;
-													cur_y = selected_piece.y + 1;
-													x_inc--;
-													y_inc++;
-												} else {
-													cur_x = selected_piece.x + 2;
-													cur_y = selected_piece.y - 2;
-													x_inc++;
-													y_inc--;
-												}
-												break;
-								case LEFT:		if(selected_piece.x > 1){
-													if(board[selected_piece.y][selected_piece.x-2] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.x < COLS - 1){
-													if(board[selected_piece.y][selected_piece.x+1] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x + 1;
-													cur_y = selected_piece.y;
-													x_inc++;
-												} else {
-													cur_x = selected_piece.x - 2;
-													cur_y = selected_piece.y;
-													x_inc--;
-												}
-												break;
-								case RIGHT:		if(selected_piece.x < COLS - 2){
-													if(board[selected_piece.y][selected_piece.x+2] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.x > 0){
-													if(board[selected_piece.y][selected_piece.x-1] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x - 1;
-													cur_y = selected_piece.y;
-													x_inc--;
-												} else {
-													cur_x = selected_piece.x + 2;
-													cur_y = selected_piece.y;
-													x_inc++;
-												}
-												break;
-								case DOWNLEFT:	if(selected_piece.y < ROWS - 2 && selected_piece.x > 1){
-													if(board[selected_piece.y+2][selected_piece.x-2] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.y > 0 && selected_piece.x < COLS - 1){
-													if(board[selected_piece.y-1][selected_piece.x+1] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x + 1;
-													cur_y = selected_piece.y - 1;
-													x_inc++;
-													y_inc--;
-												} else {
-													cur_x = selected_piece.x - 2;
-													cur_y = selected_piece.y + 2;
-													x_inc--;
-													y_inc++;
-												}
-												break;
-								case DOWN:		if(selected_piece.y < ROWS - 2){
-													if(board[selected_piece.y+2][selected_piece.x] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.y > 0){
-													if(board[selected_piece.y-1][selected_piece.x] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x;
-													cur_y = selected_piece.y - 1;
-													y_inc--;
-												} else {
-													cur_x = selected_piece.x;
-													cur_y = selected_piece.y + 2;
-													y_inc++;
-												}
-												break;
-								case DOWNRIGHT:	if(selected_piece.y < ROWS - 2 && selected_piece.x < COLS - 2){
-													if(board[selected_piece.y+2][selected_piece.x+2] == opposite){
-														after = true;
-													}
-												}
-												if(selected_piece.y > 0 && selected_piece.x > 0){
-													if(board[selected_piece.y-1][selected_piece.x-1] == opposite){
-														before = true;
-													}
-												}	
-												if(!(before) && !(after)){
-													valid_move = checkForBlank(opposite,dir,selected_piece);
-													if(!valid_move){
-														blank = true;
-														innate = true;
-													} else {
-														cur_x = selected_piece.x;
-														cur_y = selected_piece.y;
-													}
-													break;
-												} else if(before && after){
-													//HANDLE CHOICE
-												} else if(before){
-													cur_x = selected_piece.x - 1;
-													cur_y = selected_piece.y - 1;
-													x_inc--;
-													y_inc--;
-												} else {
-													cur_x = selected_piece.x + 2;
-													cur_y = selected_piece.y + 2;
-													x_inc++;
-													y_inc++;
-												}
-												break;
-								default:		break;
-								}
-								
-								if(innate){
-									if(!chain_piece){
-										selected_piece = null;
+								if(!overrideMode){
+									//Check if not moving to adjacent piece
+									if(Math.abs(selected_piece.y - row) > 1 || Math.abs(selected_piece.x - col) > 1){
+										info.write("Can only move to adjacent pieces.");
+										if(!chain_piece){
+											selected_piece = null;
+										}
+										break;
 									}
-									if(blank){
-										info.write("Must take opponent piece off board.");
+									//Check if the piece cannot move diagonally
+									if((row + col)%2 == 1){
+										int x_dif = Math.abs(selected_piece.x - col);
+										int y_dif = Math.abs(selected_piece.y - row);
+										if(x_dif != 0 && y_dif != 0){
+											info.write("This piece cannot move diagonally.");
+											if(!chain_piece){
+												selected_piece = null;
+											}
+											break;
+										}
 									}
-									break;
+									
+									boolean repeat = false;
+									if(chain_piece == true){
+										for (int k = 0; k < chained_spots.size(); k++){
+												if(chained_spots.get(k).y == row && chained_spots.get(k).x == col){
+													repeat = true;
+													break;
+											}
+										}
+									}
+									
+									if(repeat){
+										info.write("Cannot move to the same place during a chain.");
+										break;
+									}
+									//Move detection goes here
+									
+									
+									if(col - selected_piece.x == -1){
+										switch(row - selected_piece.y){
+										case -1: dir = Direction.UPLEFT;
+												 break;
+										case 0:	 dir = Direction.LEFT;
+												 break;
+										case 1:  dir = Direction.DOWNLEFT;
+												 break;
+										default: break;
+										}
+									} else if (col - selected_piece.x == 0){
+										switch(row - selected_piece.y){
+										case -1: dir = Direction.UP;
+												 break;
+										case 0:	 dir = Direction.NEUTRAL;
+												 break;
+										case 1:  dir = Direction.DOWN;
+												 break;
+										default: break;
+										}
+									} else if (col - selected_piece.x == 1){
+										switch(row - selected_piece.y){
+										case -1: dir = Direction.UPRIGHT;
+												 break;
+										case 0:	 dir = Direction.RIGHT;
+												 break;
+										case 1:  dir = Direction.DOWNRIGHT;
+												 break;
+										default: break;
+										}
+									}
+									
+									if(chain_piece && dir == previous_direction){
+										info.write("Cannot move in same direction twice");
+										break;
+									}
+									
+									
+									
+									boolean innate = false;
+									boolean blank = false;
+									switch(dir){
+									case NEUTRAL:		innate = true;
+														if(chain_piece == true){
+														info.write("Chain ended.");
+														countPieces();
+														chain_piece = false;
+														chained_spots.clear();
+													}
+													break;
+									case UPLEFT: 	if(selected_piece.y > 1 && selected_piece.x > 1){
+														if(board[selected_piece.y-2][selected_piece.x-2] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.y < ROWS - 1 && selected_piece.x < COLS - 1){
+														if(board[selected_piece.y+1][selected_piece.x+1] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x + 1, selected_piece.y + 1);
+														choice2 = new Point(selected_piece.x - 2, selected_piece.y - 2);
+													} else if(before){
+														cur_x = selected_piece.x + 1;
+														cur_y = selected_piece.y + 1;
+														x_inc++;
+														y_inc++;
+													} else {
+														cur_x = selected_piece.x - 2;
+														cur_y = selected_piece.y - 2;
+														x_inc--;
+														y_inc--;
+													}
+													break;
+									case UP:		if(selected_piece.y > 1){
+														if(board[selected_piece.y-2][selected_piece.x] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.y < ROWS - 1){
+														if(board[selected_piece.y+1][selected_piece.x] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x, selected_piece.y + 1);
+														choice2 = new Point(selected_piece.x, selected_piece.y - 2);
+													} else if(before){
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y + 1;
+														y_inc++;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y - 2;
+														y_inc--;
+													}
+													break;
+									case UPRIGHT:	if(selected_piece.y > 1 && selected_piece.x < COLS - 2){
+														if(board[selected_piece.y-2][selected_piece.x+2] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.y < ROWS - 1 && selected_piece.x > 0){
+														if(board[selected_piece.y+1][selected_piece.x-1] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x - 1, selected_piece.y + 1);
+														choice2 = new Point(selected_piece.x + 2, selected_piece.y - 2);
+													} else if(before){
+														cur_x = selected_piece.x - 1;
+														cur_y = selected_piece.y + 1;
+														x_inc--;
+														y_inc++;
+													} else {
+														cur_x = selected_piece.x + 2;
+														cur_y = selected_piece.y - 2;
+														x_inc++;
+														y_inc--;
+													}
+													break;
+									case LEFT:		if(selected_piece.x > 1){
+														if(board[selected_piece.y][selected_piece.x-2] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.x < COLS - 1){
+														if(board[selected_piece.y][selected_piece.x+1] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x + 1, selected_piece.y);
+														choice2 = new Point(selected_piece.x - 2, selected_piece.y);
+													} else if(before){
+														cur_x = selected_piece.x + 1;
+														cur_y = selected_piece.y;
+														x_inc++;
+													} else {
+														cur_x = selected_piece.x - 2;
+														cur_y = selected_piece.y;
+														x_inc--;
+													}
+													break;
+									case RIGHT:		if(selected_piece.x < COLS - 2){
+														if(board[selected_piece.y][selected_piece.x+2] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.x > 0){
+														if(board[selected_piece.y][selected_piece.x-1] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x - 1, selected_piece.y);
+														choice2 = new Point(selected_piece.x + 2, selected_piece.y);
+													} else if(before){
+														cur_x = selected_piece.x - 1;
+														cur_y = selected_piece.y;
+														x_inc--;
+													} else {
+														cur_x = selected_piece.x + 2;
+														cur_y = selected_piece.y;
+														x_inc++;
+													}
+													break;
+									case DOWNLEFT:	if(selected_piece.y < ROWS - 2 && selected_piece.x > 1){
+														if(board[selected_piece.y+2][selected_piece.x-2] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.y > 0 && selected_piece.x < COLS - 1){
+														if(board[selected_piece.y-1][selected_piece.x+1] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x + 1, selected_piece.y - 1);
+														choice2 = new Point(selected_piece.x - 2, selected_piece.y + 2);
+													} else if(before){
+														cur_x = selected_piece.x + 1;
+														cur_y = selected_piece.y - 1;
+														x_inc++;
+														y_inc--;
+													} else {
+														cur_x = selected_piece.x - 2;
+														cur_y = selected_piece.y + 2;
+														x_inc--;
+														y_inc++;
+													}
+													break;
+									case DOWN:		if(selected_piece.y < ROWS - 2){
+														if(board[selected_piece.y+2][selected_piece.x] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.y > 0){
+														if(board[selected_piece.y-1][selected_piece.x] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x, selected_piece.y - 1);
+														choice2 = new Point(selected_piece.x, selected_piece.y + 2);
+													} else if(before){
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y - 1;
+														y_inc--;
+													} else {
+														cur_x = selected_piece.x;
+														cur_y = selected_piece.y + 2;
+														y_inc++;
+													}
+													break;
+									case DOWNRIGHT:	if(selected_piece.y < ROWS - 2 && selected_piece.x < COLS - 2){
+														if(board[selected_piece.y+2][selected_piece.x+2] == opposite){
+															after = true;
+														}
+													}
+													if(selected_piece.y > 0 && selected_piece.x > 0){
+														if(board[selected_piece.y-1][selected_piece.x-1] == opposite){
+															before = true;
+														}
+													}	
+													if(!(before) && !(after)){
+														valid_move = checkForBlank(opposite,dir,selected_piece);
+														if(!valid_move){
+															blank = true;
+															innate = true;
+														} else {
+															cur_x = selected_piece.x;
+															cur_y = selected_piece.y;
+														}
+														break;
+													} else if(before && after){
+														overrideMode = true;
+														overrideDir = dir;
+														choice1 = new Point(selected_piece.x - 1, selected_piece.y - 1);
+														choice2 = new Point(selected_piece.x + 2, selected_piece.y + 2);
+													} else if(before){
+														cur_x = selected_piece.x - 1;
+														cur_y = selected_piece.y - 1;
+														x_inc--;
+														y_inc--;
+													} else {
+														cur_x = selected_piece.x + 2;
+														cur_y = selected_piece.y + 2;
+														x_inc++;
+														y_inc++;
+													}
+													break;
+									default:		break;
+									}
+									
+									if(overrideMode){
+										info.write("Selected the piece before or after your move to eliminate it");
+										break;
+									}
+									if(innate){
+										if(!chain_piece){
+											selected_piece = null;
+										}
+										if(blank){
+											info.write("Must take opponent piece off board.");
+										}
+										break;
+									}
+								} else {
+									overrideMode = false;
+									dir = overrideDir;
+									if(choice1.x == col && choice1.y == row){
+										before = true;
+										after = false;
+									} else {
+										before = false;
+										after = true;
+									}
+									switch(dir){
+									case UPLEFT:		row = selected_piece.y - 1;
+														col = selected_piece.x - 1;
+														if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = 1;
+														y_inc = 1;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = -1;
+														y_inc = -1;
+													}
+													break;
+									case UP:		row = selected_piece.y - 1;
+													col = selected_piece.x;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = 0;
+														y_inc = 1;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = 0;
+														y_inc = -1;
+													}
+													break;
+									case UPRIGHT:	row = selected_piece.y - 1;
+													col = selected_piece.x + 1;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = -1;
+														y_inc = 1;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = 1;
+														y_inc = -1;
+													}
+													break;				
+									case LEFT:		row = selected_piece.y;
+													col = selected_piece.x - 1;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = 1;
+														y_inc = 0;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = -1;
+														y_inc = 0;
+													}
+													break;
+									case RIGHT:		row = selected_piece.y;
+													col = selected_piece.x + 1;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = -1;
+														y_inc = 0;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = 1;
+														y_inc = 0;
+													}
+													break;
+									case DOWNLEFT:	row = selected_piece.y + 1;
+													col = selected_piece.x - 1;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = 1;
+														y_inc = -1;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = -1;
+														y_inc = 1;
+													}
+													break;				
+									case DOWN:		row = selected_piece.y + 1;
+													col = selected_piece.x;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = 0;
+														y_inc = -1;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = 0;
+														y_inc = 1;
+													}
+													break;				
+									case DOWNRIGHT:	row = selected_piece.y + 1;
+													col = selected_piece.x + 1;
+													if(before){
+														cur_x = choice1.x;
+														cur_y = choice1.y;
+														x_inc = -1;
+														y_inc = -1;
+													} else {
+														cur_x = choice2.x;
+														cur_y = choice2.y;
+														x_inc = 1;
+														y_inc = 1;
+													}
+													break;		
+									default:		break;
+									}
+									choice1 = null;
+									choice2 = null;
+									overrideDir = Direction.DUMMY;
 								}
 								
 								if(valid_move){
@@ -519,13 +693,19 @@ public class GamePanel extends JPanel{
 	}
 	
 	public boolean checkForBlank(Piece color, Direction dir,Point p){
+		String[] letters= new String[5];
+		letters[0]= "A";
+		letters[1]= "B";
+		letters[2]= "C";
+		letters[3]= "D";
+		letters[4]= "E";
 		if(chain_piece){
 			return detectMove(p,dir,color);
 		}
 		for(int col = 0; col < COLS; col++){
 			for(int row = 0; row < ROWS; row++){
 				if(detectMove(new Point(col,row),Direction.DUMMY, color)){
-					info.write((col+1)+" "+(row+1)+" has a valid move");
+					info.write((col+1)+" "+letters[row]+" has a valid move");
 					return false;
 				}
 			}
@@ -599,7 +779,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("ULA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -616,7 +796,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("ULB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -633,7 +813,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("UA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -650,7 +830,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("UB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -667,7 +847,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("URA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -684,7 +864,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("URB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -701,7 +881,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("LA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -718,7 +898,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("LB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -735,7 +915,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("RA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -752,7 +932,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("RB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -769,7 +949,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("DLA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -786,7 +966,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("DLB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -803,7 +983,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("DA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -820,7 +1000,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("DB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -837,7 +1017,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("DRA"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -854,7 +1034,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 						}
-						if(valid) {info.write("DRB"); return true;}
+						if(valid) return true;
 					}
 				}
 			}
@@ -977,6 +1157,14 @@ public class GamePanel extends JPanel{
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
 			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-hilightsize/2, (2*(selected_piece.y+1)-1)*(yheight/(2*ROWS))-hilightsize/2, hilightsize, hilightsize);
+		}
+		if(choice1 != null){
+			g.setColor(Color.CYAN);
+			g.fillOval((choice1.x+1)*(xwidth/(COLS+1))-hilightsize/2, (2*(choice1.y+1)-1)*(yheight/(2*ROWS))-hilightsize/2, hilightsize, hilightsize);
+		}
+		if(choice2 != null){
+			g.setColor(Color.CYAN);
+			g.fillOval((choice2.x+1)*(xwidth/(COLS+1))-hilightsize/2, (2*(choice2.y+1)-1)*(yheight/(2*ROWS))-hilightsize/2, hilightsize, hilightsize);
 		}
 		
 		for(int row = 1; row<board.length+1; row++){
