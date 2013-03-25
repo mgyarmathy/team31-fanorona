@@ -4,6 +4,8 @@ import java.awt.*;
 //InfoPanel displays information about the current game
 public class InfoPanel extends JPanel{
 	int i=0;
+	public boolean initial = false;
+	
 	public InfoPanel(){
 		setPreferredSize(new Dimension(400, 0));
 		setBackground(Color.WHITE);
@@ -24,6 +26,7 @@ public class InfoPanel extends JPanel{
 		super.paintComponent(g);
 		g.drawString(s,20,20 + i);
 		i+=20;
+
 	}
 	
 	@Override
@@ -31,7 +34,9 @@ public class InfoPanel extends JPanel{
 		//draw the information here
 		i=0;
 		super.paintComponent(g);
-		g.drawString("Player 1's turn", 20, 20);
-		i+=20;
+		if(initial == false){
+			g.drawString("Player 1's turn", 20, 20);
+			i+=20;
+		}
 	 }
 }

@@ -18,6 +18,8 @@ public class GamePanel extends JPanel{
 	int TurnCount;
 	int TurnPrior;
 	
+	boolean win,draw;
+	
 	public enum Piece {PLAYER, OPPONENT, EMPTY};
 	private enum Direction {NEUTRAL, UPLEFT, UP, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWN, DOWNRIGHT, DUMMY};
 	private Color playerColor = Color.WHITE;
@@ -44,6 +46,9 @@ public class GamePanel extends JPanel{
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				
+				info.initial=true;// initial print for info panel stop
+				
 				String[] letters= new String[5];
 				letters[0]= "A";
 				letters[1]= "B";
@@ -59,7 +64,7 @@ public class GamePanel extends JPanel{
 				Point p = e.getPoint();
 				for(int row = 0; row < buttons.length; row++){
 					for(int col = 0; col < buttons[0].length; col++){
-						if(buttons[row][col].contains(p)){
+						if(buttons[row][col].contains(p) && !win && !draw){
 							emptyClick=false;
 							//select piece
 							if(selected_piece == null && board[row][col]!=Piece.EMPTY){ //no piece selected
@@ -490,14 +495,15 @@ public class GamePanel extends JPanel{
 										chained_spots.clear();
 										previous_direction = Direction.DUMMY;
 									}
-								}
-								// if move is valid and no more moves to make - countPieces
-								if(chain_piece == false){
-									countPieces();
-									selected_piece = null;
+									// if move is valid and no more moves to make - countPieces
+									if(chain_piece == false){
+										countPieces();
+										selected_piece = null;
+									}
 								}
 								break;
 							}
+							
 							else if(board[row][col]!=Piece.EMPTY) { info.write("There is a piece There!"); break;} //Spot taken
 							else { info.write("This spot is empty!");  break; } //Spot empty
 						}
@@ -1015,9 +1021,15 @@ public class GamePanel extends JPanel{
 		
 		TurnCount = TurnPrior = 0;
 		selected_piece = null;
+		chained_spots = new ArrayList<Point>();
+		chain_piece = false;
+		previous_direction = Direction.DUMMY;
+		
+		win = draw = false;
+		
+		if(TurnCount == 0 && info.getGraphics()!= null) info.write(printTurn());
 	}
 	
-
 	public void drawButtons(Graphics g){
 		buttons = new Rectangle[ROWS][COLS];
 		int xwidth = getWidth();
@@ -1072,10 +1084,15 @@ public class GamePanel extends JPanel{
 				else EmptyPieceCount++;
 			}
 		}
-		TurnCount++;
-		if(TurnCount == 50); // Draw
-		if(OppPieceCount == 0 || PlayerPieceCount == 0); //  Win/Lose
-		info.write(printTurn());
+		if(!draw && !win) TurnCount++;
+		if(TurnCount == 50) draw = true;
+		if(OppPieceCount == 0 || PlayerPieceCount == 0) win = true;
+		
+		
+		if(!draw && !win) info.write(printTurn());
+		else if(draw) info.write("Draw");
+		else if(OppPieceCount == 0) info.write("Player 1 Wins!");
+		else info.write("Player 2 Wins!");
 	}
 	
 	
