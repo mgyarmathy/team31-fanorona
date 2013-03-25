@@ -705,7 +705,7 @@ public class GamePanel extends JPanel{
 		for(int col = 0; col < COLS; col++){
 			for(int row = 0; row < ROWS; row++){
 				if(detectMove(new Point(col,row),Direction.DUMMY, color)){
-					info.write((col+1)+" "+letters[row]+" has a valid move");
+					info.write(letters[row]+(col+1)+" has a valid move");
 					return false;
 				}
 			}
