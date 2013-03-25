@@ -214,13 +214,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -251,13 +256,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -286,13 +296,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -323,13 +338,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -358,13 +378,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -393,13 +418,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -430,13 +460,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
@@ -465,13 +500,18 @@ public class GamePanel extends JPanel{
 														}
 													}	
 													if(!(before) && !(after)){
-														valid_move = checkForBlank(opposite,dir,selected_piece);
-														if(!valid_move){
-															blank = true;
+														if(chain_piece){
 															innate = true;
+															blank = true;
 														} else {
-															cur_x = selected_piece.x;
-															cur_y = selected_piece.y;
+															valid_move = checkForBlank(opposite,dir,selected_piece);
+															if(!valid_move){
+																blank = true;
+																innate = true;
+															} else {
+																cur_x = selected_piece.x;
+																cur_y = selected_piece.y;
+															}
 														}
 														break;
 													} else if(before && after){
