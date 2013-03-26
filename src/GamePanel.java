@@ -1272,7 +1272,7 @@ public class GamePanel extends JPanel{
 			}
 		}
 		if(!draw && !win) TurnCount++;
-		if(TurnCount == 50) draw = true;
+		if(TurnCount == 10*ROWS) draw = true;
 		if(OppPieceCount == 0 || PlayerPieceCount == 0) win = true;
 		
 		
