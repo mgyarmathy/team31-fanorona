@@ -1152,20 +1152,20 @@ public class GamePanel extends JPanel{
 		int xwidth = getWidth();
 		int yheight= getHeight();
 		
-		int piecesize=(getWidth()+getHeight())/50;
-		int hilightsize=(getWidth()+getHeight())/40;
+		int piecesize=(getWidth()+getHeight())/55;
+		int hilightsize=(getWidth()+getHeight())/45;
 		
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
-			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-hilightsize/2, (selected_piece.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-(hilightsize-2)/2, (selected_piece.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
 		}
 		if(choice1 != null){
 			g.setColor(Color.CYAN);
-			g.fillOval((choice1.x+1)*(xwidth/(COLS+1))-hilightsize/2, (choice1.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+			g.fillOval((choice1.x+1)*(xwidth/(COLS+1))-(hilightsize-2)/2, (choice1.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
 		}
 		if(choice2 != null){
 			g.setColor(Color.CYAN);
-			g.fillOval((choice2.x+1)*(xwidth/(COLS+1))-hilightsize/2, (choice2.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+			g.fillOval((choice2.x+1)*(xwidth/(COLS+1))-(hilightsize-2)/2, (choice2.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
 		}
 		
 		for(int row = 1; row<board.length+1; row++){
@@ -1173,18 +1173,17 @@ public class GamePanel extends JPanel{
 				if(board[row-1][col-1] == Piece.EMPTY) continue;
 				if(board[row-1][col-1] == Piece.OPPONENT){
 					g.setColor(opponentColor);
-					g.fillOval(col*(xwidth/(COLS+1))-piecesize/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
+					g.fillOval(col*(xwidth/(COLS+1))-(piecesize-2)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
 				}
 				if(board[row-1][col-1] == Piece.PLAYER){
 					g.setColor(playerColor);
-					g.fillOval(col*(xwidth/(COLS+1))-piecesize/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
+					g.fillOval(col*(xwidth/(COLS+1))-(piecesize-2)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
 				}
 			}
 		}
 	}
 
 	public void newGame(){//**********************************
-		
 		
 		board = new Piece[ROWS][COLS];
 		//fill top rows with OPPONENT pieces
