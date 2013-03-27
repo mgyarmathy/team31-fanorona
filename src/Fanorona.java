@@ -74,6 +74,41 @@ public class Fanorona extends JFrame{
 		fileMenu.add(help);
 		fileMenu.add(about);
 		JMenu options = new JMenu("Options");
+		JMenuItem boardSize = new JMenuItem("Set Board Size");
+		boardSize.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				int rows = board.getNumberOfRows(); 
+				int cols = board.getNumberofCols();
+				
+				JTextField rowsField = new JTextField(""+rows,2);
+			    JTextField colsField = new JTextField(""+cols,2);
+
+			    JPanel panel = new JPanel();
+			    panel.add(new JLabel("rows:"));
+			    panel.add(rowsField);
+			    panel.add(Box.createHorizontalStrut(15)); // a spacer
+			    panel.add(new JLabel("columns:"));
+			    panel.add(colsField);
+			    
+			    JOptionPane.showMessageDialog(null, "Note: Rows and Columns must be odd and between 1-13 for valid game." +
+			    		"\nChanging the board size will start a new game.", "Team 31 - Fanorona", JOptionPane.WARNING_MESSAGE);
+			    int result = JOptionPane.showConfirmDialog(null, panel, 
+			             "Please Enter Row and Column Size", JOptionPane.OK_CANCEL_OPTION);
+			    if (result == JOptionPane.OK_OPTION) {
+			       rows = Integer.parseInt(rowsField.getText());
+			       cols = Integer.parseInt(colsField.getText());
+			       if((rows % 2 == 1) && (cols % 2 == 1)){
+			    	   board.setBoardSize(rows, cols);
+				       board.newGame();
+			       }
+			       else{
+			    	   info.write("Invalid Board Size");
+			       }
+			    }
+			      
+				
+			}
+		});
 		JMenuItem playerName = new JMenuItem("Set Player Name");
 		playerName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
@@ -154,6 +189,7 @@ public class Fanorona extends JFrame{
 			}
 		});
 		
+		options.add(boardSize);
 		options.add(playerName);
 		options.add(pieceColors);
 		options.add(mute);

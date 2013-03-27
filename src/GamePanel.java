@@ -9,8 +9,8 @@ import java.awt.event.*;
 // GamePanel displays the current state of the board.
 public class GamePanel extends JPanel{
 	
-	static final int ROWS = 5;
-	static final int COLS = 9;
+	static int ROWS = 5;
+	static int COLS = 9;
 	
 	
 	
@@ -1185,7 +1185,7 @@ public class GamePanel extends JPanel{
 
 	public void newGame(){//**********************************
 		board = new Piece[ROWS][COLS];
-		//fill top two rows with OPPONENT pieces
+		//fill top rows with OPPONENT pieces
 		for(int i = 0; i<ROWS/2; i++){
 			for(int j = 0; j<COLS; j++){
 				board[i][j] = Piece.OPPONENT;
@@ -1202,7 +1202,7 @@ public class GamePanel extends JPanel{
 			}
 			board[ROWS/2][i] = p;
 		}
-		//fill bottom two rows with PLAYER pieces
+		//fill bottom rows with PLAYER pieces
 		for(int i = ROWS/2+1; i<ROWS; i++){
 			for(int j = 0; j<COLS; j++){
 				board[i][j] = Piece.PLAYER;
@@ -1236,6 +1236,19 @@ public class GamePanel extends JPanel{
 		}
 	}
 
+	public void setBoardSize(int numberOfRows, int numberofColumns){
+		ROWS = numberOfRows;
+		COLS = numberofColumns;
+	}
+	
+	public int getNumberOfRows(){
+		return ROWS;
+	}
+	
+	public int getNumberofCols(){
+		return COLS;
+	}
+	
 	public void setPlayerName(String s){
 		playerName = s;
 		info.write("Name changed to: "+ s);
