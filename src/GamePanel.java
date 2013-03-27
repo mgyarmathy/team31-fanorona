@@ -1123,7 +1123,7 @@ public class GamePanel extends JPanel{
 			g.drawLine(x1, y1+1 , x2, y1+1);
 			g.drawLine(x1, y1+2 , x2, y1+2);
 			char c= (char)(i+64);
-			g.drawString(Character.toString(c),xwidth/10/2-getWidth()/30 , y1+getHeight()/50);
+			g.drawString(Character.toString(c),x1/2-getWidth()/50 , y1+getHeight()/50);
 		}
 		
 		
@@ -1184,6 +1184,8 @@ public class GamePanel extends JPanel{
 	}
 
 	public void newGame(){//**********************************
+		
+		
 		board = new Piece[ROWS][COLS];
 		//fill top rows with OPPONENT pieces
 		for(int i = 0; i<ROWS/2; i++){
@@ -1192,15 +1194,16 @@ public class GamePanel extends JPanel{
 			}
 		}
 		//alternate colors in middle row, except middle space
-		Piece p = Piece.PLAYER;
+		Piece prev = Piece.PLAYER, p= Piece.OPPONENT;
 		for(int i=0;i <COLS;i++){
-			if(i == COLS/2) p = Piece.EMPTY;
+			if(i == COLS/2) board[ROWS/2][i]  = Piece.EMPTY;
 			else {
-				if( p == Piece.PLAYER) p = Piece.OPPONENT;
-				else if( p == Piece.OPPONENT) p = Piece.PLAYER;
-				else p = Piece.OPPONENT;
+				board[ROWS/2][i] = p;
+				Piece tmp = prev;
+				prev=p;
+				p=tmp;
 			}
-			board[ROWS/2][i] = p;
+			
 		}
 		//fill bottom rows with PLAYER pieces
 		for(int i = ROWS/2+1; i<ROWS; i++){
