@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class Stopwatch extends JPanel implements Runnable {
 		private boolean count=false;
-		private int time;
+		private double time;
 		private int interval;
 		
 		private boolean kill_thread=false;
@@ -30,29 +30,23 @@ public class Stopwatch extends JPanel implements Runnable {
 		}
 		
 		public void run(){
-			Graphics g = this.getGraphics();
 			while(!kill_thread){
 				while(count && interval != 0){
-					for(;time>0; time--){
+					for(;time>0; time=time-0.1){
 						if(count == false || interval == 0) { timeReset(); break;}
 						try{
-							Thread.sleep(1000);
-							if(g!=null){
-								super.paintComponent(g);
-								g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, getHeight()/2 ));
-								g.drawString(Integer.toString(time)+" Seconds Left For Turn ", 5, 45);
-							}
+							Thread.sleep(100);
 						}
 						catch(InterruptedException e){}
 					}
 					
-					if (time == 0){
+					if (Math.round(time) == 0){
 						timeUp=true;
 						count = false;
 						board.countPieces();
 					}
 				}
-				try{Thread.sleep(1000);}
+				try{Thread.sleep(500);}
 				catch(InterruptedException e){}
 			}
 		}
@@ -62,7 +56,7 @@ public class Stopwatch extends JPanel implements Runnable {
 			//draw the information here
 			super.paintComponent(g);
 			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, getHeight()/2 ));
-			if(interval != 0) g.drawString(Integer.toString(time)+" Seconds Left For Turn ", 5, 45);
+			if(interval != 0) g.drawString(Double.toString(Math.round(time*100.0)/100.0)+" Seconds Left For Turn ", 5, 45);
 			repaint();
 		 }
 		
@@ -93,7 +87,7 @@ public class Stopwatch extends JPanel implements Runnable {
 			timeReset();
 		}
 		
-		public int getTime(){
+		public double getTime(){
 			return time;
 		}
 		

@@ -17,7 +17,7 @@ public class Fanorona extends JFrame{
 		addMenuBar();
 		Container content = getContentPane();
 		info = new InfoPanel();
-		stopw = new Stopwatch(50000); new Thread(stopw).start();
+		stopw = new Stopwatch(20000); new Thread(stopw).start();
 		board = new GamePanel(info,stopw);
 		stopw.addboard(board);
 		content.add(board, BorderLayout.CENTER);	

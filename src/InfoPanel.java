@@ -13,12 +13,13 @@ public class InfoPanel extends JPanel{
 		setPreferredSize(new Dimension(300, 0));
 		setBackground(new Color(240,240,240));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
-		RepaintManager.currentManager(this).markCompletelyClean(this);
 		setVisible(true);
+		RepaintManager.currentManager(this).markCompletelyClean(this);
 	}
 	
 	public void write(String s){
 		Graphics g = this.getGraphics();
+		
 		if(i> getHeight() - 30) {
 			g.setColor(new Color(240,240,240));
 			g.fillRect(0, 0, getWidth(), getHeight());  
@@ -27,6 +28,7 @@ public class InfoPanel extends JPanel{
 		g.setColor(Color.BLACK);
 		g.drawString(s,20,20 + i);
 		i += 20;
+		RepaintManager.currentManager(this).markCompletelyClean(this);
 	}
 	
 	@Override
@@ -37,5 +39,7 @@ public class InfoPanel extends JPanel{
 			g.drawString("Player 1's turn", 20, 20);
 			i+=20;
 		}
+		RepaintManager.currentManager(this).markCompletelyClean(this);
+		//repaint();
 	}
 }

@@ -1307,9 +1307,9 @@ public class GamePanel extends JPanel{
 		if(!draw && !win) TurnCount++;
 		
 		if(!draw && !win){ info.write(printTurn()); stopw.timeStart();}
-		else if(draw) { info.write("Draw"); stopw.timeStop(); stopw.timeReset();}
-		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); stopw.timeReset();}
-		else { info.write("Player 2 Wins!"); stopw.timeStop(); stopw.timeReset();}
+		else if(draw) { info.write("Draw"); stopw.timeStop(); }
+		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); }
+		else { info.write("Player 2 Wins!"); stopw.timeStop(); }
 	}
 	
 	
