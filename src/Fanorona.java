@@ -2,9 +2,11 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.net.*;
 
 
-public class Fanorona extends JFrame{
+public class Fanorona extends JFrame implements Runnable{
 	
 	GamePanel board;
 	InfoPanel info;
@@ -204,6 +206,55 @@ public class Fanorona extends JFrame{
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
+	}
+
+	@Override
+	public void run() {
+		Socket c_socket = null;
+		InputStream c_sockInput = null;
+		OutputStream c_sockOutput = null;
+		
+		try {
+			c_socket = new Socket("localhost", 6544);
+		} catch (UnknownHostException e) {
+			System.err.println("Don't know about host: FanoronaServer."); 
+			System.exit(1);
+		} catch(IOException e){
+			System.err.println("Couldn't get I/O for the connection to: FanoronaServer.");
+			System.exit(1);
+		}
+		try {
+			c_sockInput = c_socket.getInputStream();
+		} catch (IOException e) {
+			System.err.println("Client unable to get input stream"); 
+			System.exit(1);
+		}
+		try {
+			c_sockOutput = c_socket.getOutputStream();
+		} catch (IOException e) {
+			System.err.println("Client unable to get output stream"); 
+			System.exit(1);
+		}
+		
+		byte[] buf=new byte[1024];
+		try {
+			int bytes_read = c_sockInput.read(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("Client unable to read"); 
+			System.exit(1);
+		}
+		
+		String testString = new String(buf);
+		info.write("");
+		info.write(testString);
+		
+		try {
+			c_socket.close();
+		} catch (IOException e) {
+			System.err.println("Client unable to close client socket"); 
+			System.exit(1);
+		}
+		
 	}
 	
 	
