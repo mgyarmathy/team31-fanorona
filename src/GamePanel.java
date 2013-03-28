@@ -3,8 +3,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//TODO: Figure out how to select between pieces to eliminate
-//TODO: Allow for moving to spaces without eliminating pieces
 
 // GamePanel displays the current state of the board.
 public class GamePanel extends JPanel{

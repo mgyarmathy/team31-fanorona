@@ -56,7 +56,7 @@ public class Stopwatch extends JPanel implements Runnable {
 			//draw the information here
 			super.paintComponent(g);
 			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, getHeight()/2 ));
-			if(interval != 0) g.drawString(Double.toString(Math.round(time*100.0)/100.0)+" Seconds Left For Turn ", 5, 45);
+			if(interval != 0) g.drawString(Double.toString(Math.round(time*100.0)/100.0)+" Seconds Left For Turn ", 20, 45);
 			repaint();
 		 }
 		
