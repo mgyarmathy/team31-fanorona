@@ -16,7 +16,6 @@ public class GamePanel extends JPanel{
 	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
 	int TurnCount;
-	int TurnPrior;
 	
 	boolean win,draw;
 	
@@ -38,24 +37,25 @@ public class GamePanel extends JPanel{
 	private Direction overrideDir = Direction.DUMMY;
 	
 	public InfoPanel info;
+	public Stopwatch stopw;
 	
 
-	public GamePanel(InfoPanel i){
+	public GamePanel(InfoPanel i ,Stopwatch s){
 		setPreferredSize(new Dimension(700,500));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setVisible(true);
 		info = i;
+		stopw = s;
 		newGame();
+		
+		
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
 				info.initial=true;// initial print for info panel stop
-				
-				if(TurnPrior!=TurnCount) printTurn();
-				
-				
+				if(!stopw.running() && !win && !draw) stopw.timeStart();
 				boolean emptyClick=true;
 				
 				Point p = e.getPoint();
@@ -140,7 +140,7 @@ public class GamePanel extends JPanel{
 									}
 									
 									if(repeat){
-										info.write("Cannot move to the same place during a chain.");
+										info.write("Can't move to the same place during a chain.");
 										break;
 									}
 									//Move detection goes here
@@ -179,7 +179,7 @@ public class GamePanel extends JPanel{
 									}
 									
 									if(chain_piece && dir == previous_direction){
-										info.write("Cannot move in same direction twice");
+										info.write("Can't move in same direction twice");
 										break;
 									}
 									
@@ -528,7 +528,7 @@ public class GamePanel extends JPanel{
 									}
 									
 									if(overrideMode){
-										info.write("Selected the piece before or after your move to eliminate it");
+										info.write("Selecte the piece(s) you want to eliminate");
 										break;
 									}
 									if(innate){
@@ -722,7 +722,6 @@ public class GamePanel extends JPanel{
 					if(!chain_piece)
 						selected_piece = null; 
 				} // deselect piece
-				TurnPrior = TurnCount;
 			}
 		});
 	}
@@ -1077,15 +1076,16 @@ public class GamePanel extends JPanel{
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw ze game here
-		//super.paintComponent(g);
+		super.paintComponent(g);
 		drawBoard(g);
 		drawPieces(g);
 		drawButtons(g);
+		
+		//validate();
 		repaint();
 	 }	
 	
 	public void drawBoard(Graphics g){
-		
 		int xstartp= 0;
 		int ystartp= 0;
 		
@@ -1152,20 +1152,20 @@ public class GamePanel extends JPanel{
 		int xwidth = getWidth();
 		int yheight= getHeight();
 		
-		int piecesize=(getWidth()+getHeight())/55;
-		int hilightsize=(getWidth()+getHeight())/45;
+		int piecesize=(getWidth()+getHeight())/50;
+		int hilightsize=(getWidth()+getHeight())/40;
 		
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
-			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-(hilightsize-2)/2, (selected_piece.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+			g.fillOval((selected_piece.x+1)*(xwidth/(COLS+1))-(hilightsize)/2, (selected_piece.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
 		}
 		if(choice1 != null){
 			g.setColor(Color.CYAN);
-			g.fillOval((choice1.x+1)*(xwidth/(COLS+1))-(hilightsize-2)/2, (choice1.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+			g.fillOval((choice1.x+1)*(xwidth/(COLS+1))-(hilightsize)/2, (choice1.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
 		}
 		if(choice2 != null){
 			g.setColor(Color.CYAN);
-			g.fillOval((choice2.x+1)*(xwidth/(COLS+1))-(hilightsize-2)/2, (choice2.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+			g.fillOval((choice2.x+1)*(xwidth/(COLS+1))-(hilightsize)/2, (choice2.y+1)*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
 		}
 		
 		for(int row = 1; row<board.length+1; row++){
@@ -1173,11 +1173,11 @@ public class GamePanel extends JPanel{
 				if(board[row-1][col-1] == Piece.EMPTY) continue;
 				if(board[row-1][col-1] == Piece.OPPONENT){
 					g.setColor(opponentColor);
-					g.fillOval(col*(xwidth/(COLS+1))-(piecesize-2)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
+					g.fillOval(col*(xwidth/(COLS+1))-(piecesize)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
 				}
 				if(board[row-1][col-1] == Piece.PLAYER){
 					g.setColor(playerColor);
-					g.fillOval(col*(xwidth/(COLS+1))-(piecesize-2)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
+					g.fillOval(col*(xwidth/(COLS+1))-(piecesize)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
 				}
 			}
 		}
@@ -1211,15 +1211,20 @@ public class GamePanel extends JPanel{
 			}
 		}
 		
-		TurnCount = TurnPrior = 0;
+		TurnCount = 0;
+		
 		selected_piece = null;
+		choice1 = null;
+		choice2 = null;
 		chained_spots = new ArrayList<Point>();
 		chain_piece = false;
 		previous_direction = Direction.DUMMY;
 		
-		win = draw = false;
+		win = false;
+		draw = false;
 		
 		if(TurnCount == 0 && info.getGraphics()!= null) info.write(printTurn());
+		if(stopw.getGraphics()!=null) { stopw.timeReset(); }
 	}
 	
 	public void drawButtons(Graphics g){
@@ -1278,6 +1283,8 @@ public class GamePanel extends JPanel{
 	}
 	
 	public void countPieces(){
+		stopw.timeStop();
+	
 		PlayerPieceCount = OppPieceCount = EmptyPieceCount = 0;
 		for(int row = 0; row<board.length; row++){
 			for(int col = 0; col<board[0].length; col++){
@@ -1286,15 +1293,23 @@ public class GamePanel extends JPanel{
 				else EmptyPieceCount++;
 			}
 		}
-		if(!draw && !win) TurnCount++;
-		if(TurnCount == 10*ROWS) draw = true;
+		
+		if(stopw.isTimeUp()){
+			if(TurnCount%2 == 0) PlayerPieceCount = 0;
+			else OppPieceCount = 0;
+			win = true;
+		}
+		if(!stopw.isTimeUp()) stopw.timeReset();	
+			
+		
+		if(TurnCount == 10*ROWS-1) draw = true;
 		if(OppPieceCount == 0 || PlayerPieceCount == 0) win = true;
+		if(!draw && !win) TurnCount++;
 		
-		
-		if(!draw && !win) info.write(printTurn());
-		else if(draw) info.write("Draw");
-		else if(OppPieceCount == 0) info.write("Player 1 Wins!");
-		else info.write("Player 2 Wins!");
+		if(!draw && !win){ info.write(printTurn()); stopw.timeStart();}
+		else if(draw) { info.write("Draw"); stopw.timeStop(); stopw.timeReset();}
+		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); stopw.timeReset();}
+		else { info.write("Player 2 Wins!"); stopw.timeStop(); stopw.timeReset();}
 	}
 	
 	

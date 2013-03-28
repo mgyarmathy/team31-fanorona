@@ -1,4 +1,5 @@
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -7,6 +8,7 @@ public class Fanorona extends JFrame{
 	
 	GamePanel board;
 	InfoPanel info;
+	Stopwatch stopw;
 	
 	
 	public Fanorona(){
@@ -15,9 +17,12 @@ public class Fanorona extends JFrame{
 		addMenuBar();
 		Container content = getContentPane();
 		info = new InfoPanel();
-		board = new GamePanel(info);
+		stopw = new Stopwatch(50000); new Thread(stopw).start();
+		board = new GamePanel(info,stopw);
+		stopw.addboard(board);
 		content.add(board, BorderLayout.CENTER);	
 		content.add(info, BorderLayout.EAST);
+		content.add(stopw, BorderLayout.SOUTH);
 		pack();
 		setVisible(true);
 	}
@@ -28,9 +33,10 @@ public class Fanorona extends JFrame{
 		JMenuItem newGame = new JMenuItem("New Game");
 		newGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
-            {
+            { 
+            	info.initial=false;
                 board.newGame();
-                info.clear(board.printTurn());
+               
             }
         });
 		
