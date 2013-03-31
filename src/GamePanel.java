@@ -17,7 +17,7 @@ public class GamePanel extends JPanel{
 	
 	boolean win,draw;
 	
-	public enum Piece {PLAYER, OPPONENT, EMPTY};
+	public enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
 	private enum Direction {NEUTRAL, UPLEFT, UP, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWN, DOWNRIGHT, DUMMY};
 	private Color playerColor = Color.WHITE;
 	private Color opponentColor = Color.BLACK;
@@ -25,9 +25,12 @@ public class GamePanel extends JPanel{
 	
 	private Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
+	private Rectangle SacButton = new Rectangle();
 	private Point selected_piece = null;
 	private Point choice1 = null;
 	private Point choice2 = null;
+	private Point sacrificeP = null;
+	private Point sacrificeO = null;
 	private ArrayList<Point> chained_spots = new ArrayList<Point>();
 	private boolean chain_piece = false;
 	private Direction previous_direction = Direction.DUMMY;
@@ -69,7 +72,7 @@ public class GamePanel extends JPanel{
 								}
 							}
 							//select piece
-							if((selected_piece == null && board[row][col]!=Piece.EMPTY) && !overrideMode){ //no piece selected
+							if((selected_piece == null && (board[row][col]!=Piece.EMPTY && board[row][col]!=Piece.SACRIFICE)) && !overrideMode){ //no piece selected
 								selected_piece = new Point(col, row);
 								Piece color = board[selected_piece.y][selected_piece.x];
 								if(TurnCount%2==0 && color != Piece.PLAYER) {
@@ -539,15 +542,32 @@ public class GamePanel extends JPanel{
 										break;
 									}
 								} else {
-									overrideMode = false;
-									dir = overrideDir;
+									
 									if(choice1.x == col && choice1.y == row){
 										before = true;
 										after = false;
-									} else {
+									} else if(choice2.x == col && choice2.y == row){
 										before = false;
 										after = true;
+									} else if (selected_piece.x == col && selected_piece.y == row){
+										selected_piece = null;
+										choice1 = null;
+										choice2 = null;
+										overrideMode = false;
+										overrideDir = Direction.DUMMY;
+										if(chain_piece){
+											info.write("Chain Ended.");
+											chain_piece = false;
+											chained_spots.clear();
+											countPieces();
+										}
+										break;
+									} else {
+										info.write("Must select one of two pieces.");
+										break;
 									}
+									overrideMode = false;
+									dir = overrideDir;
 									switch(dir){
 									case UPLEFT:		row = selected_piece.y - 1;
 														col = selected_piece.x - 1;
@@ -697,6 +717,8 @@ public class GamePanel extends JPanel{
 									if(next_move){
 										chain_piece = true;
 										previous_direction = dir;
+										stopw.timeReset();
+										stopw.timeStart();
 									} else {
 										chain_piece = false;
 										chained_spots.clear();
@@ -716,8 +738,26 @@ public class GamePanel extends JPanel{
 						}
 					}
 				}
+				if(SacButton.contains(p) && !win && !draw){
+					emptyClick = false;
+					if(overrideMode || chain_piece){
+						info.write("Cannot sacrifice a piece now.");
+					} else if (selected_piece == null){
+						info.write("Must choose a piece to sacrifice.");
+					} else {
+						board[selected_piece.y][selected_piece.x] = Piece.SACRIFICE;
+						if(TurnCount%2 == 0){
+							sacrificeP = new Point(selected_piece.x,selected_piece.y);
+						} else {
+							sacrificeO = new Point(selected_piece.x,selected_piece.y);
+						}
+						selected_piece = null;
+						countPieces();
+						info.write("Piece has been sacrificed to block moves.");
+					}
+				}
 				if(emptyClick) {
-					if(!chain_piece)
+					if(!chain_piece && !overrideMode)
 						selected_piece = null; 
 				} // deselect piece
 			}
@@ -1198,6 +1238,7 @@ public class GamePanel extends JPanel{
 		
 		int piecesize=(getWidth()+getHeight())/50;
 		int hilightsize=(getWidth()+getHeight())/40;
+		int sacrificesize=(getWidth()+getHeight())/80;
 		
 		if(selected_piece != null){
 			g.setColor(Color.YELLOW);
@@ -1215,6 +1256,14 @@ public class GamePanel extends JPanel{
 		for(int row = 1; row<board.length+1; row++){
 			for(int col = 1; col<board[0].length+1; col++){
 				if(board[row-1][col-1] == Piece.EMPTY) continue;
+				if(board[row-1][col-1] == Piece.SACRIFICE){
+					g.setColor(Color.YELLOW);
+					g.fillOval(col*(xwidth/(COLS+1))-(hilightsize)/2, row*yheight/(ROWS+1)-hilightsize/2, hilightsize, hilightsize);
+					g.setColor(Color.BLACK);
+					g.fillOval(col*(xwidth/(COLS+1))-(piecesize)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
+					g.setColor(Color.YELLOW);
+					g.fillOval(col*(xwidth/(COLS+1))-(sacrificesize)/2, row*yheight/(ROWS+1)-sacrificesize/2, sacrificesize, sacrificesize);
+				}
 				if(board[row-1][col-1] == Piece.OPPONENT){
 					g.setColor(opponentColor);
 					g.fillOval(col*(xwidth/(COLS+1))-(piecesize)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
@@ -1224,6 +1273,15 @@ public class GamePanel extends JPanel{
 					g.fillOval(col*(xwidth/(COLS+1))-(piecesize)/2, row*yheight/(ROWS+1)-piecesize/2, piecesize, piecesize);
 				}
 			}
+		}
+		
+		int psize = getWidth()/24;
+		if(selected_piece != null && !chain_piece && !overrideMode){
+			g.setColor(Color.BLACK);
+			g.drawString("SACRIFICE", xwidth - (6*psize), yheight-4);
+		} else {
+			g.setColor(Color.GRAY);
+			g.drawString("SACRIFICE", xwidth - (6*psize), yheight-4);
 		}
 	}
 
@@ -1260,6 +1318,8 @@ public class GamePanel extends JPanel{
 		selected_piece = null;
 		choice1 = null;
 		choice2 = null;
+		sacrificeP = null;
+		sacrificeO = null;
 		chained_spots = new ArrayList<Point>();
 		chain_piece = false;
 		previous_direction = Direction.DUMMY;
@@ -1285,6 +1345,12 @@ public class GamePanel extends JPanel{
 				buttons[row-1][col-1] = new Rectangle(col*(xwidth/(COLS+1))-piecesize/2, row*(yheight/(ROWS+1))-piecesize/2, piecesize, piecesize);
 			}
 		}
+		
+		g.setColor(Color.BLACK);
+		g.fillRect(xwidth - (2*piecesize), yheight - (piecesize)+4, piecesize*2, piecesize-4);
+		g.setColor(Color.GREEN);
+		g.fillRect(xwidth - (2*piecesize)+4, yheight - (piecesize)+8, piecesize*2-8, piecesize-12);		
+		SacButton = new Rectangle(xwidth - (2*piecesize), yheight - (piecesize)+4, piecesize*2, piecesize+4);
 	}
 
 	public void setBoardSize(int numberOfRows, int numberofColumns){
@@ -1350,7 +1416,18 @@ public class GamePanel extends JPanel{
 		if(OppPieceCount == 0 || PlayerPieceCount == 0) win = true;
 		if(!draw && !win) TurnCount++;
 		
-		if(!draw && !win){ info.write(printTurn()); stopw.timeStart();}
+		if(!draw && !win){
+			info.write(printTurn());
+			if(TurnCount%2 == 0 && sacrificeP != null){
+				board[sacrificeP.y][sacrificeP.x] = Piece.EMPTY;
+				sacrificeP = null;
+			}
+			if(TurnCount%2 == 1 && sacrificeO != null){
+				board[sacrificeO.y][sacrificeO.x] = Piece.EMPTY;
+				sacrificeO = null;
+			}
+			stopw.timeStart();
+		}
 		else if(draw) { info.write("Draw"); stopw.timeStop(); }
 		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); }
 		else { info.write("Player 2 Wins!"); stopw.timeStop(); }
