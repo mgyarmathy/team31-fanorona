@@ -1123,25 +1123,71 @@ public class GamePanel extends JPanel{
 			char c= (char)(i+64);
 			g.drawString(Character.toString(c),x1/2-getWidth()/50 , y1+getHeight()/50);
 		}
-		
+		boolean flip=false; 
 		
 		// draw diagonal lines
 		g.setColor(Color.GRAY);
-		for(int i=1; i<=ROWS/2;i++){
-			y1= ystartp +(2*i-1)*yheight/(ROWS+1);
-			y2= ystartp +((2*i-1)+2)*yheight/(ROWS+1);
-			for(int j=1; j<=COLS/2;j++){
-				x1= xstartp+ (2*j-1)*xwidth/(COLS+1);
-				x2= xstartp+ ((2*j-1)+2)*xwidth/(COLS+1);
-				
+		for(int i=ROWS/2+1; i<=ROWS-1;i++){
+			y1= ystartp +i*yheight/(ROWS+1);
+			y2= ystartp +(i+1)*yheight/(ROWS+1);
+			for(int j=1; j<=COLS-1;j++){
+					if(flip){
+						if((j+(COLS/2)%2)%2==0){
+							x1= xstartp+ j*xwidth/(COLS+1);
+							x2= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+						else{
+							x2= xstartp+ j*xwidth/(COLS+1);
+							x1= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+					}
+					else{
+						if((j+(COLS/2)%2)%2==0){
+							x2= xstartp+ j*xwidth/(COLS+1);
+							x1= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+						else{
+							x1= xstartp+ j*xwidth/(COLS+1);
+							x2= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+					}
 				g.drawLine(x1, y1 , x2, y2);
 				g.drawLine(x1+1, y1 , x2+1, y2);
 				g.drawLine(x1+2, y1 , x2+2, y2);
-				
-				g.drawLine(x2, y1 , x1, y2);
-				g.drawLine(x2+1, y1 , x1+1, y2);
-				g.drawLine(x2+2, y1 , x1+2, y2);
 			}
+			flip = !flip;
+		}
+		
+		flip =true;
+		for(int i=ROWS/2; i>=1;i--){
+			y1= ystartp +i*yheight/(ROWS+1);
+			y2= ystartp +(i+1)*yheight/(ROWS+1);
+			for(int j=1; j<=COLS-1;j++){
+					if(flip){
+						if((j+(COLS/2)%2)%2==0){
+							x1= xstartp+ j*xwidth/(COLS+1);
+							x2= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+						else{
+							x2= xstartp+ j*xwidth/(COLS+1);
+							x1= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+					}
+					else{
+						if((j+(COLS/2)%2)%2==0){
+							x2= xstartp+ j*xwidth/(COLS+1);
+							x1= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+						else{
+							x1= xstartp+ j*xwidth/(COLS+1);
+							x2= xstartp+ (j+1)*xwidth/(COLS+1);
+						}
+					}
+				g.drawLine(x1, y1 , x2, y2);
+				g.drawLine(x1+1, y1 , x2+1, y2);
+				g.drawLine(x1+2, y1 , x2+2, y2);
+			}
+			flip = !flip;
 		}
 	}
 
