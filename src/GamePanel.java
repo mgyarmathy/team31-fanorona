@@ -120,7 +120,7 @@ public class GamePanel extends JPanel{
 										break;
 									}
 									//Check if the piece cannot move diagonally
-									if((row + col)%2 == Diag){
+									if((row + col)%2 != Diag){
 										int x_dif = Math.abs(selected_piece.x - col);
 										int y_dif = Math.abs(selected_piece.y - row);
 										if(x_dif != 0 && y_dif != 0){
@@ -1359,9 +1359,9 @@ public class GamePanel extends JPanel{
 		ROWS = numberOfRows;
 		COLS = numberofColumns;
 		if((ROWS + COLS)%4 == 0){
-			Diag = 0;
-		} else {
 			Diag = 1;
+		} else {
+			Diag = 0;
 		}
 	}
 	
