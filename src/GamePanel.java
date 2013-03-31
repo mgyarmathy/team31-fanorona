@@ -15,6 +15,8 @@ public class GamePanel extends JPanel{
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
 	int TurnCount;
 	
+	public int Diag = 0;
+	
 	boolean win,draw;
 	
 	public enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
@@ -118,7 +120,7 @@ public class GamePanel extends JPanel{
 										break;
 									}
 									//Check if the piece cannot move diagonally
-									if((row + col)%2 == 1){
+									if((row + col)%2 == Diag){
 										int x_dif = Math.abs(selected_piece.x - col);
 										int y_dif = Math.abs(selected_piece.y - row);
 										if(x_dif != 0 && y_dif != 0){
@@ -805,7 +807,7 @@ public class GamePanel extends JPanel{
 		
 		//Determine which directions to take into account, based on position
 		
-		if ((start.y+start.x)%2 == 0){
+		if ((start.y+start.x)%2 == Diag){
 			if(start.y > 1 && start.x > 1)					ULafter = true;
 			if(start.y > 0 && start.x > 0 && 
 				start.y < ROWS - 1 && start.x < COLS - 1)	ULbefore = true;
@@ -1356,6 +1358,11 @@ public class GamePanel extends JPanel{
 	public void setBoardSize(int numberOfRows, int numberofColumns){
 		ROWS = numberOfRows;
 		COLS = numberofColumns;
+		if((ROWS + COLS)%4 == 0){
+			Diag = 0;
+		} else {
+			Diag = 1;
+		}
 	}
 	
 	public int getNumberOfRows(){
