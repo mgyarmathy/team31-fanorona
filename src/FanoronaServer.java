@@ -5,16 +5,49 @@ import java.net.*;
 public class FanoronaServer implements Runnable{
 	//establish server port
 	public FanoronaServer(){}
+	
+	public void sendMessage(OutputStream s_socketOutput, String message){
+		byte[] buf = new byte[1024];
+	    char[] charArray = message.toCharArray();
+	    for(int i = 0; i<charArray.length; i++){
+	    	buf[i] = (byte)charArray[i];
+	    }
+	    buf[charArray.length] = (byte)' ';
+	    try {
+			s_socketOutput.write(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("server: unable to write to output stream");
+			System.exit(1);
+		}
+		
+	}
+	
+	public String receiveMessage(InputStream s_socketInput){
+		byte[] buf = new byte[1024];
+		try {
+			s_socketInput.read(buf, 0, buf.length);
+		} catch (IOException e) {
+			System.err.println("Client unable to read"); 
+			System.exit(1);
+		}
+		String message = new String(buf);
+		return message;
+	}
 
 	@Override
 	public void run() {
 		ServerSocket serverSocket = null;
+		InputStream sockInput = null;
+		OutputStream sockOutput = null;
+		
+		//create serverSocket
 		try {
 			serverSocket = new ServerSocket(4555);
 		} catch (IOException ex) {
 			System.out.println("Could not listen on port: 4555");
 			System.exit(-1);
 		}
+		
 		//wait for client to connect
 		Socket clientSocket = null;
 		try {
@@ -25,8 +58,7 @@ public class FanoronaServer implements Runnable{
 		}
 		System.out.println("connection established");
 		
-		InputStream sockInput = null;
-		OutputStream sockOutput = null;
+		//set up client input/output streams
 		try {
 			sockInput = clientSocket.getInputStream();
 		} catch (IOException e) {
@@ -40,42 +72,14 @@ public class FanoronaServer implements Runnable{
 			System.exit(1);
 		}
 		
-		byte[] buf = new byte[1024];
-		char[] message = "WELCOME".toCharArray();
-	    for(int i = 0; i<message.length; i++){
-	    	buf[i] = (byte)message[i];
-	    }
-	    try {
-			sockOutput.write(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("server: unable to write to output stream");
-			System.exit(1);
-		}
+		sendMessage(sockOutput, "WELCOME");
 	    
-	    buf = new byte[1024];
-	    message = "INFO 9 5 B 5000".toCharArray();
-	    for(int i = 0; i<message.length; i++){
-	    	buf[i] = (byte)message[i];
-	    }
-	    buf[message.length] = (byte)' ';
-	    try {
-			sockOutput.write(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("server: unable to write to output stream");
-			System.exit(1);
-		}
-	    
-	    
-	    try {
-			int bytes_read = sockInput.read(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("Client unable to read"); 
-			System.exit(1);
-		}
+		sendMessage(sockOutput, "INFO 9 5 B 20000");
 		
-		String ready = new String(buf);
+		String ready = receiveMessage(sockInput);
 		System.out.println(ready);
 		
+		//close client and server sockets upon termination
 		try {
 			clientSocket.close();
 		} catch (IOException e) {

@@ -224,6 +224,34 @@ public class Fanorona extends JFrame implements Runnable{
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
 	}
+	
+	public void sendMessage(OutputStream c_socketOutput, String message){
+		byte[] buf = new byte[1024];
+	    char[] charArray = message.toCharArray();
+	    for(int i = 0; i<charArray.length; i++){
+	    	buf[i] = (byte)charArray[i];
+	    }
+	    buf[charArray.length] = (byte)' ';
+	    try {
+			c_socketOutput.write(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("server: unable to write to output stream");
+			System.exit(1);
+		}
+		
+	}
+	
+	public String receiveMessage(InputStream c_socketInput){
+		byte[] buf = new byte[1024];
+		try {
+			c_socketInput.read(buf, 0, buf.length);
+		} catch (IOException e) {
+			System.err.println("Client unable to read"); 
+			System.exit(1);
+		}
+		String message = new String(buf);
+		return message;
+	}
 
 	@Override
 	public void run() {
@@ -259,27 +287,14 @@ public class Fanorona extends JFrame implements Runnable{
 		}
 		
 		//read WELCOME message from server
-		try {
-			int bytes_read = c_sockInput.read(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("Client unable to read"); 
-			System.exit(1);
-		}
-		String welcome = new String(buf);
+		String welcome = receiveMessage(c_sockInput);
 		if(!welcome.startsWith("WELCOME")){ System.out.println("error: server did not WELCOME"); }
 		System.out.println(welcome);
 		
 		//read INFO from server
-		try {
-			int bytes_read = c_sockInput.read(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("Client unable to read"); 
-			System.exit(1);
-		}
-		String gameInfo = new String(buf);
+		String gameInfo = receiveMessage(c_sockInput);
 		if(gameInfo.startsWith("INFO")) { //parse game INFO
 			String[] tokens = gameInfo.split("\\s+");
-			System.out.println(tokens.length);
 			int cols = Integer.parseInt(tokens[1]);
 			int rows = Integer.parseInt(tokens[2]);
 			String firstMove = tokens[3];
@@ -306,17 +321,7 @@ public class Fanorona extends JFrame implements Runnable{
 		
 		
 		//send READY to server for game to begin
-		buf = new byte[1024];
-	    message = "READY".toCharArray();
-	    for(int i = 0; i<message.length; i++){
-	    	buf[i] = (byte)message[i];
-	    }
-	    try {
-			c_sockOutput.write(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("server: unable to write to output stream");
-			System.exit(1);
-		}
+		sendMessage(c_sockOutput, "READY");
 		
 		
 		//close socket at end of session
