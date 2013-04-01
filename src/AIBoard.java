@@ -192,7 +192,7 @@ public class AIBoard {
 		chained_spots.add(retP);
 		curX += xInc;
 		curY += yInc;
-		while(curX > 0 && curX < GamePanel.COLS && curY > 0 && curY < GamePanel.ROWS){
+		while(curX >= 0 && curX < GamePanel.COLS && curY >= 0 && curY < GamePanel.ROWS){
 			if(Boardstate[curY][curX] == myColor){
 				Boardstate[curY][curX] = GamePanel.Piece.EMPTY;
 				curX += xInc;
