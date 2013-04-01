@@ -12,6 +12,10 @@ public class Fanorona extends JFrame implements Runnable{
 	InfoPanel info;
 	Stopwatch stopw;
 	
+	Socket c_socket = null;
+	InputStream c_sockInput = null;
+	OutputStream c_sockOutput = null;
+	
 	
 	public Fanorona(){
 		super("Team 31 - Fanorona");
@@ -255,9 +259,7 @@ public class Fanorona extends JFrame implements Runnable{
 
 	@Override
 	public void run() {
-		Socket c_socket = null;
-		InputStream c_sockInput = null;
-		OutputStream c_sockOutput = null;
+
 		byte[] buf = new byte[1024];
 		char[] message;
 		
@@ -312,16 +314,36 @@ public class Fanorona extends JFrame implements Runnable{
 				board.setBoardSize(rows, cols);
 			}
 			else { System.err.println("error: invalid board size from server"); System.exit(1);}
-			board.newGame();
-			setVisible(true);
+			
 		}
 		else { System.err.println("error: server did not give INFO"); System.exit(1);}
 		System.out.println(gameInfo);
-		
-		
-		
+
 		//send READY to server for game to begin
 		sendMessage(c_sockOutput, "READY");
+		
+		//receive BEGIN, and game begins
+		String begin = receiveMessage(c_sockInput);
+		if(begin.startsWith("BEGIN")){
+			board.newGame();
+			setVisible(true);
+		}
+		else { System.err.println("error: server did not send BEGIN message"); System.exit(1);}
+		System.out.println(begin);
+		
+		
+		//capture_move   ::==  A position position | W position position
+		//paika_move     ::==  P position position
+		//sacrifice_move ::==  S position
+		String move = receiveMessage(c_sockInput);
+		String[] tokens = move.split("\\s+");
+		if(tokens[0].equals("A") || tokens[0].equals("W")){
+			int fromCol = Integer.parseInt(tokens[1]);
+			int fromRow = Integer.parseInt(tokens[2]);
+			int toCol = Integer.parseInt(tokens[3]);
+			int toRow = Integer.parseInt(tokens[4]);
+		}
+		System.out.println(move);
 		
 		
 		//close socket at end of session

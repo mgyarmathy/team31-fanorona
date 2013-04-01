@@ -79,6 +79,12 @@ public class FanoronaServer implements Runnable{
 		String ready = receiveMessage(sockInput);
 		System.out.println(ready);
 		
+		sendMessage(sockOutput, "BEGIN");
+		//capture_move   ::==  A position position | W position position
+		//paika_move     ::==  P position position
+		//sacrifice_move ::==  S position
+		sendMessage(sockOutput, "A 6 3 5 3");
+		
 		//close client and server sockets upon termination
 		try {
 			clientSocket.close();
