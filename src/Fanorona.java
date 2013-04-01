@@ -17,17 +17,7 @@ public class Fanorona extends JFrame implements Runnable{
 		super("Team 31 - Fanorona");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addMenuBar();
-		Container content = getContentPane();
-		info = new InfoPanel();
-		stopw = new Stopwatch(20000); new Thread(stopw).start();
-		//stopw = new Stopwatch(0); new Thread(stopw).start();
-		board = new GamePanel(info,stopw);
-		stopw.addboard(board);
-		content.add(board, BorderLayout.CENTER);	
-		content.add(info, BorderLayout.EAST);
-		content.add(stopw, BorderLayout.SOUTH);
-		pack();
-		setVisible(true);
+		setVisible(false);
 	}
 	
 	public void addMenuBar(){
@@ -240,9 +230,12 @@ public class Fanorona extends JFrame implements Runnable{
 		Socket c_socket = null;
 		InputStream c_sockInput = null;
 		OutputStream c_sockOutput = null;
+		byte[] buf = new byte[1024];
+		char[] message;
 		
+		//connect to server over localhost
 		try {
-			c_socket = new Socket("localhost", 6544);
+			c_socket = new Socket("localhost", 4555);
 		} catch (UnknownHostException e) {
 			System.err.println("Don't know about host: FanoronaServer."); 
 			System.exit(1);
@@ -250,6 +243,8 @@ public class Fanorona extends JFrame implements Runnable{
 			System.err.println("Couldn't get I/O for the connection to: FanoronaServer.");
 			System.exit(1);
 		}
+		
+		//get input/output streams from socket
 		try {
 			c_sockInput = c_socket.getInputStream();
 		} catch (IOException e) {
@@ -263,18 +258,68 @@ public class Fanorona extends JFrame implements Runnable{
 			System.exit(1);
 		}
 		
-		byte[] buf=new byte[1024];
+		//read WELCOME message from server
 		try {
 			int bytes_read = c_sockInput.read(buf, 0, buf.length);
 		} catch (IOException e1) {
 			System.err.println("Client unable to read"); 
 			System.exit(1);
 		}
+		String welcome = new String(buf);
+		if(!welcome.startsWith("WELCOME")){ System.out.println("error: server did not WELCOME"); }
+		System.out.println(welcome);
 		
-		String testString = new String(buf);
-		info.write("");
-		info.write(testString);
+		//read INFO from server
+		try {
+			int bytes_read = c_sockInput.read(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("Client unable to read"); 
+			System.exit(1);
+		}
+		String gameInfo = new String(buf);
+		if(gameInfo.startsWith("INFO")) { //parse game INFO
+			String[] tokens = gameInfo.split("\\s+");
+			System.out.println(tokens.length);
+			int cols = Integer.parseInt(tokens[1]);
+			int rows = Integer.parseInt(tokens[2]);
+			String firstMove = tokens[3];
+			int clockTime = Integer.parseInt(tokens[4]);
+			Container content = getContentPane();
+			info = new InfoPanel();
+			stopw = new Stopwatch(clockTime); new Thread(stopw).start();
+			board = new GamePanel(info,stopw);
+			stopw.addboard(board);
+			content.add(board, BorderLayout.CENTER);	
+			content.add(info, BorderLayout.EAST);
+			content.add(stopw, BorderLayout.SOUTH);
+			pack();
+			if(cols % 2 == 1 && rows % 2 == 1){
+				board.setBoardSize(rows, cols);
+			}
+			else { System.err.println("error: invalid board size from server"); System.exit(1);}
+			board.newGame();
+			setVisible(true);
+		}
+		else { System.err.println("error: server did not give INFO"); System.exit(1);}
+		System.out.println(gameInfo);
 		
+		
+		
+		//send READY to server for game to begin
+		buf = new byte[1024];
+	    message = "READY".toCharArray();
+	    for(int i = 0; i<message.length; i++){
+	    	buf[i] = (byte)message[i];
+	    }
+	    try {
+			c_sockOutput.write(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("server: unable to write to output stream");
+			System.exit(1);
+		}
+		
+		
+		//close socket at end of session
 		try {
 			c_socket.close();
 		} catch (IOException e) {

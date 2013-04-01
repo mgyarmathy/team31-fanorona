@@ -10,9 +10,9 @@ public class FanoronaServer implements Runnable{
 	public void run() {
 		ServerSocket serverSocket = null;
 		try {
-			serverSocket = new ServerSocket(6544);
+			serverSocket = new ServerSocket(4555);
 		} catch (IOException ex) {
-			System.out.println("Could not listen on port: 6544");
+			System.out.println("Could not listen on port: 4555");
 			System.exit(-1);
 		}
 		//wait for client to connect
@@ -40,14 +40,41 @@ public class FanoronaServer implements Runnable{
 			System.exit(1);
 		}
 		
-		String testString = "This is an example";
-	    byte[] buf = testString.getBytes();
+		byte[] buf = new byte[1024];
+		char[] message = "WELCOME".toCharArray();
+	    for(int i = 0; i<message.length; i++){
+	    	buf[i] = (byte)message[i];
+	    }
 	    try {
 			sockOutput.write(buf, 0, buf.length);
 		} catch (IOException e1) {
 			System.err.println("server: unable to write to output stream");
 			System.exit(1);
 		}
+	    
+	    buf = new byte[1024];
+	    message = "INFO 9 5 B 5000".toCharArray();
+	    for(int i = 0; i<message.length; i++){
+	    	buf[i] = (byte)message[i];
+	    }
+	    buf[message.length] = (byte)' ';
+	    try {
+			sockOutput.write(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("server: unable to write to output stream");
+			System.exit(1);
+		}
+	    
+	    
+	    try {
+			int bytes_read = sockInput.read(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("Client unable to read"); 
+			System.exit(1);
+		}
+		
+		String ready = new String(buf);
+		System.out.println(ready);
 		
 		try {
 			clientSocket.close();
