@@ -353,7 +353,7 @@ public class Fanorona extends JFrame implements Runnable{
 			int toCol = Integer.parseInt(tokens[3]);
 			int toRow = Integer.parseInt(tokens[4]);
 			System.out.println(serverMove);
-			//perform piece movement and update client board appropriately
+			//TODO: perform piece movement and update client board appropriately
 			sendMessage(c_sockOutput, "OK"); //confirm move
 		}
 		else if(tokens[0].equals("S")){
@@ -365,7 +365,7 @@ public class Fanorona extends JFrame implements Runnable{
 		}
 		
 		//player makes move...
-		sendMessage(c_sockOutput, "A 6 4 6 3");
+		sendMessage(c_sockOutput, "A 6 2 6 3");
 		//then gets server OK
 		String ok = receiveMessage(c_sockInput);
 		System.out.println(ok);

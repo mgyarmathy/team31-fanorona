@@ -74,10 +74,11 @@ public class FanoronaServer implements Runnable{
 		int ROWS = 5;
 		int COLS = 9;
 		String firstMove = "B";
+		int timer_msecs = 20000;
 		
 		sendMessage(sockOutput, "WELCOME");
 	    
-		sendMessage(sockOutput, "INFO " + COLS + " " + ROWS + " " + firstMove + " " + "20000");
+		sendMessage(sockOutput, "INFO " + COLS + " " + ROWS + " " + firstMove + " " + timer_msecs);
 		
 		String ready = receiveMessage(sockInput);
 		System.out.println(ready);
@@ -91,7 +92,23 @@ public class FanoronaServer implements Runnable{
 		System.out.println(ok);
 		String playerMove = receiveMessage(sockInput);
 		//parse player move
-		System.out.println(playerMove);
+		String[] tokens = playerMove.split("\\s+");
+		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+			int fromCol = Integer.parseInt(tokens[1]);
+			int fromRow = Integer.parseInt(tokens[2]);
+			int toCol = Integer.parseInt(tokens[3]);
+			int toRow = Integer.parseInt(tokens[4]);
+			System.out.println(playerMove);
+			//TODO: perform piece movement and update client board appropriately
+			sendMessage(sockOutput, "OK"); //confirm move
+		}
+		else if(tokens[0].equals("S")){
+			int sacCol = Integer.parseInt(tokens[1]);
+			int sacRow = Integer.parseInt(tokens[2]);
+			System.out.println(playerMove);
+			//perform sacrifice on that specific piece
+			sendMessage(sockOutput, "OK"); //confirm move
+		}
 		sendMessage(sockOutput, "OK"); //confirm move received
 		
 		
