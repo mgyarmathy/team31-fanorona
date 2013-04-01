@@ -10,7 +10,7 @@ public class GamePanel extends JPanel{
 	static int ROWS = 5;
 	static int COLS = 9;
 	
-	boolean AImode = true;
+	boolean AImode = false;
 	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
 	int TurnCount;
@@ -1400,6 +1400,14 @@ public class GamePanel extends JPanel{
 			else return("Player 1's Turn");
 		}
 		else return("Player 2's Turn");
+	}
+	
+	public void setHumans(){
+		AImode = false;
+	}
+	
+	public void setHumanAI(){
+		AImode = true;
 	}
 	
 	public void countPieces(){

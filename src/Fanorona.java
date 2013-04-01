@@ -19,8 +19,8 @@ public class Fanorona extends JFrame implements Runnable{
 		addMenuBar();
 		Container content = getContentPane();
 		info = new InfoPanel();
-		//stopw = new Stopwatch(20000); new Thread(stopw).start();
-		stopw = new Stopwatch(0); new Thread(stopw).start();
+		stopw = new Stopwatch(20000); new Thread(stopw).start();
+		//stopw = new Stopwatch(0); new Thread(stopw).start();
 		board = new GamePanel(info,stopw);
 		stopw.addboard(board);
 		content.add(board, BorderLayout.CENTER);	
@@ -198,12 +198,38 @@ public class Fanorona extends JFrame implements Runnable{
 			}
 		});
 		
+		JMenu playerMenu = new JMenu("Players");
+		JMenuItem HvH = new JMenuItem("Human vs Human");
+		HvH.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	info.initial=false;
+            	board.setHumans();
+                board.newGame();
+               
+            }
+        });
+		
+		JMenuItem HvC = new JMenuItem("Human vs Computer");
+		HvC.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	info.initial=false;
+            	board.setHumanAI();
+                board.newGame();
+               
+            }
+        });
+		playerMenu.add(HvH);
+		playerMenu.add(HvC);
+		
 		options.add(boardSize);
 		options.add(playerName);
 		options.add(pieceColors);
 		options.add(mute);
 		menuBar.add(fileMenu);
 		menuBar.add(options);
+		menuBar.add(playerMenu);
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
