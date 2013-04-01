@@ -17,6 +17,9 @@ public class GamePanel extends JPanel{
 	
 	static int Diag = 0;
 	
+	String Player1move,Player2move;
+	boolean Player1newmove=false,Player2newmove=false; 
+	
 	boolean win,draw;
 	
 	static enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
@@ -699,6 +702,36 @@ public class GamePanel extends JPanel{
 									char c=(char) (selected_piece.y+65);
 									char c2=(char) (row+65);
 									info.write(Character.toString(c)+Integer.toString(selected_piece.x+1)+" moved to "+Character.toString(c2)+Integer.toString(col+1));
+									
+									
+									
+									//TODO:detect advance/withdraw/paika ********************************************************
+									/*if(paika){	
+										if(TurnCount%2==0){ 
+											Player1move+="P "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
+										}
+										else{
+											Player2move+="P "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
+										}
+									}*/
+									//else if(advance){
+										if(TurnCount%2==0){ 
+											Player1move+="A "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
+										}
+										else{
+											Player2move+="A "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
+										}
+									//}
+									/*else {
+										if(TurnCount%2==0){ 
+											Player1move+="W "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
+										}
+										else{
+											Player2move+="W "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
+										}
+									}*/
+									//******************************************************************************************
+										
 									board[row][col] = color;
 									board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
 									chained_spots.add(new Point(selected_piece.x, selected_piece.y));
@@ -723,6 +756,17 @@ public class GamePanel extends JPanel{
 									}
 									if(next_move){
 										chain_piece = true;
+										
+										// server chain move string stuff ****************************************
+										if(TurnCount%2==0){ 
+											Player1move+=" + ";
+										}
+										else{
+											Player2move+=" + ";
+										}
+										//************************************************************************
+										
+										
 										previous_direction = dir;
 										stopw.timeReset();
 										stopw.timeStart();
@@ -733,6 +777,18 @@ public class GamePanel extends JPanel{
 									}
 									// if move is valid and no more moves to make - countPieces
 									if(chain_piece == false){
+										
+										// set move new and clear other player move string ****************************************************
+										if(TurnCount%2==0){
+											Player1newmove=true;
+											Player2move="";
+										}
+										else{
+											Player2newmove=true;
+											Player1move="";
+										}
+										//send move to other player function ******************************************************************
+										
 										countPieces();
 										selected_piece = null;
 									}
@@ -758,6 +814,22 @@ public class GamePanel extends JPanel{
 						} else {
 							sacrificeO = new Point(selected_piece.x,selected_piece.y);
 						}
+						
+						
+						
+						// sacrifice move string
+						if(TurnCount%2==0){ 
+							Player1move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
+							Player1newmove=true;
+							Player2move="";
+						}
+						else{
+							Player2move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
+							Player2newmove=true;
+							Player1move="";
+						}
+						// send move to server **************************************
+						
 						selected_piece = null;
 						countPieces();
 						info.write("Piece has been sacrificed to block moves.");
