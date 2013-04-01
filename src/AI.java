@@ -118,42 +118,42 @@ public class AI{
 		
 		if(UL){
 			if (board[y-1][x-1] == GamePanel.Piece.EMPTY){
-				return new Point(y-1,x-1);
+				return new Point(x-1,y-1);
 			}
 		}
 		if(U){
 			if (board[y-1][x] == GamePanel.Piece.EMPTY){
-				return new Point(y-1,x);
+				return new Point(x,y-1);
 			}
 		}
 		if(UR){
 			if (board[y-1][x+1] == GamePanel.Piece.EMPTY){
-				return new Point(y-1,x+1);
+				return new Point(x+1,y-1);
 			}
 		}
 		if(L){
 			if (board[y][x-1] == GamePanel.Piece.EMPTY){
-				return new Point(y,x-1);
+				return new Point(x-1,y);
 			}
 		}
 		if(R){
 			if (board[y][x+1] == GamePanel.Piece.EMPTY){
-				return new Point(y,x+1);
+				return new Point(x+1,y);
 			}
 		}
 		if(DL){
 			if (board[y+1][x-1] == GamePanel.Piece.EMPTY){
-				return new Point(y+1,x-1);
+				return new Point(x-1,y+1);
 			}
 		}
 		if(D){
 			if (board[y+1][x] == GamePanel.Piece.EMPTY){
-				return new Point(y+1,x);
+				return new Point(x,y+1);
 			}
 		}
 		if(DR){
 			if (board[y+1][x+1] == GamePanel.Piece.EMPTY){
-				return new Point(y+1,x+1);
+				return new Point(x+1,y+1);
 			}
 		}
 		
