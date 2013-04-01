@@ -1,4 +1,5 @@
 import javax.swing.*;
+
 import java.awt.*;
 import java.util.*;
 
@@ -12,32 +13,33 @@ public class AI{
 		color = col;
 	}
 	
-	public void create(){
-		AIBoard base = tree.getRoot().getData();
+	public void create(GamePanel.Piece mColor, Tree<AIBoard>.Node<AIBoard> t){
+		AIBoard base = t.getData();
 		GamePanel.Piece[][] baseBoard = copyBoard(base.getBoard());
 		ArrayList<AIBoard> moves = new ArrayList<AIBoard>();
 		ArrayList<Point> places = new ArrayList<Point>();
 		for(int i = 0; i < baseBoard.length; i++){
 			for (int j = 0; j < baseBoard[0].length; j++){
-				if(baseBoard[i][j] == color){
-					findMoves(j,i,color,base,moves,places);
+				if(baseBoard[i][j] == mColor){
+					findMoves(j,i,mColor,base,moves,places);
 					
 				}
 			}
 		}
 		for(int k = 0; k < moves.size(); k++){
-			tree.getRoot().add(moves.get(k));
-			findMoves(places.get(k).x,places.get(k).y,color,moves.get(k),moves,places);
+			t.add(moves.get(k));
+			findMoves(places.get(k).x,places.get(k).y,mColor,moves.get(k),moves,places);
 		}
 	}
 	
 	public GamePanel.Piece[][] getMove(){
-		create();
+		create(color, tree.getRoot());
 		int index = -1;
+		int i = 0;
 		int value = 1000;
 		if(color == GamePanel.Piece.PLAYER)
 			value = -1000;
-		for(int i = 0; i < tree.getRoot().getChildren().size(); i++){
+		for(; i < tree.getRoot().getChildren().size(); i++){
 			AIBoard base = tree.getRoot().getChildren().get(i).getData();
 			if(color == GamePanel.Piece.OPPONENT){
 				if(base.rank < value){
@@ -52,7 +54,75 @@ public class AI{
 			}
 		}
 		if(index == -1){
-			return makeEmpty();
+			//return makeEmpty();
+			Random ran = new Random();
+			int ranCase = ran.nextInt();
+			tree.erase();
+			ArrayList<AIBoard> boards = makeEmpty(color); //add empty moves
+			for(int z = 0; z < boards.size(); z++){
+				tree.getRoot().add(boards.get(z));
+			}
+			GamePanel.Piece color2 = GamePanel.Piece.PLAYER;
+			int negarank = 1000;
+			if(color == GamePanel.Piece.PLAYER){
+				color2 = GamePanel.Piece.OPPONENT;
+				negarank = -1000;
+			}
+			
+			for(int y = 0; y < tree.getRoot().getChildren().size(); y++){
+				create(color2, tree.getRoot().getChildren().get(y)); //add opponent moves
+				if(tree.getRoot().getChildren().get(y).getChildren().size() == 0){
+					ArrayList<AIBoard> opponentEmpty = makeEmpty(color2);
+					for(int q = 0; q < opponentEmpty.size(); q++){
+						tree.getRoot().getChildren().get(y).add(opponentEmpty.get(q));
+					}
+				}
+			}
+			int worstCase = 1000;
+			int bestCase = 1000;
+			if(color == GamePanel.Piece.PLAYER){
+				worstCase = -1000;
+				bestCase = -1000;
+			}
+			
+			for(i = 0; i < tree.getRoot().getChildren().size(); i++){
+				Tree<AIBoard>.Node<AIBoard> base2 = tree.getRoot().getChildren().get(i);
+				for(int r = 0; r < base2.getChildren().size(); r++){
+					if(color == GamePanel.Piece.PLAYER){
+						worstCase = 1000;
+					} else {
+						worstCase = -1000;
+					}
+					if(color == GamePanel.Piece.OPPONENT){
+						if(base2.getData().rank <= negarank){
+							negarank = base2.getData().rank;
+							if(base2.getChildren().get(r).getData().rank > worstCase){
+								worstCase = base2.getChildren().get(r).getData().rank;
+							}
+						}
+					}else {	
+						if(base2.getData().rank >= negarank){
+							negarank = base2.getData().rank;
+							if(base2.getChildren().get(r).getData().rank < value){
+								worstCase = base2.getChildren().get(r).getData().rank;
+							}
+						}
+					}
+				}
+				if(worstCase < bestCase){
+					bestCase = worstCase;
+					index = i;
+				} else if (worstCase == bestCase){
+					if(ran.nextInt() > ranCase){
+						index = i;
+					}
+				}
+			}
+			for(int x = 0; x < tree.getRoot().getChildren().get(index).getData().messages.size(); x++){
+				GamePanel.info.write(tree.getRoot().getChildren().get(index).getData().messages.get(x));
+			}
+			return tree.getRoot().getChildren().get(index).getData().getBoard();
+			
 		} else {
 			for(int x = 0; x < tree.getRoot().getChildren().get(index).getData().messages.size(); x++){
 				GamePanel.info.write(tree.getRoot().getChildren().get(index).getData().messages.get(x));
@@ -61,41 +131,61 @@ public class AI{
 		}
 	}
 	
-	public GamePanel.Piece[][] makeEmpty(){
-		Point pick = new Point(0,0);
-		Point go = new Point(0,0);
-		boolean first = true;
-		Random ran = new Random();
-		int test = ran.nextInt();
+	public ArrayList<AIBoard> makeEmpty(GamePanel.Piece mColor){
+		ArrayList<AIBoard> retList = new ArrayList<AIBoard>();
 		
-		GamePanel.Piece[][] base = tree.getRoot().getData().getBoard();
+		GamePanel.Piece[][] base = copyBoard(tree.getRoot().getData().getBoard());
 		for (int i = 0; i < base.length; i++){
 			for (int j = 0; j < base[0].length; j++){
-				if(base[i][j] == color){
-					Point p = findSpace(j,i,base);
-					if(p.x != -1){
-						if (first){
-							first = false;
-							pick = new Point(j,i);
-							go = p;
-						} else {
-							int test2 = ran.nextInt();
-							if(test2 > test){
-								pick = new Point(j,i);
-								go = p;
+				if(base[i][j] == mColor){
+					ArrayList<Point> p = findSpace(j,i,base);
+					for(int k = 0; k < p.size(); k++){
+						GamePanel.Piece[][] base2 = copyBoard(base);
+						GamePanel.Direction dir = GamePanel.Direction.DUMMY;
+						if(p.get(k).x - j == -1){
+							switch(p.get(k).y - i){
+							case -1: dir = GamePanel.Direction.UPLEFT;
+									 break;
+							case 0:	 dir = GamePanel.Direction.LEFT;
+									 break;
+							case 1:  dir = GamePanel.Direction.DOWNLEFT;
+									 break;
+							default: break;
+							}
+						} else if (p.get(k).x - j == 0){
+							switch(p.get(k).y - i){
+							case -1: dir = GamePanel.Direction.UP;
+									 break;
+							case 0:	 dir = GamePanel.Direction.NEUTRAL;
+									 break;
+							case 1:  dir = GamePanel.Direction.DOWN;
+									 break;
+							default: break;
+							}
+						} else if (p.get(k).x - j == 1){
+							switch(p.get(k).y - i){
+							case -1: dir = GamePanel.Direction.UPRIGHT;
+									 break;
+							case 0:	 dir = GamePanel.Direction.RIGHT;
+									 break;
+							case 1:  dir = GamePanel.Direction.DOWNRIGHT;
+									 break;
+							default: break;
 							}
 						}
+						AIBoard curBoard = new AIBoard(base2);
+						curBoard.makeMove(dir, new Point(j,i),mColor,true);
+						retList.add(curBoard);
 					}
 				}
 			}
 		}
-		
-		base[pick.y][pick.x] = GamePanel.Piece.EMPTY;
-		base[go.y][go.x] = color;
-		return base;
+
+		return retList;
 	}
 	
-	public Point findSpace(int x, int y, GamePanel.Piece[][] board){
+	public ArrayList<Point> findSpace(int x, int y, GamePanel.Piece[][] board){
+		ArrayList<Point> retList = new ArrayList<Point>();
 		boolean UL = false;
 		boolean U = false;
 		boolean UR = false;
@@ -118,82 +208,59 @@ public class AI{
 		
 		if(UL){
 			if (board[y-1][x-1] == GamePanel.Piece.EMPTY){
-				return new Point(x-1,y-1);
+				retList.add(new Point(x-1,y-1));
 			}
 		}
 		if(U){
 			if (board[y-1][x] == GamePanel.Piece.EMPTY){
-				return new Point(x,y-1);
+				retList.add(new Point(x,y-1));
 			}
 		}
 		if(UR){
 			if (board[y-1][x+1] == GamePanel.Piece.EMPTY){
-				return new Point(x+1,y-1);
+				retList.add(new Point(x+1,y-1));
 			}
 		}
 		if(L){
 			if (board[y][x-1] == GamePanel.Piece.EMPTY){
-				return new Point(x-1,y);
+				retList.add(new Point(x-1,y));
 			}
 		}
 		if(R){
 			if (board[y][x+1] == GamePanel.Piece.EMPTY){
-				return new Point(x+1,y);
+				retList.add(new Point(x+1,y));
 			}
 		}
 		if(DL){
 			if (board[y+1][x-1] == GamePanel.Piece.EMPTY){
-				return new Point(x-1,y+1);
+				retList.add(new Point(x-1,y+1));
 			}
 		}
 		if(D){
 			if (board[y+1][x] == GamePanel.Piece.EMPTY){
-				return new Point(x,y+1);
+				retList.add(new Point(x,y+1));
 			}
 		}
 		if(DR){
 			if (board[y+1][x+1] == GamePanel.Piece.EMPTY){
-				return new Point(x+1,y+1);
+				retList.add(new Point(x+1,y+1));
 			}
 		}
 		
-		return new Point(-1,-1);
+		return retList;
 	}
 	
 	public void findMoves(int x, int y, GamePanel.Piece myColor, AIBoard base, ArrayList<AIBoard> moves, ArrayList<Point> places){
-		/*AIBoard base2 = new AIBoard(copyBoard(base.getBoard()));
-		base2.messages = new ArrayList<String>(base.messages);
-		base2.moves = new ArrayList<Point>(base.moves);
-		switch(base.prevDir){
-		case UPLEFT:	base2.prevDir = GamePanel.Direction.UPLEFT;
-						break;
-		case UP:		base2.prevDir = GamePanel.Direction.UP;
-						break;
-		case UPRIGHT:	base2.prevDir = GamePanel.Direction.UPRIGHT;
-						break;
-		case LEFT:		base2.prevDir = GamePanel.Direction.LEFT;
-						break;
-		case RIGHT:		base2.prevDir = GamePanel.Direction.RIGHT;
-						break;
-		case DOWNLEFT:	base2.prevDir = GamePanel.Direction.DOWNLEFT;
-						break;
-		case DOWN:		base2.prevDir = GamePanel.Direction.DOWN;
-						break;
-		case DOWNRIGHT:	base2.prevDir = GamePanel.Direction.DOWNRIGHT;
-						break;
-		default:		break;
-		}
-		base2.chained_spots = new ArrayList<Point>(base.chained_spots);*/
 		AIBoard base2 = copyAI(base);
 		
 		GamePanel.Piece[][] baseBoard = base2.getBoard();
 		GamePanel.Direction dir = base2.prevDir;
 		
-		GamePanel.Piece color = myColor;
+		GamePanel.Piece color2 = myColor;
 		if(myColor == GamePanel.Piece.PLAYER){
-			color = GamePanel.Piece.OPPONENT;
+			color2 = GamePanel.Piece.OPPONENT;
 		} else {
-			color = GamePanel.Piece.PLAYER;
+			color2 = GamePanel.Piece.PLAYER;
 		}
 		
 		boolean ULafter = false;
@@ -248,7 +315,7 @@ public class AI{
 		if(ULafter){
 			boolean valid = true;
 			if(baseBoard[y-1][x-1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y-2][x-2] == color){
+				if(baseBoard[y-2][x-2] == color2){
 					if (dir != GamePanel.Direction.UPLEFT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y-1){
@@ -270,7 +337,7 @@ public class AI{
 		if(ULbefore){
 			boolean valid = true;
 			if(baseBoard[y-1][x-1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y+1][x+1] == color){
+				if(baseBoard[y+1][x+1] == color2){
 					if (dir != GamePanel.Direction.UPLEFT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y-1){
@@ -292,7 +359,7 @@ public class AI{
 		if(Uafter){
 			boolean valid = true;
 			if(baseBoard[y-1][x] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y-2][x] == color){
+				if(baseBoard[y-2][x] == color2){
 					if (dir != GamePanel.Direction.UP){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y-1){
@@ -314,7 +381,7 @@ public class AI{
 		if(Ubefore){
 			boolean valid = true;
 			if(baseBoard[y-1][x] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y+1][x] == color){
+				if(baseBoard[y+1][x] == color2){
 					if (dir != GamePanel.Direction.UP){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y-1){
@@ -336,7 +403,7 @@ public class AI{
 		if(URafter){
 			boolean valid = true;
 			if(baseBoard[y-1][x+1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y-2][x+2] == color){
+				if(baseBoard[y-2][x+2] == color2){
 					if (dir != GamePanel.Direction.UPRIGHT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y-1){
@@ -358,7 +425,7 @@ public class AI{
 		if(URbefore){
 			boolean valid = true;
 			if(baseBoard[y-1][x+1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y+1][x-1] == color){
+				if(baseBoard[y+1][x-1] == color2){
 					if (dir != GamePanel.Direction.UPRIGHT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y-1){
@@ -380,7 +447,7 @@ public class AI{
 		if(Lafter){
 			boolean valid = true;
 			if(baseBoard[y][x-1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y][x-2] == color){
+				if(baseBoard[y][x-2] == color2){
 					if (dir != GamePanel.Direction.LEFT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y){
@@ -402,7 +469,7 @@ public class AI{
 		if(Lbefore){
 			boolean valid = true;
 			if(baseBoard[y][x-1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y][x+1] == color){
+				if(baseBoard[y][x+1] == color2){
 					if (dir != GamePanel.Direction.LEFT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y){
@@ -424,7 +491,7 @@ public class AI{
 		if(Rafter){
 			boolean valid = true;
 			if(baseBoard[y][x+1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y][x+2] == color){
+				if(baseBoard[y][x+2] == color2){
 					if (dir != GamePanel.Direction.RIGHT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y){
@@ -446,7 +513,7 @@ public class AI{
 		if(Rbefore){
 			boolean valid = true;
 			if(baseBoard[y][x+1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y][x-1] == color){
+				if(baseBoard[y][x-1] == color2){
 					if (dir != GamePanel.Direction.RIGHT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y){
@@ -468,7 +535,7 @@ public class AI{
 		if(DLafter){
 			boolean valid = true;
 			if(baseBoard[y+1][x-1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y+2][x-2] == color){
+				if(baseBoard[y+2][x-2] == color2){
 					if (dir != GamePanel.Direction.DOWNLEFT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y+1){
@@ -490,7 +557,7 @@ public class AI{
 		if(DLbefore){
 			boolean valid = true;
 			if(baseBoard[y+1][x-1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y-1][x+1] == color){
+				if(baseBoard[y-1][x+1] == color2){
 					if (dir != GamePanel.Direction.DOWNLEFT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y+1){
@@ -512,7 +579,7 @@ public class AI{
 		if(Dafter){
 			boolean valid = true;
 			if(baseBoard[y+1][x] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y+2][x] == color){
+				if(baseBoard[y+2][x] == color2){
 					if (dir != GamePanel.Direction.DOWN){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y+1){
@@ -534,7 +601,7 @@ public class AI{
 		if(Dbefore){
 			boolean valid = true;
 			if(baseBoard[y+1][x] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y-1][x] == color){
+				if(baseBoard[y-1][x] == color2){
 					if (dir != GamePanel.Direction.DOWN){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y+1){
@@ -556,7 +623,7 @@ public class AI{
 		if(DRafter){
 			boolean valid = true;
 			if(baseBoard[y+1][x+1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y+2][x+2] == color){
+				if(baseBoard[y+2][x+2] == color2){
 					if (dir != GamePanel.Direction.DOWNRIGHT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y+1){
@@ -578,7 +645,7 @@ public class AI{
 		if(DRbefore){
 			boolean valid = true;
 			if(baseBoard[y+1][x+1] == GamePanel.Piece.EMPTY){
-				if(baseBoard[y-1][x-1] == color){
+				if(baseBoard[y-1][x-1] == color2){
 					if (dir != GamePanel.Direction.DOWNRIGHT){
 						for (int i = 0; i < base2.chained_spots.size(); i++){
 							if(base2.chained_spots.get(i).y == y+1){
@@ -622,7 +689,7 @@ public class AI{
 	public AIBoard copyAI(AIBoard base){
 		AIBoard base2 = new AIBoard(copyBoard(base.getBoard()));
 		base2.messages = new ArrayList<String>(base.messages);
-		base2.moves = new ArrayList<Point>(base.moves);
+		base2.moves = new ArrayList<Boolean>(base.moves);
 		switch(base.prevDir){
 		case UPLEFT:	base2.prevDir = GamePanel.Direction.UPLEFT;
 						break;

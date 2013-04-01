@@ -1446,6 +1446,11 @@ public class GamePanel extends JPanel{
 			}
 			if(TurnCount%2 == 1 && AImode){
 				AI computer = new AI(board, Piece.OPPONENT);
+				/*try{
+					Thread.sleep(500);
+				} catch(InterruptedException ex){
+					Thread.currentThread().interrupt();
+				}*/
 				board = computer.getMove();
 				countPieces();
 			} else {

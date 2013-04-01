@@ -13,6 +13,10 @@ public class Tree<T>{
 		return root;
 	}
 	
+	public void erase(){
+		root.children.clear();
+	}
+	
 	public class Node<T>{
 		private T data;
 		private Node<T> parent;

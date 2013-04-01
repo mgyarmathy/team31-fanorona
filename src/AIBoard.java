@@ -5,7 +5,7 @@ import java.awt.*;
 public class AIBoard {
 	
 	public GamePanel.Piece[][] Boardstate = new GamePanel.Piece[GamePanel.ROWS][GamePanel.COLS];
-	public ArrayList<Point> moves = new ArrayList<Point>();
+	public ArrayList<Boolean> moves = new ArrayList<Boolean>();
 	public int rank = 0;
 	public GamePanel.Direction prevDir = GamePanel.Direction.DUMMY;
 	public ArrayList<Point> chained_spots = new ArrayList<Point>();
@@ -48,13 +48,13 @@ public class AIBoard {
 						retP = new Point(start.x-1,start.y-1);
 						prevDir = GamePanel.Direction.UPLEFT;
 						if(after){
-							Boardstate[start.y-2][start.x-2] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y-2][start.x-2] = GamePanel.Piece.EMPTY;
 							curX = start.x-2;
 							curY = start.y-2;
 							xInc = -1;
 							yInc = -1;
 						} else {
-							Boardstate[start.y+1][start.x+1] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y+1][start.x+1] = GamePanel.Piece.EMPTY;
 							curX = start.x+1;
 							curY = start.y+1;
 							xInc = 1;
@@ -66,12 +66,12 @@ public class AIBoard {
 						retP = new Point(start.x,start.y-1);
 						prevDir = GamePanel.Direction.UP;
 						if(after){
-							Boardstate[start.y-2][start.x] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y-2][start.x] = GamePanel.Piece.EMPTY;
 							curX = start.x-2;
 							curY = start.y;
 							yInc = -1;
 						} else {
-							Boardstate[start.y+1][start.x] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y+1][start.x] = GamePanel.Piece.EMPTY;
 							curX = start.x;
 							curY = start.y+1;
 							yInc = 1;
@@ -82,13 +82,13 @@ public class AIBoard {
 						retP = new Point(start.x+1,start.y-1);
 						prevDir = GamePanel.Direction.UPRIGHT;
 						if(after){
-							Boardstate[start.y-2][start.x+2] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y-2][start.x+2] = GamePanel.Piece.EMPTY;
 							curX = start.x+2;
 							curY = start.y-2;
 							xInc = +1;
 							yInc = -1;
 						} else {
-							Boardstate[start.y+1][start.x-1] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y+1][start.x-1] = GamePanel.Piece.EMPTY;
 							curX = start.x-1;
 							curY = start.y+1;
 							xInc = -1;
@@ -100,12 +100,12 @@ public class AIBoard {
 						retP = new Point(start.x-1,start.y);
 						prevDir = GamePanel.Direction.LEFT;
 						if(after) {
-							Boardstate[start.y][start.x-2] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y][start.x-2] = GamePanel.Piece.EMPTY;
 							curX = start.x-2;
 							curY = start.y;
 							xInc = -1;
 						} else {
-							Boardstate[start.y][start.x+1] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y][start.x+1] = GamePanel.Piece.EMPTY;
 							curX = start.x+1;
 							curY = start.y;
 							xInc = 1;
@@ -116,12 +116,12 @@ public class AIBoard {
 						retP = new Point(start.x+1,start.y);
 						prevDir = GamePanel.Direction.RIGHT;
 						if(after) {
-							Boardstate[start.y][start.x+2] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y][start.x+2] = GamePanel.Piece.EMPTY;
 							curX = start.x+2;
 							curY = start.y;
 							xInc = +1;
 						} else {
-							Boardstate[start.y][start.x-1] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y][start.x-1] = GamePanel.Piece.EMPTY;
 							curX = start.x-1;
 							curY = start.y;
 							xInc = -1;
@@ -132,13 +132,13 @@ public class AIBoard {
 						retP = new Point(start.x-1,start.y+1);
 						prevDir = GamePanel.Direction.DOWNLEFT;
 						if(after) {
-							Boardstate[start.y+2][start.x-2] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y+2][start.x-2] = GamePanel.Piece.EMPTY;
 							curX = start.x-2;
 							curY = start.y+2;
 							xInc = -1;
 							yInc = 1;
 						} else {
-							Boardstate[start.y-1][start.x+1] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y-1][start.x+1] = GamePanel.Piece.EMPTY;
 							curX = start.x+1;
 							curY = start.y-1;
 							xInc = 1;
@@ -150,12 +150,12 @@ public class AIBoard {
 						retP = new Point(start.x,start.y+1);
 						prevDir = GamePanel.Direction.DOWN;
 						if(after) {
-							Boardstate[start.y+2][start.x] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y+2][start.x] = GamePanel.Piece.EMPTY;
 							curX = start.x;
 							curY = start.y+2;
 							yInc = 1;
 						} else {
-							Boardstate[start.y-1][start.x] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y-1][start.x] = GamePanel.Piece.EMPTY;
 							curX = start.x;
 							curY = start.y-1;
 							yInc = -1;
@@ -166,13 +166,13 @@ public class AIBoard {
 						retP = new Point(start.x+1,start.y+1);
 						prevDir = GamePanel.Direction.DOWNRIGHT;
 						if(after){
-							Boardstate[start.y+2][start.x+2] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y+2][start.x+2] = GamePanel.Piece.EMPTY;
 							curX = start.x+2;
 							curY = start.y+2;
 							xInc = 1;
 							yInc = 1;
 						} else {
-							Boardstate[start.y-1][start.x-1] = GamePanel.Piece.EMPTY;
+							//Boardstate[start.y-1][start.x-1] = GamePanel.Piece.EMPTY;
 							curX = start.x-1;
 							curY = start.y-1;
 							xInc = -1;
@@ -190,8 +190,8 @@ public class AIBoard {
 			chained_spots.add(new Point(start.x,start.y));
 		}
 		chained_spots.add(retP);
-		curX += xInc;
-		curY += yInc;
+		//curX += xInc;
+		//curY += yInc;
 		while(curX >= 0 && curX < GamePanel.COLS && curY >= 0 && curY < GamePanel.ROWS){
 			if(Boardstate[curY][curX] == myColor){
 				Boardstate[curY][curX] = GamePanel.Piece.EMPTY;
@@ -205,6 +205,7 @@ public class AIBoard {
 		char c=(char) (start.y+65);
 		char c2=(char) (retP.y+65);
 		messages.add((Character.toString(c)+Integer.toString(start.x+1)+" moved to "+Character.toString(c2)+Integer.toString(retP.x+1)));
+		moves.add(after);
 		return retP;
 	}
 	
