@@ -54,81 +54,96 @@ public class AI{
 			}
 		}
 		if(index == -1){
-			//return makeEmpty();
-			Random ran = new Random();
-			int ranCase = ran.nextInt();
+			index = 0;
 			tree.erase();
 			ArrayList<AIBoard> boards = makeEmpty(color); //add empty moves
 			for(int z = 0; z < boards.size(); z++){
 				tree.getRoot().add(boards.get(z));
 			}
-			GamePanel.Piece color2 = GamePanel.Piece.PLAYER;
-			int negarank = 1000;
-			if(color == GamePanel.Piece.PLAYER){
-				color2 = GamePanel.Piece.OPPONENT;
-				negarank = -1000;
-			}
 			
-			for(int y = 0; y < tree.getRoot().getChildren().size(); y++){
-				create(color2, tree.getRoot().getChildren().get(y)); //add opponent moves
-				if(tree.getRoot().getChildren().get(y).getChildren().size() == 0){
-					ArrayList<AIBoard> opponentEmpty = makeEmpty(color2);
-					for(int q = 0; q < opponentEmpty.size(); q++){
-						tree.getRoot().getChildren().get(y).add(opponentEmpty.get(q));
-					}
+		}
+		Random ran = new Random();	
+		int ranCase = ran.nextInt();
+		GamePanel.Piece color2 = GamePanel.Piece.PLAYER;
+		int negarank = 1000;
+		if(color == GamePanel.Piece.PLAYER){
+			color2 = GamePanel.Piece.OPPONENT;
+			negarank = -1000;
+		}
+		
+		for(int y = 0; y < tree.getRoot().getChildren().size(); y++){
+			create(color2, tree.getRoot().getChildren().get(y)); //add opponent moves
+			if(tree.getRoot().getChildren().get(y).getChildren().size() == 0){
+				ArrayList<AIBoard> opponentEmpty = makeEmpty(color2);
+				for(int q = 0; q < opponentEmpty.size(); q++){
+					tree.getRoot().getChildren().get(y).add(opponentEmpty.get(q));
 				}
 			}
-			int worstCase = 1000;
-			int bestCase = 1000;
-			if(color == GamePanel.Piece.PLAYER){
-				worstCase = -1000;
-				bestCase = -1000;
-			}
-			
-			for(i = 0; i < tree.getRoot().getChildren().size(); i++){
+		}
+		int worstCase = 1000;
+		int bestCase = 1000;
+		if(color == GamePanel.Piece.PLAYER){
+			worstCase = -1000;
+			bestCase = -1000;
+		}
+		
+		for(i = 0; i < tree.getRoot().getChildren().size(); i++){ //for every move
+			if(tree.getRoot().getChildren().get(i) != null){
 				Tree<AIBoard>.Node<AIBoard> base2 = tree.getRoot().getChildren().get(i);
-				for(int r = 0; r < base2.getChildren().size(); r++){
-					if(color == GamePanel.Piece.PLAYER){
-						worstCase = 1000;
-					} else {
-						worstCase = -1000;
+				create(color, base2);
+				if(base2.getChildren().size() == 0){
+					ArrayList<AIBoard> futureEmpty = makeEmpty(color);
+					for(int w = 0; w < futureEmpty.size(); w++){
+						base2.add(futureEmpty.get(w));
 					}
+				}
+				if(color == GamePanel.Piece.PLAYER){
+					worstCase = 1000;
+				} else {
+					worstCase = -1000;
+				}
+				for(int r = 0; r < base2.getChildren().size(); r++){ //for every opponent response
 					if(color == GamePanel.Piece.OPPONENT){
-						if(base2.getData().rank <= negarank){
-							negarank = base2.getData().rank;
-							if(base2.getChildren().get(r).getData().rank > worstCase){
-								worstCase = base2.getChildren().get(r).getData().rank;
+						for(int s = 0; s < base2.getChildren().get(r).getChildren().size(); s++){ //for every future move
+							if(base2.getChildren().get(r).getChildren().get(s).getData().rank > worstCase){
+								worstCase = base2.getChildren().get(r).getChildren().get(s).getData().rank;
 							}
 						}
 					}else {	
-						if(base2.getData().rank >= negarank){
-							negarank = base2.getData().rank;
-							if(base2.getChildren().get(r).getData().rank < value){
-								worstCase = base2.getChildren().get(r).getData().rank;
+						for(int s = 0; s < base2.getChildren().get(r).getChildren().size(); s++){ //for every future move
+							if(base2.getChildren().get(r).getChildren().get(s).getData().rank < worstCase){
+								worstCase = base2.getChildren().get(r).getChildren().get(s).getData().rank;
+							}
+						}
+					}
+					if(color == GamePanel.Piece.OPPONENT){
+						if(worstCase < bestCase){
+							bestCase = worstCase;
+							index = i;
+						} else if (worstCase == bestCase){
+							if(ran.nextInt() > ranCase){
+								ranCase = ran.nextInt();
+								index = i;
+							}
+						}
+					} else {
+						if(worstCase > bestCase){
+							bestCase = worstCase;
+							index = i;
+						} else if (worstCase == bestCase){
+							if(ran.nextInt() > ranCase){
+								ranCase = ran.nextInt();
+								index = i;
 							}
 						}
 					}
 				}
-				if(worstCase < bestCase){
-					bestCase = worstCase;
-					index = i;
-				} else if (worstCase == bestCase){
-					if(ran.nextInt() > ranCase){
-						index = i;
-					}
-				}
 			}
-			for(int x = 0; x < tree.getRoot().getChildren().get(index).getData().messages.size(); x++){
-				GamePanel.info.write(tree.getRoot().getChildren().get(index).getData().messages.get(x));
-			}
-			return tree.getRoot().getChildren().get(index).getData().getBoard();
-			
-		} else {
-			for(int x = 0; x < tree.getRoot().getChildren().get(index).getData().messages.size(); x++){
-				GamePanel.info.write(tree.getRoot().getChildren().get(index).getData().messages.get(x));
-			}
-			return tree.getRoot().getChildren().get(index).getData().getBoard();
 		}
+		for(int x = 0; x < tree.getRoot().getChildren().get(index).getData().messages.size(); x++){
+			GamePanel.info.write(tree.getRoot().getChildren().get(index).getData().messages.get(x));
+		}
+		return tree.getRoot().getChildren().get(index).getData().getBoard();
 	}
 	
 	public ArrayList<AIBoard> makeEmpty(GamePanel.Piece mColor){
@@ -196,15 +211,15 @@ public class AI{
 		boolean DR = false;
 		
 		if ((y+x)%2 == GamePanel.Diag){
-			if(y > 1 && x > 1)										UL = true;
-			if(y > 1 && x < GamePanel.COLS - 2) 					UR = true;
-			if(y < GamePanel.ROWS - 2 && x > 1) 		  			DL = true;
-			if(y < GamePanel.ROWS - 2 && x < GamePanel.COLS - 2)	DR = true;
+			if(y > 0 && x > 0)										UL = true;
+			if(y > 0 && x < GamePanel.COLS - 1) 					UR = true;
+			if(y < GamePanel.ROWS - 1 && x > 0) 		  			DL = true;
+			if(y < GamePanel.ROWS - 1 && x < GamePanel.COLS - 1)	DR = true;
 		}
-		if(y > 1)										U = true;
-		if(x > 1)										L = true;
-		if(x < GamePanel.COLS - 2)						R = true;
-		if(y < GamePanel.ROWS - 2)						D = true;
+		if(y > 0)										U = true;
+		if(x > 0)										L = true;
+		if(x < GamePanel.COLS - 1)						R = true;
+		if(y < GamePanel.ROWS - 1)						D = true;
 		
 		if(UL){
 			if (board[y-1][x-1] == GamePanel.Piece.EMPTY){

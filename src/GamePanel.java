@@ -10,7 +10,7 @@ public class GamePanel extends JPanel{
 	static int ROWS = 5;
 	static int COLS = 9;
 	
-	boolean AImode = false;
+	int AImode = 0;
 	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
 	int TurnCount;
@@ -57,7 +57,9 @@ public class GamePanel extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
-				if(AImode && TurnCount%2 == 1){
+				if(AImode == 1 && TurnCount%2 == 1){
+					return;
+				} else if (AImode == 2){
 					return;
 				}
 				info.initial=true;// initial print for info panel stop
@@ -1334,6 +1336,17 @@ public class GamePanel extends JPanel{
 		
 		if(TurnCount == 0 && info.getGraphics()!= null) info.write(printTurn());
 		if(stopw.getGraphics()!=null) { stopw.timeReset(); }
+		if(AImode == 2){
+			AI computer = new AI(board, Piece.PLAYER);
+			try{
+				Thread.sleep(250);
+			} catch(InterruptedException ex){
+				Thread.currentThread().interrupt();
+			}
+			board = computer.getMove();
+			paintComponent(this.getGraphics());
+			countPieces();
+		}
 	}
 	
 	public void drawButtons(Graphics g){
@@ -1403,11 +1416,15 @@ public class GamePanel extends JPanel{
 	}
 	
 	public void setHumans(){
-		AImode = false;
+		AImode = 0;
 	}
 	
 	public void setHumanAI(){
-		AImode = true;
+		AImode = 1;
+	}
+	
+	public void setAIs(){
+		AImode = 2;
 	}
 	
 	public void countPieces(){
@@ -1444,18 +1461,31 @@ public class GamePanel extends JPanel{
 				board[sacrificeO.y][sacrificeO.x] = Piece.EMPTY;
 				sacrificeO = null;
 			}
-			if(TurnCount%2 == 1 && AImode){
-				AI computer = new AI(board, Piece.OPPONENT);
-				/*try{
-					Thread.sleep(500);
-				} catch(InterruptedException ex){
-					Thread.currentThread().interrupt();
-				}*/
-				board = computer.getMove();
-				countPieces();
-			} else {
-				stopw.timeStart();
+			if(AImode != 0){
+				if(TurnCount%2 == 1){
+					AI computer = new AI(board, Piece.OPPONENT);
+					try{
+						Thread.sleep(250);
+					} catch(InterruptedException ex){
+						Thread.currentThread().interrupt();
+					}
+					board = computer.getMove();
+					paintComponent(this.getGraphics());
+					countPieces();
+				}
+				if(TurnCount%2 == 0 && AImode == 2){
+					AI computer = new AI(board, Piece.PLAYER);
+					try{
+						Thread.sleep(250);
+					} catch(InterruptedException ex){
+						Thread.currentThread().interrupt();
+					}
+					board = computer.getMove();
+					paintComponent(this.getGraphics());
+					countPieces();
+				}
 			}
+			stopw.timeStart();
 		}
 		else if(draw) { info.write("Draw"); stopw.timeStop(); }
 		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); }

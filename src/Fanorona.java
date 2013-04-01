@@ -214,8 +214,21 @@ public class Fanorona extends JFrame implements Runnable{
                
             }
         });
+		
+		JMenuItem CvC = new JMenuItem("Computer vs Computer");
+		CvC.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	info.initial=false;
+            	board.setAIs();
+                board.newGame();
+               
+            }
+        });
+		
 		playerMenu.add(HvH);
 		playerMenu.add(HvC);
+		playerMenu.add(CvC);
 		
 		options.add(boardSize);
 		options.add(playerName);
