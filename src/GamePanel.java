@@ -10,17 +10,17 @@ public class GamePanel extends JPanel{
 	static int ROWS = 5;
 	static int COLS = 9;
 	
-	
+	boolean AImode = true;
 	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
 	int TurnCount;
 	
-	public int Diag = 0;
+	static int Diag = 0;
 	
 	boolean win,draw;
 	
-	public enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
-	private enum Direction {NEUTRAL, UPLEFT, UP, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWN, DOWNRIGHT, DUMMY};
+	static enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
+	static enum Direction {NEUTRAL, UPLEFT, UP, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWN, DOWNRIGHT, DUMMY};
 	private Color playerColor = Color.WHITE;
 	private Color opponentColor = Color.BLACK;
 	private String playerName = "Player 1";
@@ -39,7 +39,7 @@ public class GamePanel extends JPanel{
 	private boolean overrideMode = false;
 	private Direction overrideDir = Direction.DUMMY;
 	
-	public InfoPanel info;
+	static InfoPanel info;
 	public Stopwatch stopw;
 	
 
@@ -57,6 +57,9 @@ public class GamePanel extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
+				if(AImode && TurnCount%2 == 1){
+					return;
+				}
 				info.initial=true;// initial print for info panel stop
 				if(!stopw.running() && !win && !draw) stopw.timeStart();
 				boolean emptyClick=true;
@@ -785,7 +788,7 @@ public class GamePanel extends JPanel{
 	
 	public boolean detectMove(Point start, Direction dir, Piece color){
 
-		if(board[start.y][start.x] == Piece.EMPTY || board[start.y][start.x] == color){
+		if(board[start.y][start.x] == Piece.EMPTY || board[start.y][start.x] == color || board[start.y][start.x] == Piece.SACRIFICE){
 			return false;
 		}
 		boolean ULafter = false;
@@ -1433,7 +1436,13 @@ public class GamePanel extends JPanel{
 				board[sacrificeO.y][sacrificeO.x] = Piece.EMPTY;
 				sacrificeO = null;
 			}
-			stopw.timeStart();
+			if(TurnCount%2 == 1 && AImode){
+				AI computer = new AI(board, Piece.OPPONENT);
+				board = computer.getMove();
+				countPieces();
+			} else {
+				stopw.timeStart();
+			}
 		}
 		else if(draw) { info.write("Draw"); stopw.timeStop(); }
 		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); }
