@@ -295,11 +295,12 @@ public class Fanorona extends JFrame implements Runnable{
 		
 		//read INFO from server
 		String gameInfo = receiveMessage(c_sockInput);
+		String firstMove = "W";
 		if(gameInfo.startsWith("INFO")) { //parse game INFO
 			String[] tokens = gameInfo.split("\\s+");
 			int cols = Integer.parseInt(tokens[1]);
 			int rows = Integer.parseInt(tokens[2]);
-			String firstMove = tokens[3];
+			firstMove = tokens[3]; //either W or B
 			int clockTime = Integer.parseInt(tokens[4]);
 			Container content = getContentPane();
 			info = new InfoPanel();
@@ -331,19 +332,103 @@ public class Fanorona extends JFrame implements Runnable{
 		else { System.err.println("error: server did not send BEGIN message"); System.exit(1);}
 		System.out.println(begin);
 		
-		
-		//capture_move   ::==  A position position | W position position
-		//paika_move     ::==  P position position
-		//sacrifice_move ::==  S position
-		String move = receiveMessage(c_sockInput);
-		String[] tokens = move.split("\\s+");
-		if(tokens[0].equals("A") || tokens[0].equals("W")){
+		String serverMove = receiveMessage(c_sockInput);
+		String[] tokens = serverMove.split("\\s+");
+		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
 			int fromCol = Integer.parseInt(tokens[1]);
 			int fromRow = Integer.parseInt(tokens[2]);
 			int toCol = Integer.parseInt(tokens[3]);
 			int toRow = Integer.parseInt(tokens[4]);
+			System.out.println(serverMove);
+			//perform piece movement and update client board appropriately
+			sendMessage(c_sockOutput, "OK"); //confirm move
 		}
-		System.out.println(move);
+		else if(tokens[0].equals("S")){
+			int sacCol = Integer.parseInt(tokens[1]);
+			int sacRow = Integer.parseInt(tokens[2]);
+			System.out.println(serverMove);
+			//perform sacrifice on that specific piece
+			sendMessage(c_sockOutput, "OK"); //confirm move
+		}
+		
+		//player makes move...
+		sendMessage(c_sockOutput, "A 6 4 6 3");
+		//then gets server OK
+		String ok = receiveMessage(c_sockInput);
+		System.out.println(ok);
+		
+		/*if(firstMove.equals("W")){
+			while(true){
+				//player makes first move each turn
+				//let player perform move - where do movements get written to infopanel?
+				//capture_move   ::==  A position position | W position position
+				//paika_move     ::==  P position position
+				//sacrifice_move ::==  S position
+				//sendMessage("this is a move");
+				
+				//get server OK
+				while(!receiveMessage(c_sockInput).startsWith("OK"));
+				
+				String serverMessage = receiveMessage(c_sockInput);
+				String[] tokens = serverMessage.split("\\s+");
+				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					int fromCol = Integer.parseInt(tokens[1]);
+					int fromRow = Integer.parseInt(tokens[2]);
+					int toCol = Integer.parseInt(tokens[3]);
+					int toRow = Integer.parseInt(tokens[4]);
+					System.out.println(serverMessage);
+					//perform piece movement and update client board appropriately
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("S")){
+					int sacCol = Integer.parseInt(tokens[1]);
+					int sacRow = Integer.parseInt(tokens[2]);
+					System.out.println(serverMessage);
+					//perform sacrifice on that specific piece
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				
+				//TODO: handle "TIE" "LOSER" "WINNER" "ILLEGAL" 
+				//break loop if this occurs
+			}
+		}
+		else if(firstMove.equals("B")){
+			//player moves second each turn
+			while(true){
+				String serverMessage = receiveMessage(c_sockInput);
+				String[] tokens = serverMessage.split("\\s+");
+				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					int fromCol = Integer.parseInt(tokens[1]);
+					int fromRow = Integer.parseInt(tokens[2]);
+					int toCol = Integer.parseInt(tokens[3]);
+					int toRow = Integer.parseInt(tokens[4]);
+					System.out.println(serverMessage);
+					//perform piece movement and update client board appropriately
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("S")){
+					int sacCol = Integer.parseInt(tokens[1]);
+					int sacRow = Integer.parseInt(tokens[2]);
+					System.out.println(serverMessage);
+					//perform sacrifice on that specific piece
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				//TODO: handle "TIE" "LOSER" "WINNER" "ILLEGAL" 
+				//break loop if this occurs
+				
+				//let player perform move
+				//capture_move   ::==  A position position | W position position
+				//paika_move     ::==  P position position
+				//sacrifice_move ::==  S position
+				
+				//get server OK
+				while(!receiveMessage(c_sockInput).startsWith("OK"));
+				
+			}
+		}*/
+		
+
+
 		
 		
 		//close socket at end of session
