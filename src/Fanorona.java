@@ -377,8 +377,19 @@ public class Fanorona extends JFrame implements Runnable{
 						}
 						//selected_piece = AImoves.chained_spots.get(moving+1);
 						//animate();
-						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						boolean after = true;
+						boolean before = true;
+						if(AImoves.moves.get(moving) == GamePanel.Type.WITHDRAW){
+							after = false;
+						} else if(AImoves.moves.get(moving) == GamePanel.Type.ADVANCE){
+							before = false;
+						} else {
+							before = false;
+							after = false;
+						}
+						
+						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
 						board.selected_piece = AImoves.chained_spots.get(moving+1);
 						board.animate();
 					}
@@ -536,8 +547,19 @@ public class Fanorona extends JFrame implements Runnable{
 						}
 						//selected_piece = AImoves.chained_spots.get(moving+1);
 						//animate();
-						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						boolean after = true;
+						boolean before = true;
+						if(AImoves.moves.get(moving) == GamePanel.Type.WITHDRAW){
+							after = false;
+						} else if(AImoves.moves.get(moving) == GamePanel.Type.ADVANCE){
+							before = false;
+						} else {
+							before = false;
+							after = false;
+						}
+						
+						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
 						board.selected_piece = AImoves.chained_spots.get(moving+1);
 						board.animate();
 					}
