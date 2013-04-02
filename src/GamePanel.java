@@ -204,6 +204,45 @@ public class GamePanel extends JPanel{
 		return movedata;
 	}
 	
+	public int serverSacrificePiece(Point sel_piece){
+		selected_piece = sel_piece;
+		
+		if(overrideMode || chain_piece){
+			info.write("Cannot sacrifice a piece now.");
+			return -1;
+		} else if (selected_piece == null){
+			info.write("Must choose a piece to sacrifice.");
+			return -99;
+		} else {
+			board[selected_piece.y][selected_piece.x] = Piece.SACRIFICE;
+			if(TurnCount%2 == WHITE){
+				sacrificeP = new Point(selected_piece.x,selected_piece.y);
+			} else {
+				sacrificeO = new Point(selected_piece.x,selected_piece.y);
+			}
+			
+			
+			// sacrifice move string
+			if(TurnCount%2==WHITE){ 
+				Player1move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
+				Player1newmove=true;
+				Player2move="";
+			}
+			else{
+				Player2move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
+				Player2newmove=true;
+				Player1move="";
+			}
+			// send move to server **************************************
+			
+			selected_piece = null;
+			countPieces();
+			info.write("Piece has been sacrificed to block moves.");
+		}
+		
+		return 0;
+	}
+	
 	
 	public int movePiece(int col, int row){
 		
