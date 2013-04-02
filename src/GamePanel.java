@@ -41,7 +41,7 @@ public class GamePanel extends JPanel{
 	Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
 	private Rectangle SacButton = new Rectangle();
-	private Point selected_piece = null;
+	Point selected_piece = null;
 	private Point choice1 = null;
 	private Point choice2 = null;
 	private Point sacrificeP = null;

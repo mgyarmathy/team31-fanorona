@@ -361,6 +361,27 @@ public class Fanorona extends JFrame implements Runnable{
 					AI computer = new AI(board.board, GamePanel.Piece.PLAYER);
 					AIBoard AImoves = computer.getMove();
 					//perform AI moves on local board
+					if(AImoves.chained_spots.size() != 0){
+						board.selected_piece = AImoves.chained_spots.get(0);
+						board.animate();
+					}
+					
+					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+						if(moving > 0){
+							if(board.TurnCount%2==board.WHITE){ 
+								board.Player1move+=" + ";
+							}
+							else{
+								board.Player2move+=" + ";
+							}
+						}
+						//selected_piece = AImoves.chained_spots.get(moving+1);
+						//animate();
+						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
+						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						board.selected_piece = AImoves.chained_spots.get(moving+1);
+						board.animate();
+					}
 					
 				}
 				else{ //player determines move
@@ -496,9 +517,30 @@ public class Fanorona extends JFrame implements Runnable{
 				// make black move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 				if(AIControl){ //AI determines move
-					AI computer = new AI(board.board, GamePanel.Piece.OPPONENT);
+					AI computer = new AI(board.board, GamePanel.Piece.PLAYER);
 					AIBoard AImoves = computer.getMove();
 					//perform AI moves on local board
+					if(AImoves.chained_spots.size() != 0){
+						board.selected_piece = AImoves.chained_spots.get(0);
+						board.animate();
+					}
+					
+					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+						if(moving > 0){
+							if(board.TurnCount%2==board.WHITE){ 
+								board.Player1move+=" + ";
+							}
+							else{
+								board.Player2move+=" + ";
+							}
+						}
+						//selected_piece = AImoves.chained_spots.get(moving+1);
+						//animate();
+						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
+						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						board.selected_piece = AImoves.chained_spots.get(moving+1);
+						board.animate();
+					}
 					
 				}
 				else{ //player determines move
