@@ -116,25 +116,26 @@ public class AI{
 							}
 						}
 					}
-					if(color == GamePanel.Piece.OPPONENT){
-						if(worstCase < bestCase){
-							bestCase = worstCase;
+					
+				}
+				if(color == GamePanel.Piece.OPPONENT){
+					if(worstCase < bestCase){
+						bestCase = worstCase;
+						index = i;
+					} else if (worstCase == bestCase){
+						if(ran.nextInt() > ranCase){
+							ranCase = ran.nextInt();
 							index = i;
-						} else if (worstCase == bestCase){
-							if(ran.nextInt() > ranCase){
-								ranCase = ran.nextInt();
-								index = i;
-							}
 						}
-					} else {
-						if(worstCase > bestCase){
-							bestCase = worstCase;
+					}
+				} else {
+					if(worstCase > bestCase){
+						bestCase = worstCase;
+						index = i;
+					} else if (worstCase == bestCase){
+						if(ran.nextInt() > ranCase){
+							ranCase = ran.nextInt();
 							index = i;
-						} else if (worstCase == bestCase){
-							if(ran.nextInt() > ranCase){
-								ranCase = ran.nextInt();
-								index = i;
-							}
 						}
 					}
 				}

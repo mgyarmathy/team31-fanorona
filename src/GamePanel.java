@@ -1714,7 +1714,7 @@ public class GamePanel extends JPanel{
 					}
 					
 					selected_piece = null;
-					animate();
+					paintComponent(this.getGraphics());
 					countPieces();
 					
 				}
@@ -1745,7 +1745,7 @@ public class GamePanel extends JPanel{
 					}
 					
 					selected_piece = null;
-					animate();
+					paintComponent(this.getGraphics());
 					countPieces();
 				}
 			}
