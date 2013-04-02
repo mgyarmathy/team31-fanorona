@@ -451,111 +451,7 @@ public class Fanorona extends JFrame implements Runnable{
 				String ok = receiveMessage(c_sockInput);
 				System.out.println(ok);
 			}
-		}
-		
-		
-		/*
-		String serverMove = receiveMessage(c_sockInput);
-		String[] tokens = serverMove.split("\\s+");
-		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-			
-			int fromCol = Integer.parseInt(tokens[1]);
-			int fromRow = Integer.parseInt(tokens[2]);
-			int toCol = Integer.parseInt(tokens[3]);
-			int toRow = Integer.parseInt(tokens[4]);
-			System.out.println(serverMove);
-			board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,tokens[0]);
-			board.animate();
-			sendMessage(c_sockOutput, "OK"); //confirm move
-		}
-		else if(tokens[0].equals("S")){
-			int sacCol = Integer.parseInt(tokens[1]);
-			int sacRow = Integer.parseInt(tokens[2]);
-			System.out.println(serverMove);
-			//perform sacrifice on that specific piece
-			sendMessage(c_sockOutput, "OK"); //confirm move
-		}*/
-		
-		//player makes move...
-		//board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5,tokens[0]);
-		//sendMessage(c_sockOutput, "A 6 4 5 5");
-	
-		//then gets server OK
-		
-		
-		/*if(firstMove.equals("W")){
-			while(true){
-				//player makes first move each turn
-				//let player perform move - where do movements get written to infopanel?
-				//capture_move   ::==  A position position | W position position
-				//paika_move     ::==  P position position
-				//sacrifice_move ::==  S position
-				//sendMessage("this is a move");
-				
-				//get server OK
-				while(!receiveMessage(c_sockInput).startsWith("OK"));
-				
-				String serverMessage = receiveMessage(c_sockInput);
-				String[] tokens = serverMessage.split("\\s+");
-				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					int fromCol = Integer.parseInt(tokens[1]);
-					int fromRow = Integer.parseInt(tokens[2]);
-					int toCol = Integer.parseInt(tokens[3]);
-					int toRow = Integer.parseInt(tokens[4]);
-					System.out.println(serverMessage);
-					//perform piece movement and update client board appropriately
-					sendMessage(c_sockOutput, "OK"); //confirm move
-				}
-				else if(tokens[0].equals("S")){
-					int sacCol = Integer.parseInt(tokens[1]);
-					int sacRow = Integer.parseInt(tokens[2]);
-					System.out.println(serverMessage);
-					//perform sacrifice on that specific piece
-					sendMessage(c_sockOutput, "OK"); //confirm move
-				}
-				
-				//TODO: handle "TIE" "LOSER" "WINNER" "ILLEGAL" 
-				//break loop if this occurs
-			}
-		}
-		else if(firstMove.equals("B")){
-			//player moves second each turn
-			while(true){
-				String serverMessage = receiveMessage(c_sockInput);
-				String[] tokens = serverMessage.split("\\s+");
-				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					int fromCol = Integer.parseInt(tokens[1]);
-					int fromRow = Integer.parseInt(tokens[2]);
-					int toCol = Integer.parseInt(tokens[3]);
-					int toRow = Integer.parseInt(tokens[4]);
-					System.out.println(serverMessage);
-					//perform piece movement and update client board appropriately
-					sendMessage(c_sockOutput, "OK"); //confirm move
-				}
-				else if(tokens[0].equals("S")){
-					int sacCol = Integer.parseInt(tokens[1]);
-					int sacRow = Integer.parseInt(tokens[2]);
-					System.out.println(serverMessage);
-					//perform sacrifice on that specific piece
-					sendMessage(c_sockOutput, "OK"); //confirm move
-				}
-				//TODO: handle "TIE" "LOSER" "WINNER" "ILLEGAL" 
-				//break loop if this occurs
-				
-				//let player perform move
-				//capture_move   ::==  A position position | W position position
-				//paika_move     ::==  P position position
-				//sacrifice_move ::==  S position
-				
-				//get server OK
-				while(!receiveMessage(c_sockInput).startsWith("OK"));
-				
-			}
-		}*/
-		
-
-
-		
+		}		
 		
 		//close socket at end of session
 		try {
@@ -569,3 +465,19 @@ public class Fanorona extends JFrame implements Runnable{
 	
 	
 }
+
+//snippet to handle multiple moves
+//String dir = tokens[0];
+//example string: A 5 4 5 3 + 5 3 4 3 +  4  3  3  3 
+//indices         0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+//and for one move: A 5 4 5 3
+//indices			0 1 2 3 4
+//for(int i = 1; i<tokens.length; i=i+5){
+//	int fCol = Integer.parseInt(tokens[i]);
+//	int fRow = Integer.parseInt(tokens[i+1]);
+//	int tCol = Integer.parseInt(tokens[i+2]);
+//	int tRow = Integer.parseInt(tokens[i+3]);
+	//tokens[i+4] = "+"
+//	board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+//}
+

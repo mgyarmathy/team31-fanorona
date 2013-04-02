@@ -250,6 +250,8 @@ public class FanoronaServer extends JFrame implements Runnable{
 //String dir = tokens[0];
 //example string: A 5 4 5 3 + 5 3 4 3 +  4  3  3  3 
 //indices         0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+//and for one move: A 5 4 5 3
+//indices			0 1 2 3 4
 //for(int i = 1; i<tokens.length; i=i+5){
 //	int fCol = Integer.parseInt(tokens[i]);
 //	int fRow = Integer.parseInt(tokens[i+1]);
