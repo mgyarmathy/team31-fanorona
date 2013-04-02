@@ -34,6 +34,7 @@ public class GamePanel extends JPanel{
 	
 	static enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
 	static enum Direction {NEUTRAL, UPLEFT, UP, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWN, DOWNRIGHT, DUMMY};
+	static enum Type {ADVANCE, WITHDRAW, PAIKA};
 	private Color playerColor = Color.WHITE;
 	private Color opponentColor = Color.BLACK;
 	private String playerName = "Player 1";
@@ -1553,8 +1554,19 @@ public class GamePanel extends JPanel{
 				}
 				//selected_piece = AImoves.chained_spots.get(moving+1);
 				//animate();
-				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-				printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+				boolean after = true;
+				boolean before = true;
+				if(AImoves.moves.get(moving) == Type.WITHDRAW){
+					after = false;
+				} else if(AImoves.moves.get(moving) == Type.ADVANCE){
+					before = false;
+				} else {
+					before = false;
+					after = false;
+				}
+				
+				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+				printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
 				selected_piece = AImoves.chained_spots.get(moving+1);
 				animate();
 			}
@@ -1719,8 +1731,19 @@ public class GamePanel extends JPanel{
 						}
 						//selected_piece = AImoves.chained_spots.get(moving+1);
 						//animate();
-						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						boolean after = true;
+						boolean before = true;
+						if(AImoves.moves.get(moving) == Type.WITHDRAW){
+							after = false;
+						} else if(AImoves.moves.get(moving) == Type.ADVANCE){
+							before = false;
+						} else {
+							before = false;
+							after = false;
+						}
+						
+						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
 						selected_piece = AImoves.chained_spots.get(moving+1);
 						animate();
 						
@@ -1751,8 +1774,18 @@ public class GamePanel extends JPanel{
 						}
 						//selected_piece = AImoves.chained_spots.get(moving+1);
 						//animate();
-						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						boolean after = true;
+						boolean before = true;
+						if(AImoves.moves.get(moving) == Type.WITHDRAW){
+							after = false;
+						} else if(AImoves.moves.get(moving) == Type.ADVANCE){
+							before = false;
+						} else {
+							before = false;
+							after = false;
+						}
+						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
 						selected_piece = AImoves.chained_spots.get(moving+1);
 						animate();
 					}

@@ -5,7 +5,7 @@ import java.awt.*;
 public class AIBoard {
 	
 	public GamePanel.Piece[][] Boardstate = new GamePanel.Piece[GamePanel.ROWS][GamePanel.COLS];
-	public ArrayList<Boolean> moves = new ArrayList<Boolean>();
+	public ArrayList<GamePanel.Type> moves = new ArrayList<GamePanel.Type>();
 	public int rank = 0;
 	public GamePanel.Direction prevDir = GamePanel.Direction.DUMMY;
 	public ArrayList<Point> chained_spots = new ArrayList<Point>();
@@ -192,6 +192,17 @@ public class AIBoard {
 		chained_spots.add(retP);
 		//curX += xInc;
 		//curY += yInc;
+		GamePanel.Type move = GamePanel.Type.PAIKA;
+		if(curX >= 0 && curX < GamePanel.COLS && curY >= 0 && curY < GamePanel.ROWS){
+			if(Boardstate[curY][curX] == myColor){
+				if(after){
+					move = GamePanel.Type.ADVANCE;
+				} else {
+					move = GamePanel.Type.WITHDRAW;
+				}
+			}
+		}
+		
 		while(curX >= 0 && curX < GamePanel.COLS && curY >= 0 && curY < GamePanel.ROWS){
 			if(Boardstate[curY][curX] == myColor){
 				Boardstate[curY][curX] = GamePanel.Piece.EMPTY;
@@ -205,7 +216,9 @@ public class AIBoard {
 		char c=(char) (start.y+65);
 		char c2=(char) (retP.y+65);
 		messages.add((Character.toString(c)+Integer.toString(start.x+1)+" moved to "+Character.toString(c2)+Integer.toString(retP.x+1)));
-		moves.add(after);
+		
+		
+		moves.add(move);
 		return retP;
 	}
 	

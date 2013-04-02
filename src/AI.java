@@ -728,7 +728,7 @@ public class AI{
 	public AIBoard copyAI(AIBoard base){
 		AIBoard base2 = new AIBoard(copyBoard(base.getBoard()));
 		base2.messages = new ArrayList<String>(base.messages);
-		base2.moves = new ArrayList<Boolean>(base.moves);
+		base2.moves = new ArrayList<GamePanel.Type>(base.moves);
 		switch(base.prevDir){
 		case UPLEFT:	base2.prevDir = GamePanel.Direction.UPLEFT;
 						break;
