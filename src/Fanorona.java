@@ -528,7 +528,7 @@ public class Fanorona extends JFrame implements Runnable{
 				// make black move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 				if(AIControl){ //AI determines move
-					AI computer = new AI(board.board, GamePanel.Piece.PLAYER);
+					AI computer = new AI(board.board, GamePanel.Piece.OPPONENT);
 					AIBoard AImoves = computer.getMove();
 					//perform AI moves on local board
 					if(AImoves.chained_spots.size() != 0){
