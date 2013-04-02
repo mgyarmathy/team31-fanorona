@@ -67,8 +67,8 @@ public class AIBoard {
 						prevDir = GamePanel.Direction.UP;
 						if(after){
 							//Boardstate[start.y-2][start.x] = GamePanel.Piece.EMPTY;
-							curX = start.x-2;
-							curY = start.y;
+							curX = start.x;
+							curY = start.y-2;
 							yInc = -1;
 						} else {
 							//Boardstate[start.y+1][start.x] = GamePanel.Piece.EMPTY;

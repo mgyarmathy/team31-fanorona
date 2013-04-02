@@ -1278,7 +1278,7 @@ public class GamePanel extends JPanel{
 		}
 		if(curY >= 0 && curY < ROWS && curX >= 0 && curX < COLS){
 			if(board[curY][curX] != color2 && detectMove(from, dir, color2)){
-				info.write("TEST");
+				//info.write("TEST");
 				return false;
 			}
 		}
