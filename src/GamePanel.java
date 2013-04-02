@@ -584,30 +584,30 @@ public class GamePanel extends JPanel{
 			
 			
 			//TODO:detect advance/withdraw/paika ********************************************************
-			/*if(paika){	
+			if(!after && !before){	
 				if(TurnCount%2==0){ 
 					Player1move+="P "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
 				}
 				else{
 					Player2move+="P "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
 				}
-			}*/
-			//else if(advance){
+			}
+			else if(after){
 				if(TurnCount%2==0){ 
 					Player1move+="A "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
 				}
 				else{
 					Player2move+="A "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
 				}
-			//}
-			/*else {
+			}
+			else {
 				if(TurnCount%2==0){ 
 					Player1move+="W "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
 				}
 				else{
 					Player2move+="W "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
 				}
-			}*/
+			}
 			//******************************************************************************************
 				
 				//board[row][col] = color;
