@@ -12,6 +12,9 @@ public class GamePanel extends JPanel{
 	
 	static int ROWS = 5;
 	static int COLS = 9;
+	static int BLACK = 1;
+	static int WHITE = 0;
+	
 	
 	int AImode = 0;
 	
@@ -63,7 +66,7 @@ public class GamePanel extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
-				if(AImode == 1 && TurnCount%2 == 1){
+				if(AImode == 1 && TurnCount%2 == BLACK){
 					return;
 				} else if (AImode == 2){
 					return;
@@ -88,12 +91,12 @@ public class GamePanel extends JPanel{
 							if((selected_piece == null && (board[row][col]!=Piece.EMPTY && board[row][col]!=Piece.SACRIFICE)) && !overrideMode){ //no piece selected
 								selected_piece = new Point(col, row);
 								Piece color = board[selected_piece.y][selected_piece.x];
-								if(TurnCount%2==0 && color != Piece.PLAYER) {
+								if(TurnCount%2==WHITE && color != Piece.PLAYER) {
 									info.write("It's "+printTurn());
 									if(!chain_piece)
 										selected_piece =null; 
 								}
-								if(TurnCount%2==1 && color != Piece.OPPONENT) {
+								if(TurnCount%2==BLACK && color != Piece.OPPONENT) {
 									info.write("It's "+printTurn());
 									if(!chain_piece)
 										selected_piece =null; 
@@ -121,7 +124,7 @@ public class GamePanel extends JPanel{
 						info.write("Must choose a piece to sacrifice.");
 					} else {
 						board[selected_piece.y][selected_piece.x] = Piece.SACRIFICE;
-						if(TurnCount%2 == 0){
+						if(TurnCount%2 == WHITE){
 							sacrificeP = new Point(selected_piece.x,selected_piece.y);
 						} else {
 							sacrificeO = new Point(selected_piece.x,selected_piece.y);
@@ -129,7 +132,7 @@ public class GamePanel extends JPanel{
 						
 						
 						// sacrifice move string
-						if(TurnCount%2==0){ 
+						if(TurnCount%2==WHITE){ 
 							Player1move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
 							Player1newmove=true;
 							Player2move="";
@@ -586,57 +589,32 @@ public class GamePanel extends JPanel{
 			
 			
 			
-			//TODO:detect advance/withdraw/paika ********************************************************
-			if(!after && !before){	
-				if(TurnCount%2==0){ 
-					Player1move+="P "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
-				}
-				else{
-					Player2move+="P "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
-				}
-			}
-			else if(after){
-				if(TurnCount%2==0){ 
-					Player1move+="A "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
-				}
-				else{
-					Player2move+="A "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
-				}
-			}
-			else {
-				if(TurnCount%2==0){ 
-					Player1move+="W "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
-				}
-				else{
-					Player2move+="W "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y)+" "+Integer.toString(col+1)+" "+Integer.toString(ROWS-row);
-				}
-			}
-			//******************************************************************************************
+			printMove(selected_piece, new Point(col,row), after, before);
 				
-				//board[row][col] = color;
-				//board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
-				int countBefore = count();
-				interpretMove(selected_piece, new Point(col, row), after);
+			//board[row][col] = color;
+			//board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
+			int countBefore = count();
+			interpretMove(selected_piece, new Point(col, row), after);
 
-				chained_spots.add(new Point(selected_piece.x, selected_piece.y));
-				
-				boolean thingsEliminated = false;
-				if (countBefore - count() != 0){
-					thingsEliminated = true;
-				}
-				selected_piece.x = col;
-				selected_piece.y = row;
-				
-				//CHECK FOR OTHER MOVES
-				boolean next_move = false;
-				if(thingsEliminated){
-					next_move = detectMove(selected_piece, dir, opposite);
-				}
-				if(next_move){
+			chained_spots.add(new Point(selected_piece.x, selected_piece.y));
+			
+			boolean thingsEliminated = false;
+			if (countBefore - count() != 0){
+				thingsEliminated = true;
+			}
+			selected_piece.x = col;
+			selected_piece.y = row;
+			
+			//CHECK FOR OTHER MOVES
+			boolean next_move = false;
+			if(thingsEliminated){
+				next_move = detectMove(selected_piece, dir, opposite);
+			}
+			if(next_move){
 					chain_piece = true;
 					
 					// server chain move string stuff ****************************************
-					if(TurnCount%2==0){ 
+					if(TurnCount%2==WHITE){ 
 						Player1move+=" + ";
 					}
 					else{
@@ -657,7 +635,7 @@ public class GamePanel extends JPanel{
 			if(chain_piece == false){
 				
 				// set move new and clear other player move string ****************************************************
-				if(TurnCount%2==0){
+				if(TurnCount%2==WHITE){
 					Player1newmove=true;
 					Player2move="";
 				}
@@ -672,6 +650,35 @@ public class GamePanel extends JPanel{
 			}
 		}
 		return 0;
+	}
+	
+	public void printMove(Point start, Point end, boolean after, boolean before){
+		//TODO:detect advance/withdraw/paika ********************************************************
+		if(!after && !before){	
+			if(TurnCount%2==WHITE){ 
+				Player1move+="P "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
+			}
+			else{
+				Player2move+="P "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
+			}
+		}
+		else if(after){
+			if(TurnCount%2==WHITE){ 
+				Player1move+="A "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
+			}
+			else{
+				Player2move+="A "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
+			}
+		}
+		else {
+			if(TurnCount%2==WHITE){ 
+				Player1move+="W "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
+			}
+			else{
+				Player2move+="W "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
+			}
+		}
+		//******************************************************************************************
 	}
 	
 	public boolean checkForBlank(Piece color, Direction dir,Point p){
@@ -1024,7 +1031,7 @@ public class GamePanel extends JPanel{
 	
 	public boolean interpretMove(Point from, Point to, boolean after){
 		Piece color = Piece.EMPTY;
-		if(TurnCount%2 == 0){
+		if(TurnCount%2 == WHITE){
 			color = Piece.PLAYER;
 		} else {
 			color = Piece.OPPONENT;
@@ -1441,23 +1448,24 @@ public class GamePanel extends JPanel{
 			
 			if(AImoves.chained_spots.size() != 0){
 				selected_piece = AImoves.chained_spots.get(0);
-			}
-			paintComponent(this.getGraphics());
-			try{
-				Thread.sleep(100);
-			} catch(InterruptedException ex){
-				Thread.currentThread().interrupt();
+				animate();
 			}
 			
 			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-				selected_piece = AImoves.chained_spots.get(moving+1);
-				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-				try{
-					Thread.sleep(100);
-				} catch(InterruptedException ex){
-					Thread.currentThread().interrupt();
+				if(moving > 0){
+					if(TurnCount%2==WHITE){ 
+						Player1move+=" + ";
+					}
+					else{
+						Player2move+=" + ";
+					}
 				}
-				paintComponent(this.getGraphics());
+				//selected_piece = AImoves.chained_spots.get(moving+1);
+				//animate();
+				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
+				printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+				selected_piece = AImoves.chained_spots.get(moving+1);
+				animate();
 			}
 			
 			selected_piece = null;
@@ -1525,7 +1533,7 @@ public class GamePanel extends JPanel{
 	}
 	
 	public String printTurn(){
-		if(TurnCount%2==0) {
+		if(TurnCount%2==WHITE) {
 			if(playerName!=null) {return (playerName+"'s Turn");}
 			else return("Player 1's Turn");
 		}
@@ -1542,6 +1550,16 @@ public class GamePanel extends JPanel{
 	
 	public void setAIs(){
 		AImode = 2;
+	}
+	
+	public void blackFirst(){
+		BLACK = 0;
+		WHITE = 1;
+	}
+	
+	public void whiteFirst(){
+		BLACK = 1;
+		WHITE = 0;
 	}
 	
 	public void animate(){
@@ -1567,7 +1585,7 @@ public class GamePanel extends JPanel{
 		}
 		
 		if(stopw.isTimeUp()){
-			if(TurnCount%2 == 0) PlayerPieceCount = 0;
+			if(TurnCount%2 == WHITE) PlayerPieceCount = 0;
 			else OppPieceCount = 0;
 			win = true;
 		}
@@ -1580,16 +1598,16 @@ public class GamePanel extends JPanel{
 		
 		if(!draw && !win){
 			info.write(printTurn());
-			if(TurnCount%2 == 0 && sacrificeP != null){
+			if(TurnCount%2 == WHITE && sacrificeP != null){
 				board[sacrificeP.y][sacrificeP.x] = Piece.EMPTY;
 				sacrificeP = null;
 			}
-			if(TurnCount%2 == 1 && sacrificeO != null){
+			if(TurnCount%2 == BLACK && sacrificeO != null){
 				board[sacrificeO.y][sacrificeO.x] = Piece.EMPTY;
 				sacrificeO = null;
 			}
 			if(AImode != 0){
-				if(TurnCount%2 == 1){
+				if(TurnCount%2 == BLACK){
 					AI computer = new AI(board, Piece.OPPONENT);
 					AIBoard AImoves = computer.getMove();
 					
@@ -1600,9 +1618,19 @@ public class GamePanel extends JPanel{
 					}
 					
 					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-						selected_piece = AImoves.chained_spots.get(moving+1);
-						animate();
+						if(moving > 0){
+							if(TurnCount%2==WHITE){ 
+								Player1move+=" + ";
+							}
+							else{
+								Player2move+=" + ";
+							}
+						}
+						//selected_piece = AImoves.chained_spots.get(moving+1);
+						//animate();
 						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
+						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
+						selected_piece = AImoves.chained_spots.get(moving+1);
 						animate();
 						
 					}
@@ -1612,7 +1640,7 @@ public class GamePanel extends JPanel{
 					countPieces();
 					
 				}
-				if(TurnCount%2 == 0 && AImode == 2){
+				if(TurnCount%2 == WHITE && AImode == 2){
 					AI computer = new AI(board, Piece.PLAYER);
 					AIBoard AImoves = computer.getMove();
 					
@@ -1622,9 +1650,19 @@ public class GamePanel extends JPanel{
 					}
 					
 					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+						if(moving > 0){
+							if(TurnCount%2==WHITE){ 
+								Player1move+=" + ";
+							}
+							else{
+								Player2move+=" + ";
+							}
+						}
+						//selected_piece = AImoves.chained_spots.get(moving+1);
+						//animate();
+						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
+						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving), !AImoves.moves.get(moving));
 						selected_piece = AImoves.chained_spots.get(moving+1);
-						animate();
-						interpretMove(chained_spots.get(moving),chained_spots.get(moving+1), AImoves.moves.get(moving));
 						animate();
 					}
 					
