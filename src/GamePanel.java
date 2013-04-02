@@ -158,12 +158,43 @@ public class GamePanel extends JPanel{
 	}
 	
 	
-	public void serverMovePiece(Point sel_piece,int moveToCol, int moveToRow){
+	public void serverMovePiece(Point sel_piece,int moveToCol, int moveToRow,String movedirection){
 		// row logic must be moveToRow = ROWS - row  from
 		// server end to match our board 
 		selected_piece = sel_piece;
 		
-		movePiece(moveToCol,moveToRow);
+		int movedata = movePiece(moveToCol,moveToRow);
+		
+		if(movedata == -3){
+			int choiceMoveCol,choiceMoveRow;
+			if(movedirection == "A"){
+				
+				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+1; }
+				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow+1; }
+				else if(previous_direction== Direction.DOWNRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow+1; }
+				else if(previous_direction== Direction.LEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow; }
+				else if(previous_direction== Direction.RIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow; }
+				else if(previous_direction== Direction.UPLEFT) { choiceMoveCol= moveToCol-1; choiceMoveRow = moveToRow-1; }
+				else if(previous_direction== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow-1; }
+				else { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow-1; }
+				
+				movePiece(choiceMoveCol,choiceMoveRow);
+			}
+			
+			if(movedirection == "W"){
+				
+				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+2; }
+				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow+2; }
+				else if(previous_direction== Direction.DOWNRIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow+2; }
+				else if(previous_direction== Direction.LEFT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow; }
+				else if(previous_direction== Direction.RIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow; }
+				else if(previous_direction== Direction.UPLEFT) { choiceMoveCol= moveToCol-2; choiceMoveRow = moveToRow-2; }
+				else if(previous_direction== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow-2; }
+				else { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow-1; }
+				
+				movePiece(choiceMoveCol,choiceMoveRow);
+			}
+		}
 	}
 	
 	
@@ -174,6 +205,7 @@ public class GamePanel extends JPanel{
 		// -2 already moved there
 		// -3 must select piece to remove
 		// -4 valid move with other piece
+		
 		boolean valid_move = true;
 		boolean before = false;
 		boolean after = false;
