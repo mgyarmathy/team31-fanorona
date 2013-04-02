@@ -158,14 +158,19 @@ public class GamePanel extends JPanel{
 	}
 	
 	
-	public void serverMovePiece(Point sel_piece,int moveToCol, int moveToRow,String movedirection){
+	public int serverMovePiece(Point sel_piece,int moveToCol, int moveToRow,String movedirection){
 		// row logic must be moveToRow = ROWS - row  from
 		// server end to match our board 
+		
+		// if movedata is positive move was good
+		// if +1 must selected piece(s) to take off
+		// if negative move not good or other valid move available
+		
 		selected_piece = sel_piece;
 		
 		int movedata = movePiece(moveToCol,moveToRow);
 		
-		if(movedata == -3){
+		if(movedata == +1){
 			int choiceMoveCol,choiceMoveRow;
 			if(movedirection == "A"){
 				
@@ -178,7 +183,7 @@ public class GamePanel extends JPanel{
 				else if(previous_direction== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow-1; }
 				else { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow-1; }
 				
-				movePiece(choiceMoveCol,choiceMoveRow);
+				movedata = movePiece(choiceMoveCol,choiceMoveRow);
 			}
 			
 			if(movedirection == "W"){
@@ -192,18 +197,20 @@ public class GamePanel extends JPanel{
 				else if(previous_direction== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow-2; }
 				else { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow-1; }
 				
-				movePiece(choiceMoveCol,choiceMoveRow);
+				movedata = movePiece(choiceMoveCol,choiceMoveRow);
 			}
 		}
+		
+		return movedata;
 	}
 	
 	
 	public int movePiece(int col, int row){
 		
 		// 0 successful move
+		// +1 must select piece to remove
 		// -1 can't move there
 		// -2 already moved there
-		// -3 must select piece to remove
 		// -4 valid move with other piece
 		
 		boolean valid_move = true;
@@ -544,7 +551,7 @@ public class GamePanel extends JPanel{
 			
 			if(overrideMode){
 				info.write("Selecte the piece(s) you want to eliminate");
-				return -3;
+				return +1;
 			}
 			if(innate){
 				if(!chain_piece){
@@ -578,7 +585,7 @@ public class GamePanel extends JPanel{
 				return 0;
 			} else {
 				info.write("Must select one of two pieces.");
-				return -3;
+				return +1;
 			}
 			overrideMode = false;
 			dir = overrideDir;
