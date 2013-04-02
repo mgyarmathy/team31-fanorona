@@ -367,10 +367,22 @@ public class Fanorona extends JFrame implements Runnable{
 				board.Player1newmove = false;
 				String ok = receiveMessage(c_sockInput);
 				System.out.println(ok);
+				//check to see if move caused WIN/DRAW
+				if(board.win) {
+					sendMessage(c_sockOutput, "LOSER");
+					info.write("YOU WIN");
+					break;
+				}
+				if(board.draw){
+					sendMessage(c_sockOutput, "DRAW");
+					info.write("Game ends in DRAW");
+					break;
+				}
 					
 				String playerMove = receiveMessage(c_sockInput);
 				info.write(playerMove);
 				//parse player move
+				int goodmove = 0;
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
 					for(int i = 0; i<tokens.length; i=i+6){
@@ -380,25 +392,36 @@ public class Fanorona extends JFrame implements Runnable{
 						int tCol = Integer.parseInt(tokens[i+3]);
 						int tRow = Integer.parseInt(tokens[i+4]);
 						//tokens[i+5] = "+"
-						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+						goodmove = board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
 					}
 					
 					System.out.println(playerMove);
 					sendMessage(c_sockOutput, "OK"); //confirm move
+					if(goodmove<0) {
+						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
+						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+					}
 				}
 				else if(tokens[0].equals("S")){
 					int sacCol = Integer.parseInt(tokens[1]);
 					int sacRow = Integer.parseInt(tokens[2]);
 					System.out.println(playerMove);
 					//perform sacrifice on that specific piece
-					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
 					sendMessage(c_sockOutput, "OK"); //confirm move
+					if(goodmove<0) {
+						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
+						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+					}
 				}
 				else if(tokens[0].equals("ILLEGAL")){
+					break;
 				}
 				else if(tokens[0].equals("TIME")){
 				}
 				else if(tokens[0].equals("LOSER")){
+					info.write("YOU LOSE");
+					break;
 				}
 				else if(tokens[0].equals("WINNER")){
 				}
@@ -411,6 +434,7 @@ public class Fanorona extends JFrame implements Runnable{
 				String playerMove = receiveMessage(c_sockInput);
 				info.write(playerMove);
 				//parse player move
+				int goodmove = 0;
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
 					for(int i = 0; i<tokens.length; i=i+6){
@@ -420,25 +444,38 @@ public class Fanorona extends JFrame implements Runnable{
 						int tCol = Integer.parseInt(tokens[i+3]);
 						int tRow = Integer.parseInt(tokens[i+4]);
 						//tokens[i+5] = "+"
-						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+						goodmove = board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
 					}
 					
 					System.out.println(playerMove);
 					sendMessage(c_sockOutput, "OK"); //confirm move
+					if(goodmove<0) {
+						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
+						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+					}
 				}
 				else if(tokens[0].equals("S")){
 					int sacCol = Integer.parseInt(tokens[1]);
 					int sacRow = Integer.parseInt(tokens[2]);
 					System.out.println(playerMove);
 					//perform sacrifice on that specific piece
-					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
 					sendMessage(c_sockOutput, "OK"); //confirm move
+					if(goodmove<0) {
+						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
+						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+					}
 				}
 				else if(tokens[0].equals("ILLEGAL")){
+					break;
 				}
 				else if(tokens[0].equals("TIME")){
+					System.out.println("Time up");
+					break;
 				}
 				else if(tokens[0].equals("LOSER")){
+					info.write("YOU LOSE");
+					break;
 				}
 				else if(tokens[0].equals("WINNER")){
 				}
@@ -461,6 +498,17 @@ public class Fanorona extends JFrame implements Runnable{
 				board.Player2newmove = false;
 				String ok = receiveMessage(c_sockInput);
 				System.out.println(ok);
+				//check to see if move caused WIN/DRAW
+				if(board.win) {
+					sendMessage(c_sockOutput, "LOSER");
+					info.write("YOU WIN");
+					break;
+				}
+				if(board.draw){
+					sendMessage(c_sockOutput, "DRAW");
+					info.write("Game ends in DRAW");
+					break;
+				}
 			}
 		}		
 		
