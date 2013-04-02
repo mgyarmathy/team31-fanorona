@@ -347,6 +347,114 @@ public class Fanorona extends JFrame implements Runnable{
 		else { System.err.println("error: server did not send BEGIN message"); System.exit(1);}
 		System.out.println(begin);
 		
+		while(true){
+			if(firstMove== "B"){
+				// make white move by ai
+				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
+				while(!board.Player1newmove){
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+						
+				sendMessage(c_sockOutput, board.Player1move);
+				board.Player1newmove = false;
+				String ok = receiveMessage(c_sockInput);
+				System.out.println(ok);
+					
+				String playerMove = receiveMessage(c_sockInput);
+				info.write(playerMove);
+				//parse player move
+				String[] tokens = playerMove.split("\\s+");
+				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					int fCol = Integer.parseInt(tokens[1]);
+					int fRow = Integer.parseInt(tokens[2]);
+					int tCol = Integer.parseInt(tokens[3]);
+					int tRow = Integer.parseInt(tokens[4]);
+					System.out.println(playerMove);
+					//TODO: perform piece movement and update client board appropriately
+					board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("S")){
+					int sacCol = Integer.parseInt(tokens[1]);
+					int sacRow = Integer.parseInt(tokens[2]);
+					System.out.println(playerMove);
+					//perform sacrifice on that specific piece
+					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("ILLEGAL")){
+				}
+				else if(tokens[0].equals("TIME")){
+				}
+				else if(tokens[0].equals("LOSER")){
+				}
+				else if(tokens[0].equals("WINNER")){
+				}
+				else if(tokens[0].equals("TIE")){
+					break;
+				}
+			}
+			if(firstMove== "W"){
+			
+				String playerMove = receiveMessage(c_sockInput);
+				info.write(playerMove);
+				//parse player move
+				String[] tokens = playerMove.split("\\s+");
+				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					int fCol = Integer.parseInt(tokens[1]);
+					int fRow = Integer.parseInt(tokens[2]);
+					int tCol = Integer.parseInt(tokens[3]);
+					int tRow = Integer.parseInt(tokens[4]);
+					System.out.println(playerMove);
+					//TODO: perform piece movement and update client board appropriately
+					board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("S")){
+					int sacCol = Integer.parseInt(tokens[1]);
+					int sacRow = Integer.parseInt(tokens[2]);
+					System.out.println(playerMove);
+					//perform sacrifice on that specific piece
+					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					sendMessage(c_sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("ILLEGAL")){
+				}
+				else if(tokens[0].equals("TIME")){
+				}
+				else if(tokens[0].equals("LOSER")){
+				}
+				else if(tokens[0].equals("WINNER")){
+				}
+				else if(tokens[0].equals("TIE")){
+					break;
+				}
+				
+				// make white move by ai
+				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
+				while(!board.Player1newmove){
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+						
+				sendMessage(c_sockOutput, board.Player1move);
+				board.Player1newmove = false;
+				String ok = receiveMessage(c_sockInput);
+				System.out.println(ok);
+			}
+		}
+		
+		
+		/*
 		String serverMove = receiveMessage(c_sockInput);
 		String[] tokens = serverMove.split("\\s+");
 		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
@@ -366,20 +474,12 @@ public class Fanorona extends JFrame implements Runnable{
 			System.out.println(serverMove);
 			//perform sacrifice on that specific piece
 			sendMessage(c_sockOutput, "OK"); //confirm move
-		}
+		}*/
 		
 		//player makes move...
 		//board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5,tokens[0]);
 		//sendMessage(c_sockOutput, "A 6 4 5 5");
-		while(true){
-			if(board.Player1newmove){
-				sendMessage(c_sockOutput, board.Player1move);
-				board.Player1newmove = false;
-				String ok = receiveMessage(c_sockInput);
-				System.out.println(ok);
-			}
-			if(board.win) break;
-		}
+	
 		//then gets server OK
 		
 		

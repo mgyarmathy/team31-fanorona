@@ -107,6 +107,7 @@ public class FanoronaServer extends JFrame implements Runnable{
 		pack();
 		
 		
+		
 		sendMessage(sockOutput, "BEGIN");
 		board.newGame();
 		setVisible(true);
@@ -117,32 +118,113 @@ public class FanoronaServer extends JFrame implements Runnable{
 		int fromRow = 2;
 		int toCol = 5;
 		int toRow = 3;
-		board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-		sendMessage(sockOutput, "A" + " " + fromCol + " " + fromRow + " " + toCol + " " + toRow); //server sends first move
-		String ok = receiveMessage(sockInput);
-		System.out.println(ok);
-		String playerMove = receiveMessage(sockInput);
-		//parse player move
-		String[] tokens = playerMove.split("\\s+");
-		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-			int fCol = Integer.parseInt(tokens[1]);
-			int fRow = Integer.parseInt(tokens[2]);
-			int tCol = Integer.parseInt(tokens[3]);
-			int tRow = Integer.parseInt(tokens[4]);
-			System.out.println(playerMove);
-			//TODO: perform piece movement and update client board appropriately
-			board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
-			sendMessage(sockOutput, "OK"); //confirm move
-		}
-		else if(tokens[0].equals("S")){
-			int sacCol = Integer.parseInt(tokens[1]);
-			int sacRow = Integer.parseInt(tokens[2]);
-			System.out.println(playerMove);
-			//perform sacrifice on that specific piece
-			sendMessage(sockOutput, "OK"); //confirm move
-		}
-		sendMessage(sockOutput, "OK"); //confirm move received
 		
+		
+		while(true){
+			if(firstMove== "B"){
+				// make white move by ai
+				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
+				while(!board.Player1newmove){
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+						
+				sendMessage(sockOutput, board.Player1move);
+				board.Player1newmove = false;
+				String ok = receiveMessage(sockInput);
+				System.out.println(ok);
+					
+				String playerMove = receiveMessage(sockInput);
+				info.write(playerMove);
+				//parse player move
+				String[] tokens = playerMove.split("\\s+");
+				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					int fCol = Integer.parseInt(tokens[1]);
+					int fRow = Integer.parseInt(tokens[2]);
+					int tCol = Integer.parseInt(tokens[3]);
+					int tRow = Integer.parseInt(tokens[4]);
+					System.out.println(playerMove);
+					//TODO: perform piece movement and update client board appropriately
+					board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
+					sendMessage(sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("S")){
+					int sacCol = Integer.parseInt(tokens[1]);
+					int sacRow = Integer.parseInt(tokens[2]);
+					System.out.println(playerMove);
+					//perform sacrifice on that specific piece
+					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					sendMessage(sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("ILLEGAL")){
+				}
+				else if(tokens[0].equals("TIME")){
+				}
+				else if(tokens[0].equals("LOSER")){
+				}
+				else if(tokens[0].equals("WINNER")){
+				}
+				else if(tokens[0].equals("TIE")){
+					break;
+				}
+			}
+			if(firstMove== "W"){
+			
+				String playerMove = receiveMessage(sockInput);
+				info.write(playerMove);
+				//parse player move
+				String[] tokens = playerMove.split("\\s+");
+				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					int fCol = Integer.parseInt(tokens[1]);
+					int fRow = Integer.parseInt(tokens[2]);
+					int tCol = Integer.parseInt(tokens[3]);
+					int tRow = Integer.parseInt(tokens[4]);
+					System.out.println(playerMove);
+					//TODO: perform piece movement and update client board appropriately
+					board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
+					sendMessage(sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("S")){
+					int sacCol = Integer.parseInt(tokens[1]);
+					int sacRow = Integer.parseInt(tokens[2]);
+					System.out.println(playerMove);
+					//perform sacrifice on that specific piece
+					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					sendMessage(sockOutput, "OK"); //confirm move
+				}
+				else if(tokens[0].equals("ILLEGAL")){
+				}
+				else if(tokens[0].equals("TIME")){
+				}
+				else if(tokens[0].equals("LOSER")){
+				}
+				else if(tokens[0].equals("WINNER")){
+				}
+				else if(tokens[0].equals("TIE")){
+					break;
+				}
+				
+				// make white move by ai
+				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
+				while(!board.Player1newmove){
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+						
+				sendMessage(sockOutput, board.Player1move);
+				board.Player1newmove = false;
+				String ok = receiveMessage(sockInput);
+				System.out.println(ok);
+			}
+		}
 		
 		/*if(firstMove.equals("W")){
 			while(true){
