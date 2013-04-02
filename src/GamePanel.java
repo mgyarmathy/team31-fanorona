@@ -95,14 +95,12 @@ public class GamePanel extends JPanel{
 									if(!chain_piece)
 										selected_piece =null; 
 								}
-								//info.write(letters[row]+Integer.toString(col+1)+" selected");
 								break;
 							}
 							//move selected piece
 							else if((selected_piece != null && (board[row][col]==Piece.EMPTY || (selected_piece.x == col && selected_piece.y == row)))
 										|| overrideMode){ 
 								movePiece(col,row);
-								
 							}
 							
 							else if(board[row][col]!=Piece.EMPTY) { info.write("There is a piece There!"); break;} //Spot taken
@@ -123,7 +121,6 @@ public class GamePanel extends JPanel{
 						} else {
 							sacrificeO = new Point(selected_piece.x,selected_piece.y);
 						}
-						
 						
 						
 						// sacrifice move string
@@ -152,7 +149,23 @@ public class GamePanel extends JPanel{
 		});
 	}
 	
-	public void movePiece(int col, int row){
+	
+	public void serverMovePiece(Point sel_piece,int moveToCol, int moveToRow){
+		// row logic must be moveToRow = ROWS - row  from
+		// server end to match our board 
+		selected_piece = sel_piece;
+		
+		movePiece(moveToCol,moveToRow);
+	}
+	
+	
+	public int movePiece(int col, int row){
+		
+		// 0 successful move
+		// -1 can't move there
+		// -2 already moved there
+		// -3 must select piece to remove
+		// -4 valid move with other piece
 		boolean valid_move = true;
 		boolean before = false;
 		boolean after = false;
@@ -176,7 +189,7 @@ public class GamePanel extends JPanel{
 				if(!chain_piece){
 					selected_piece = null;
 				}
-				return;
+				return -1;
 			}
 			//Check if the piece cannot move diagonally
 			if((row + col)%2 != Diag){
@@ -187,7 +200,7 @@ public class GamePanel extends JPanel{
 					if(!chain_piece){
 						selected_piece = null;
 					}
-					return;
+					return -1;
 				}
 			}
 			
@@ -203,7 +216,7 @@ public class GamePanel extends JPanel{
 			
 			if(repeat){
 				info.write("Can't move to the same place during a chain.");
-				return;
+				return -2;
 			}
 			//Move detection goes here
 			
@@ -242,7 +255,7 @@ public class GamePanel extends JPanel{
 			
 			if(chain_piece && dir == previous_direction){
 				info.write("Can't move in same direction twice");
-				return;
+				return -2;
 			}
 			
 			
@@ -591,7 +604,7 @@ public class GamePanel extends JPanel{
 			
 			if(overrideMode){
 				info.write("Selecte the piece(s) you want to eliminate");
-				return;
+				return -3;
 			}
 			if(innate){
 				if(!chain_piece){
@@ -600,7 +613,7 @@ public class GamePanel extends JPanel{
 				if(blank){
 					info.write("Must take opponent piece off board.");
 				}
-				return;
+				return -4;
 			}
 		} else {
 			
@@ -622,10 +635,10 @@ public class GamePanel extends JPanel{
 					chained_spots.clear();
 					countPieces();
 				}
-				return;
+				return 0;
 			} else {
 				info.write("Must select one of two pieces.");
-				return;
+				return -3;
 			}
 			overrideMode = false;
 			dir = overrideDir;
@@ -844,7 +857,7 @@ public class GamePanel extends JPanel{
 				selected_piece = null;
 			}
 		}
-		return;
+		return 0;
 	}
 	
 	public boolean checkForBlank(Piece color, Direction dir,Point p){
