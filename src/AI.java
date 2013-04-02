@@ -82,60 +82,83 @@ public class AI{
 		}
 		int worstCase = 1000;
 		int bestCase = 1000;
+		int oppBest = -1000;
 		if(color == GamePanel.Piece.PLAYER){
 			worstCase = -1000;
 			bestCase = -1000;
+			oppBest = 1000;
 		}
 		
 		for(i = 0; i < tree.getRoot().getChildren().size(); i++){ //for every move
 			if(tree.getRoot().getChildren().get(i) != null){
-				Tree<AIBoard>.Node<AIBoard> base2 = tree.getRoot().getChildren().get(i);
-				create(color, base2);
-				if(base2.getChildren().size() == 0){
-					ArrayList<AIBoard> futureEmpty = makeEmpty(color);
-					for(int w = 0; w < futureEmpty.size(); w++){
-						base2.add(futureEmpty.get(w));
-					}
-				}
-				if(color == GamePanel.Piece.PLAYER){
-					worstCase = 1000;
+				if (color == GamePanel.Piece.OPPONENT){
+					oppBest = -1000;
 				} else {
-					worstCase = -1000;
+					oppBest = 1000;
 				}
-				for(int r = 0; r < base2.getChildren().size(); r++){ //for every opponent response
+				for (int e = 0; e < tree.getRoot().getChildren().get(i).getChildren().size(); e++){ //for every opponent response
+					Tree<AIBoard>.Node<AIBoard> base2 = tree.getRoot().getChildren().get(i).getChildren().get(e);
+					boolean proceed = false;
 					if(color == GamePanel.Piece.OPPONENT){
-						for(int s = 0; s < base2.getChildren().get(r).getChildren().size(); s++){ //for every future move
-							if(base2.getChildren().get(r).getChildren().get(s).getData().rank > worstCase){
-								worstCase = base2.getChildren().get(r).getChildren().get(s).getData().rank;
-							}
+						if(base2.getData().rank >= oppBest){
+							oppBest = base2.getData().rank;
+							proceed = true;
 						}
-					}else {	
-						for(int s = 0; s < base2.getChildren().get(r).getChildren().size(); s++){ //for every future move
-							if(base2.getChildren().get(r).getChildren().get(s).getData().rank < worstCase){
-								worstCase = base2.getChildren().get(r).getChildren().get(s).getData().rank;
-							}
+					} else {
+						if(base2.getData().rank <= oppBest){
+							oppBest = base2.getData().rank;
+							proceed = true;
 						}
 					}
 					
-				}
-				if(color == GamePanel.Piece.OPPONENT){
-					if(worstCase < bestCase){
-						bestCase = worstCase;
-						index = i;
-					} else if (worstCase == bestCase){
-						if(ran.nextInt() > ranCase){
-							ranCase = ran.nextInt();
-							index = i;
+					if(proceed){
+						create(color, base2);
+						if(base2.getChildren().size() == 0){
+							ArrayList<AIBoard> futureEmpty = makeEmpty(color);
+							for(int w = 0; w < futureEmpty.size(); w++){
+								base2.add(futureEmpty.get(w));
+							}
 						}
-					}
-				} else {
-					if(worstCase > bestCase){
-						bestCase = worstCase;
-						index = i;
-					} else if (worstCase == bestCase){
-						if(ran.nextInt() > ranCase){
-							ranCase = ran.nextInt();
-							index = i;
+						if(color == GamePanel.Piece.PLAYER){
+							worstCase = 1000;
+						} else {
+							worstCase = -1000;
+						}
+						
+						if(color == GamePanel.Piece.OPPONENT){
+							for(int s = 0; s < base2.getChildren().size(); s++){ //for every future move
+								if(base2.getChildren().get(s).getData().rank > worstCase){
+									worstCase = base2.getChildren().get(s).getData().rank;
+								}
+							}
+						}else {	
+							for(int s = 0; s < base2.getChildren().size(); s++){ //for every future move
+								if(base2.getChildren().get(s).getData().rank < worstCase){
+									worstCase = base2.getChildren().get(s).getData().rank;
+								}
+							}
+						}
+							
+						if(color == GamePanel.Piece.OPPONENT){
+							if(worstCase < bestCase){
+								bestCase = worstCase;
+								index = i;
+							} else if (worstCase == bestCase){
+								if(ran.nextInt() > ranCase){
+									ranCase = ran.nextInt();
+									index = i;
+								}
+							}
+						} else {
+							if(worstCase > bestCase){
+								bestCase = worstCase;
+								index = i;
+							} else if (worstCase == bestCase){
+								if(ran.nextInt() > ranCase){
+									ranCase = ran.nextInt();
+									index = i;
+								}
+							}
 						}
 					}
 				}
