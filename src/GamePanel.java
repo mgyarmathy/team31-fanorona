@@ -186,7 +186,7 @@ public class GamePanel extends JPanel{
 				movedata = movePiece(choiceMoveCol,choiceMoveRow);
 			}
 			
-			if(movedirection == "W"){
+			else if(movedirection == "W"){
 				
 				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+2; }
 				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow+2; }
@@ -725,6 +725,7 @@ public class GamePanel extends JPanel{
 					Player1move="";
 				}
 				//send move to other player function ******************************************************************
+			
 				
 				countPieces();
 				selected_piece = null;
