@@ -183,13 +183,13 @@ public class GamePanel extends JPanel{
 			int choiceMoveCol,choiceMoveRow;
 			if(movedirection.equals("A")){
 				
-				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+1; }
-				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow+1; }
-				else if(previous_direction== Direction.DOWNRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow+1; }
-				else if(previous_direction== Direction.LEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow; }
-				else if(previous_direction== Direction.RIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow; }
-				else if(previous_direction== Direction.UPLEFT) { choiceMoveCol= moveToCol-1; choiceMoveRow = moveToRow-1; }
-				else if(previous_direction== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow-1; }
+				if(overrideDir== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+1; }
+				else if(overrideDir== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow+1; }
+				else if(overrideDir== Direction.DOWNRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow+1; }
+				else if(overrideDir== Direction.LEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow; }
+				else if(overrideDir== Direction.RIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow; }
+				else if(overrideDir== Direction.UPLEFT) { choiceMoveCol= moveToCol-1; choiceMoveRow = moveToRow-1; }
+				else if(overrideDir== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 1; choiceMoveRow = moveToRow-1; }
 				else { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow-1; }
 				
 				movedata = movePiece(choiceMoveCol,choiceMoveRow);
@@ -197,13 +197,13 @@ public class GamePanel extends JPanel{
 			
 			else if(movedirection.equals("W")){
 				
-				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+2; }
-				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow+2; }
-				else if(previous_direction== Direction.DOWNRIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow+2; }
-				else if(previous_direction== Direction.LEFT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow; }
-				else if(previous_direction== Direction.RIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow; }
-				else if(previous_direction== Direction.UPLEFT) { choiceMoveCol= moveToCol-2; choiceMoveRow = moveToRow-2; }
-				else if(previous_direction== Direction.UPRIGHT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow-2; }
+				if(overrideDir== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+2; }
+				else if(overrideDir== Direction.DOWNLEFT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow+2; }
+				else if(overrideDir== Direction.DOWNRIGHT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow+2; }
+				else if(overrideDir== Direction.LEFT) { choiceMoveCol= moveToCol + 2; choiceMoveRow = moveToRow; }
+				else if(overrideDir== Direction.RIGHT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow; }
+				else if(overrideDir== Direction.UPLEFT) { choiceMoveCol= moveToCol+2; choiceMoveRow = moveToRow-2; }
+				else if(overrideDir== Direction.UPRIGHT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow-2; }
 				else { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow-1; }
 				
 				movedata = movePiece(choiceMoveCol,choiceMoveRow);

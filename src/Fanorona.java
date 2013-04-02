@@ -373,14 +373,13 @@ public class Fanorona extends JFrame implements Runnable{
 				//parse player move
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					String dir = tokens[0];
-					
-					for(int i = 1; i<tokens.length; i=i+5){
-						int fCol = Integer.parseInt(tokens[i]);
-						int fRow = Integer.parseInt(tokens[i+1]);
-						int tCol = Integer.parseInt(tokens[i+2]);
-						int tRow = Integer.parseInt(tokens[i+3]);
-						//tokens[i+4] = "+"
+					for(int i = 0; i<tokens.length; i=i+6){
+						String dir = tokens[i];
+						int fCol = Integer.parseInt(tokens[i+1]);
+						int fRow = Integer.parseInt(tokens[i+2]);
+						int tCol = Integer.parseInt(tokens[i+3]);
+						int tRow = Integer.parseInt(tokens[i+4]);
+						//tokens[i+5] = "+"
 						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
 					}
 					
@@ -414,14 +413,13 @@ public class Fanorona extends JFrame implements Runnable{
 				//parse player move
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					String dir = tokens[0];
-					
-					for(int i = 1; i<tokens.length; i=i+5){
-						int fCol = Integer.parseInt(tokens[i]);
-						int fRow = Integer.parseInt(tokens[i+1]);
-						int tCol = Integer.parseInt(tokens[i+2]);
-						int tRow = Integer.parseInt(tokens[i+3]);
-						//tokens[i+4] = "+"
+					for(int i = 0; i<tokens.length; i=i+6){
+						String dir = tokens[i];
+						int fCol = Integer.parseInt(tokens[i+1]);
+						int fRow = Integer.parseInt(tokens[i+2]);
+						int tCol = Integer.parseInt(tokens[i+3]);
+						int tRow = Integer.parseInt(tokens[i+4]);
+						//tokens[i+5] = "+"
 						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
 					}
 					
@@ -459,8 +457,8 @@ public class Fanorona extends JFrame implements Runnable{
 					}
 				}
 						
-				sendMessage(c_sockOutput, board.Player1move);
-				board.Player1newmove = false;
+				sendMessage(c_sockOutput, board.Player2move);
+				board.Player2newmove = false;
 				String ok = receiveMessage(c_sockInput);
 				System.out.println(ok);
 			}
