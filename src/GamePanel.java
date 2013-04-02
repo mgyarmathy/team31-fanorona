@@ -1759,19 +1759,43 @@ public class GamePanel extends JPanel{
 		else { info.write("Player 2 Wins!"); stopw.timeStop(); }
 	}
 	
-	public void writeMove(OutputStream output, String move){
-		byte[] buf = new byte[1024];
-	    char[] charArray = move.toCharArray();
-	    for(int i = 0; i<charArray.length; i++){
-	    	buf[i] = (byte)charArray[i];
-	    }
-	    buf[charArray.length] = (byte)' ';
-	    try {
-			output.write(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("server: unable to write to output stream");
-			System.exit(1);
+	public boolean writeMove(OutputStream output){
+		if(Player1newmove){
+		
+			byte[] buf = new byte[1024];
+		    char[] charArray = Player1move.toCharArray();
+		    for(int i = 0; i<charArray.length; i++){
+		    	buf[i] = (byte)charArray[i];
+		    }
+		    buf[charArray.length] = (byte)' ';
+		    try {
+				output.write(buf, 0, buf.length);
+			} catch (IOException e1) {
+				System.err.println("server: unable to write to output stream");
+				return false;
+				//System.exit(1);
+			}
+		    return true;
 		}
+		else if(Player2newmove){
+			
+			byte[] buf = new byte[1024];
+		    char[] charArray = Player2move.toCharArray();
+		    for(int i = 0; i<charArray.length; i++){
+		    	buf[i] = (byte)charArray[i];
+		    }
+		    buf[charArray.length] = (byte)' ';
+		    try {
+				output.write(buf, 0, buf.length);
+			} catch (IOException e1) {
+				System.err.println("server: unable to write to output stream");
+				return false;
+				//System.exit(1);
+			}
+		    return true;
+		}
+		
+	    return false;
 	}
 	
 	
