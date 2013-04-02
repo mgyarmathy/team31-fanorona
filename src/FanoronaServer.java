@@ -179,6 +179,9 @@ public class FanoronaServer extends JFrame implements Runnable{
 				//parse player move
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+					
+					
+					
 					int fCol = Integer.parseInt(tokens[1]);
 					int fRow = Integer.parseInt(tokens[2]);
 					int tCol = Integer.parseInt(tokens[3]);
@@ -226,82 +229,6 @@ public class FanoronaServer extends JFrame implements Runnable{
 			}
 		}
 		
-		/*if(firstMove.equals("W")){
-			while(true){
-				//server makes second move each turn
-				
-				
-				//get client OK
-				while(!receiveMessage(sockInput).startsWith("OK"));
-				
-				String serverMessage = receiveMessage(sockInput);
-				String[] tokens = serverMessage.split("\\s+");
-				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					int fromCol = Integer.parseInt(tokens[1]);
-					int fromRow = Integer.parseInt(tokens[2]);
-					int toCol = Integer.parseInt(tokens[3]);
-					int toRow = Integer.parseInt(tokens[4]);
-					System.out.println(serverMessage);
-					//perform piece movement and update client board appropriately
-					sendMessage(sockOutput, "OK"); //confirm move
-				}
-				else if(tokens[0].equals("S")){
-					int sacCol = Integer.parseInt(tokens[1]);
-					int sacRow = Integer.parseInt(tokens[2]);
-					System.out.println(serverMessage);
-					//perform sacrifice on that specific piece
-					sendMessage(sockOutput, "OK"); //confirm move
-				}
-				
-				//TODO: handle "TIE" "LOSER" "WINNER" "ILLEGAL" 
-				//break loop if this occurs
-				
-				//let client perform move - where do movements get written to infopanel?
-				//capture_move   ::==  A position position | W position position
-				//paika_move     ::==  P position position
-				//sacrifice_move ::==  S position
-				//sendMessage("this is a move");
-			}
-		}
-		else if(firstMove.equals("B")){
-			//server moves first each turn
-			
-			
-			while(true){
-				//let client perform move
-				//capture_move   ::==  A position position | W position position
-				//paika_move     ::==  P position position
-				//sacrifice_move ::==  S position
-				
-				String serverMessage = receiveMessage(sockInput);
-				String[] tokens = serverMessage.split("\\s+");
-				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					int fromCol = Integer.parseInt(tokens[1]);
-					int fromRow = Integer.parseInt(tokens[2]);
-					int toCol = Integer.parseInt(tokens[3]);
-					int toRow = Integer.parseInt(tokens[4]);
-					System.out.println(serverMessage);
-					//perform piece movement and update client board appropriately
-					sendMessage(sockOutput, "OK"); //confirm move
-				}
-				else if(tokens[0].equals("S")){
-					int sacCol = Integer.parseInt(tokens[1]);
-					int sacRow = Integer.parseInt(tokens[2]);
-					System.out.println(serverMessage);
-					//perform sacrifice on that specific piece
-					sendMessage(sockOutput, "OK"); //confirm move
-				}
-				//TODO: handle "TIE" "LOSER" "WINNER" "ILLEGAL" 
-				//break loop if this occurs
-				
-				
-				
-				//get server OK
-				while(!receiveMessage(sockInput).startsWith("OK"));
-				
-			}
-		}*/
-		
 		
 		//close client and server sockets upon termination
 		try {
@@ -318,3 +245,18 @@ public class FanoronaServer extends JFrame implements Runnable{
 		}
 	}
 }
+
+//snippet to handle multiple moves
+//String dir = tokens[0];
+//example string: A 5 4 5 3 + 5 3 4 3 +  4  3  3  3 
+//indices         0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+//for(int i = 1; i<tokens.length; i=i+5){
+//	int fCol = Integer.parseInt(tokens[i]);
+//	int fRow = Integer.parseInt(tokens[i+1]);
+//	int tCol = Integer.parseInt(tokens[i+2]);
+//	int tRow = Integer.parseInt(tokens[i+3]);
+	//tokens[i+4] = "+"
+//	board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+//}
+
+
