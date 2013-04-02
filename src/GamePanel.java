@@ -181,7 +181,7 @@ public class GamePanel extends JPanel{
 		
 		if(movedata == +1){
 			int choiceMoveCol,choiceMoveRow;
-			if(movedirection == "A"){
+			if(movedirection.equals("A")){
 				
 				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+1; }
 				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 1; choiceMoveRow = moveToRow+1; }
@@ -195,7 +195,7 @@ public class GamePanel extends JPanel{
 				movedata = movePiece(choiceMoveCol,choiceMoveRow);
 			}
 			
-			else if(movedirection == "W"){
+			else if(movedirection.equals("W")){
 				
 				if(previous_direction== Direction.DOWN) { choiceMoveCol= moveToCol; choiceMoveRow = moveToRow+2; }
 				else if(previous_direction== Direction.DOWNLEFT) { choiceMoveCol= moveToCol - 2; choiceMoveRow = moveToRow+2; }

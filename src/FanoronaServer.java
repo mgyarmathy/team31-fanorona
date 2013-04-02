@@ -120,10 +120,10 @@ public class FanoronaServer extends JFrame implements Runnable{
 		//capture_move   ::==  A position position | W position position
 				//paika_move     ::==  P position position
 				//sacrifice_move ::==  S position
-		int fromCol = 5;
-		int fromRow = 2;
-		int toCol = 5;
-		int toRow = 3;
+		//int fromCol = 5;
+		//int fromRow = 2;
+		//int toCol = 5;
+		//int toRow = 3;
 		
 		
 		while(true){
@@ -134,7 +134,6 @@ public class FanoronaServer extends JFrame implements Runnable{
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -149,13 +148,18 @@ public class FanoronaServer extends JFrame implements Runnable{
 				//parse player move
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					int fCol = Integer.parseInt(tokens[1]);
-					int fRow = Integer.parseInt(tokens[2]);
-					int tCol = Integer.parseInt(tokens[3]);
-					int tRow = Integer.parseInt(tokens[4]);
+					String dir = tokens[0];
+					
+					for(int i = 1; i<tokens.length; i=i+5){
+						int fCol = Integer.parseInt(tokens[i]);
+						int fRow = Integer.parseInt(tokens[i+1]);
+						int tCol = Integer.parseInt(tokens[i+2]);
+						int tRow = Integer.parseInt(tokens[i+3]);
+						//tokens[i+4] = "+"
+						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+					}
+					
 					System.out.println(playerMove);
-					//TODO: perform piece movement and update client board appropriately
-					board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
 					sendMessage(sockOutput, "OK"); //confirm move
 				}
 				else if(tokens[0].equals("S")){
@@ -186,15 +190,18 @@ public class FanoronaServer extends JFrame implements Runnable{
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
 					
+					String dir = tokens[0];
 					
+					for(int i = 1; i<tokens.length; i=i+5){
+						int fCol = Integer.parseInt(tokens[i]);
+						int fRow = Integer.parseInt(tokens[i+1]);
+						int tCol = Integer.parseInt(tokens[i+2]);
+						int tRow = Integer.parseInt(tokens[i+3]);
+						//tokens[i+4] = "+"
+						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+					}
 					
-					int fCol = Integer.parseInt(tokens[1]);
-					int fRow = Integer.parseInt(tokens[2]);
-					int tCol = Integer.parseInt(tokens[3]);
-					int tRow = Integer.parseInt(tokens[4]);
 					System.out.println(playerMove);
-					//TODO: perform piece movement and update client board appropriately
-					board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow,tokens[0]);
 					sendMessage(sockOutput, "OK"); //confirm move
 				}
 				else if(tokens[0].equals("S")){
@@ -223,7 +230,7 @@ public class FanoronaServer extends JFrame implements Runnable{
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
+						// Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
