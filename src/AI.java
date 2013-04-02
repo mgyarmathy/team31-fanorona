@@ -32,7 +32,7 @@ public class AI{
 		}
 	}
 	
-	public GamePanel.Piece[][] getMove(){
+	public AIBoard getMove(){
 		create(color, tree.getRoot());
 		int index = -1;
 		int i = 0;
@@ -143,7 +143,7 @@ public class AI{
 		for(int x = 0; x < tree.getRoot().getChildren().get(index).getData().messages.size(); x++){
 			GamePanel.info.write(tree.getRoot().getChildren().get(index).getData().messages.get(x));
 		}
-		return tree.getRoot().getChildren().get(index).getData().getBoard();
+		return tree.getRoot().getChildren().get(index).getData();
 	}
 	
 	public ArrayList<AIBoard> makeEmpty(GamePanel.Piece mColor){

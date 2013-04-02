@@ -100,7 +100,9 @@ public class GamePanel extends JPanel{
 							//move selected piece
 							else if((selected_piece != null && (board[row][col]==Piece.EMPTY || (selected_piece.x == col && selected_piece.y == row)))
 										|| overrideMode){ 
+
 								movePiece(col,row);
+
 							}
 							
 							else if(board[row][col]!=Piece.EMPTY) { info.write("There is a piece There!"); break;} //Spot taken
@@ -796,41 +798,38 @@ public class GamePanel extends JPanel{
 			}*/
 			//******************************************************************************************
 				
-			board[row][col] = color;
-			board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
-			chained_spots.add(new Point(selected_piece.x, selected_piece.y));
-			
-			boolean thingsEliminated = false;
-			while(cur_x < COLS && cur_x > -1 && cur_y < ROWS && cur_y > -1){
-				if(board[cur_y][cur_x] != opposite){
-					break;
-				}
-				thingsEliminated = true;
-				board[cur_y][cur_x] = Piece.EMPTY;
-				cur_y += y_inc;
-				cur_x += x_inc;
-			}
-			selected_piece.x = col;
-			selected_piece.y = row;
-			
-			//CHECK FOR OTHER MOVES
-			boolean next_move = false;
-			if(thingsEliminated){
-				next_move = detectMove(selected_piece, dir, opposite);
-			}
-			if(next_move){
-				chain_piece = true;
+				//board[row][col] = color;
+				//board[selected_piece.y][selected_piece.x]= Piece.EMPTY;
+				int countBefore = count();
+				interpretMove(selected_piece, new Point(col, row), after);
+
+				chained_spots.add(new Point(selected_piece.x, selected_piece.y));
 				
-				// server chain move string stuff ****************************************
-				if(TurnCount%2==0){ 
-					Player1move+=" + ";
+				boolean thingsEliminated = false;
+				if (countBefore - count() != 0){
+					thingsEliminated = true;
 				}
-				else{
-					Player2move+=" + ";
+				selected_piece.x = col;
+				selected_piece.y = row;
+				
+				//CHECK FOR OTHER MOVES
+				boolean next_move = false;
+				if(thingsEliminated){
+					next_move = detectMove(selected_piece, dir, opposite);
 				}
-				//************************************************************************
-				
-				
+				if(next_move){
+					chain_piece = true;
+					
+					// server chain move string stuff ****************************************
+					if(TurnCount%2==0){ 
+						Player1move+=" + ";
+					}
+					else{
+						Player2move+=" + ";
+					}
+					//************************************************************************
+
+					
 				previous_direction = dir;
 				stopw.timeReset();
 				stopw.timeStart();
@@ -1207,6 +1206,202 @@ public class GamePanel extends JPanel{
 		return false;
 	}
 	
+	
+	public boolean interpretMove(Point from, Point to, boolean after){
+		Piece color = Piece.EMPTY;
+		if(TurnCount%2 == 0){
+			color = Piece.PLAYER;
+		} else {
+			color = Piece.OPPONENT;
+		}
+		Direction dir = Direction.DUMMY;
+		if(to.x - from.x == -1){
+			switch(to.y - from.y){
+			case -1: dir = Direction.UPLEFT;
+					 break;
+			case 0:	 dir = Direction.LEFT;
+					 break;
+			case 1:  dir = Direction.DOWNLEFT;
+					 break;
+			default: return false;
+			}
+		} else if (to.x - from.x == 0){
+			switch(to.y - from.y){
+			case -1: dir = Direction.UP;
+					 break;
+			case 0:	 return false;
+			case 1:  dir = Direction.DOWN;
+					 break;
+			default: return false;
+			}
+		} else if (to.x - from.x == 1){
+			switch(to.y - from.y){
+			case -1: dir = Direction.UPRIGHT;
+					 break;
+			case 0:	 dir = Direction.RIGHT;
+					 break;
+			case 1:  dir = Direction.DOWNRIGHT;
+					 break;
+			default: return false;
+			}
+		}
+		
+		if(board[from.y][from.x] != color || board[to.y][to.x]!= Piece.EMPTY){
+			return false;
+		}
+		
+		int curX = 0;
+		int curY = 0;
+		int xInc = 0;
+		int yInc = 0;
+		if(previous_direction == dir){
+			return false;
+		}
+		
+		switch(dir){
+		case UPLEFT:	previous_direction = Direction.UPLEFT;
+						if(after){
+							curX = from.x-2;
+							curY = from.y-2;
+							xInc = -1;
+							yInc = -1;
+						} else {
+							curX = from.x+1;
+							curY = from.y+1;
+							xInc = 1;
+							yInc = 1;
+						}
+						break;
+		case UP:		previous_direction = Direction.UP;
+						if(after){
+							curX = from.x;
+							curY = from.y-2;
+							yInc = -1;
+						} else {
+							curX = from.x;
+							curY = from.y+1;
+							yInc = 1;
+						}
+						break;
+		case UPRIGHT:	previous_direction = Direction.UPRIGHT;
+						if(after){
+							curX = from.x+2;
+							curY = from.y-2;
+							xInc = +1;
+							yInc = -1;
+						} else {
+							curX = from.x-1;
+							curY = from.y+1;
+							xInc = -1;
+							yInc = 1;
+						}
+						break;
+		case LEFT:		previous_direction = Direction.LEFT;
+						if(after) {
+							curX = from.x-2;
+							curY = from.y;
+							xInc = -1;
+						} else {
+							curX = from.x+1;
+							curY = from.y;
+							xInc = 1;
+						}
+						break;
+		case RIGHT:		previous_direction = Direction.RIGHT;
+						if(after) {
+							curX = from.x+2;
+							curY = from.y;
+							xInc = +1;
+						} else {
+							curX = from.x-1;
+							curY = from.y;
+							xInc = -1;
+						}
+						break;
+		case DOWNLEFT:	previous_direction = Direction.DOWNLEFT;
+						if(after) {
+							curX = from.x-2;
+							curY = from.y+2;
+							xInc = -1;
+							yInc = 1;
+						} else {
+							curX = from.x+1;
+							curY = from.y-1;
+							xInc = 1;
+							yInc = -1;
+						}
+						break;
+		case DOWN:		previous_direction = Direction.DOWN;
+						if(after) {
+							curX = from.x;
+							curY = from.y+2;
+							yInc = 1;
+						} else {
+							curX = from.x;
+							curY = from.y-1;
+							yInc = -1;
+						}
+						break;
+		case DOWNRIGHT:	previous_direction = Direction.DOWNRIGHT;
+						if(after){
+							curX = from.x+2;
+							curY = from.y+2;
+							xInc = 1;
+							yInc = 1;
+						} else {
+							curX = from.x-1;
+							curY = from.y-1;
+							xInc = -1;
+							yInc = -1;
+						}
+						break;
+		default:		break;
+		}
+		
+		Piece color2 = Piece.PLAYER;
+		if(color == Piece.PLAYER){
+			color2 = Piece.OPPONENT;
+		}
+		if(curY >= 0 && curY < ROWS && curX >= 0 && curX < COLS){
+			if(board[curY][curX] != color2 && detectMove(from, dir, color2)){
+				info.write("TEST");
+				return false;
+			}
+		}
+		
+		board[from.y][from.x] = Piece.EMPTY;
+		board[to.y][to.x] = color;
+		
+		while(curX >= 0 && curX < COLS && curY >= 0 && curY < ROWS){
+			if(board[curY][curX] == color2){
+				board[curY][curX] = Piece.EMPTY;
+				curX += xInc;
+				curY += yInc;
+			} else {
+				break;
+			}
+		}
+		
+		return true;
+	}
+	
+	public int count(){
+		int playerC = 0;
+		int opponentC = 0;
+		for(int i = 0; i < board.length; i++){
+			for (int j = 0; j < board[0].length; j++){
+				if(board[i][j] == GamePanel.Piece.PLAYER){
+					playerC++;
+				}
+				if(board[i][j] == GamePanel.Piece.OPPONENT){
+					opponentC++;
+				}
+			}
+		}
+		return playerC - opponentC;
+	}
+	
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		//draw ze game here
@@ -1427,12 +1622,29 @@ public class GamePanel extends JPanel{
 		if(stopw.getGraphics()!=null) { stopw.timeReset(); }
 		if(AImode == 2){
 			AI computer = new AI(board, Piece.PLAYER);
+			AIBoard AImoves = computer.getMove();
+			
+			if(AImoves.chained_spots.size() != 0){
+				selected_piece = AImoves.chained_spots.get(0);
+			}
 			try{
-				Thread.sleep(250);
+				Thread.sleep(100);
 			} catch(InterruptedException ex){
 				Thread.currentThread().interrupt();
 			}
-			board = computer.getMove();
+			
+			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+				selected_piece = AImoves.chained_spots.get(moving+1);
+				interpretMove(chained_spots.get(moving),chained_spots.get(moving+1), AImoves.moves.get(moving));
+				try{
+					Thread.sleep(100);
+				} catch(InterruptedException ex){
+					Thread.currentThread().interrupt();
+				}
+				paintComponent(this.getGraphics());
+			}
+			
+			selected_piece = null;
 			paintComponent(this.getGraphics());
 			countPieces();
 		}
@@ -1518,6 +1730,7 @@ public class GamePanel extends JPanel{
 	
 	public void countPieces(){
 		stopw.timeStop();
+		previous_direction = Direction.DUMMY;
 	
 		PlayerPieceCount = OppPieceCount = EmptyPieceCount = 0;
 		for(int row = 0; row<board.length; row++){
@@ -1553,23 +1766,57 @@ public class GamePanel extends JPanel{
 			if(AImode != 0){
 				if(TurnCount%2 == 1){
 					AI computer = new AI(board, Piece.OPPONENT);
+					AIBoard AImoves = computer.getMove();
+					
+					if(AImoves.chained_spots.size() != 0){
+						selected_piece = AImoves.chained_spots.get(0);
+					}
 					try{
-						Thread.sleep(250);
+						Thread.sleep(100);
 					} catch(InterruptedException ex){
 						Thread.currentThread().interrupt();
 					}
-					board = computer.getMove();
+					
+					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+						selected_piece = AImoves.chained_spots.get(moving+1);
+						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
+						try{
+							Thread.sleep(100);
+						} catch(InterruptedException ex){
+							Thread.currentThread().interrupt();
+						}
+						paintComponent(this.getGraphics());
+					}
+					
+					selected_piece = null;
 					paintComponent(this.getGraphics());
 					countPieces();
 				}
 				if(TurnCount%2 == 0 && AImode == 2){
 					AI computer = new AI(board, Piece.PLAYER);
+					AIBoard AImoves = computer.getMove();
+					
+					if(AImoves.chained_spots.size() != 0){
+						selected_piece = AImoves.chained_spots.get(0);
+					}
 					try{
-						Thread.sleep(250);
+						Thread.sleep(100);
 					} catch(InterruptedException ex){
 						Thread.currentThread().interrupt();
 					}
-					board = computer.getMove();
+					
+					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+						selected_piece = AImoves.chained_spots.get(moving+1);
+						interpretMove(chained_spots.get(moving),chained_spots.get(moving+1), AImoves.moves.get(moving));
+						try{
+							Thread.sleep(100);
+						} catch(InterruptedException ex){
+							Thread.currentThread().interrupt();
+						}
+						paintComponent(this.getGraphics());
+					}
+					
+					selected_piece = null;
 					paintComponent(this.getGraphics());
 					countPieces();
 				}
