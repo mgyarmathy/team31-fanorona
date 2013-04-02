@@ -117,18 +117,10 @@ public class FanoronaServer extends JFrame implements Runnable{
 		sendMessage(sockOutput, "BEGIN");
 		board.newGame();
 		setVisible(true);
-		//capture_move   ::==  A position position | W position position
-				//paika_move     ::==  P position position
-				//sacrifice_move ::==  S position
-		//int fromCol = 5;
-		//int fromRow = 2;
-		//int toCol = 5;
-		//int toRow = 3;
-		
-		
+	
 		while(true){
 			if(board.Player==1){
-				// make white move by ai
+				// make white move by AI
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 				while(!board.Player1newmove){
 					try {
@@ -142,10 +134,12 @@ public class FanoronaServer extends JFrame implements Runnable{
 				board.Player1newmove = false;
 				String ok = receiveMessage(sockInput);
 				System.out.println(ok);
-					
+				
 				String playerMove = receiveMessage(sockInput);
 				info.write(playerMove);
 				//parse player move
+				
+				int goodmove=0;	
 				String[] tokens = playerMove.split("\\s+");
 				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
 					
@@ -157,31 +151,43 @@ public class FanoronaServer extends JFrame implements Runnable{
 						int tCol = Integer.parseInt(tokens[i+3]);
 						int tRow = Integer.parseInt(tokens[i+4]);
 						//tokens[i+5] = "+"
-						board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
+						goodmove = board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
 					}
 					
 					System.out.println(playerMove);
-					sendMessage(sockOutput, "OK"); //confirm move
+					if(goodmove>=0)sendMessage(sockOutput, "OK"); //confirm move
+					//else bade move take care of it
 				}
 				else if(tokens[0].equals("S")){
 					int sacCol = Integer.parseInt(tokens[1]);
 					int sacRow = Integer.parseInt(tokens[2]);
 					System.out.println(playerMove);
 					//perform sacrifice on that specific piece
-					board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
-					sendMessage(sockOutput, "OK"); //confirm move
+					goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
+					if(goodmove>=0) sendMessage(sockOutput, "OK"); //confirm move
+					//else bade move take care of it
 				}
 				else if(tokens[0].equals("ILLEGAL")){
+					break;
 				}
 				else if(tokens[0].equals("TIME")){
+					break;
 				}
 				else if(tokens[0].equals("LOSER")){
+					break;
 				}
 				else if(tokens[0].equals("WINNER")){
+				
+					break;
 				}
 				else if(tokens[0].equals("TIE")){
 					break;
 				}
+				
+				
+				
+				// add win/lose/draw detection
+				
 			}
 			if(board.Player==2){
 			
@@ -223,7 +229,7 @@ public class FanoronaServer extends JFrame implements Runnable{
 					break;
 				}
 				
-				// make white move by ai
+				// make white move by AI
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 				while(!board.Player2newmove){
 					try {
