@@ -171,10 +171,6 @@ public class GamePanel extends JPanel{
 		boolean valid_move = true;
 		boolean before = false;
 		boolean after = false;
-		int cur_x = col;
-		int cur_y = row;
-		int x_inc = 0;
-		int y_inc = 0;
 		Piece color = board[selected_piece.y][selected_piece.x];
 		Piece opposite;
 		if(color == Piece.PLAYER){
@@ -292,9 +288,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -303,16 +296,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x + 1, selected_piece.y + 1);
 								choice2 = new Point(selected_piece.x - 2, selected_piece.y - 2);
-							} else if(before){
-								cur_x = selected_piece.x + 1;
-								cur_y = selected_piece.y + 1;
-								x_inc++;
-								y_inc++;
-							} else {
-								cur_x = selected_piece.x - 2;
-								cur_y = selected_piece.y - 2;
-								x_inc--;
-								y_inc--;
 							}
 							break;
 			case UP:		if(selected_piece.y > 1){
@@ -334,9 +317,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -345,14 +325,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x, selected_piece.y + 1);
 								choice2 = new Point(selected_piece.x, selected_piece.y - 2);
-							} else if(before){
-								cur_x = selected_piece.x;
-								cur_y = selected_piece.y + 1;
-								y_inc++;
-							} else {
-								cur_x = selected_piece.x;
-								cur_y = selected_piece.y - 2;
-								y_inc--;
 							}
 							break;
 			case UPRIGHT:	if(selected_piece.y > 1 && selected_piece.x < COLS - 2){
@@ -374,9 +346,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -385,16 +354,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x - 1, selected_piece.y + 1);
 								choice2 = new Point(selected_piece.x + 2, selected_piece.y - 2);
-							} else if(before){
-								cur_x = selected_piece.x - 1;
-								cur_y = selected_piece.y + 1;
-								x_inc--;
-								y_inc++;
-							} else {
-								cur_x = selected_piece.x + 2;
-								cur_y = selected_piece.y - 2;
-								x_inc++;
-								y_inc--;
 							}
 							break;
 			case LEFT:		if(selected_piece.x > 1){
@@ -416,9 +375,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -427,14 +383,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x + 1, selected_piece.y);
 								choice2 = new Point(selected_piece.x - 2, selected_piece.y);
-							} else if(before){
-								cur_x = selected_piece.x + 1;
-								cur_y = selected_piece.y;
-								x_inc++;
-							} else {
-								cur_x = selected_piece.x - 2;
-								cur_y = selected_piece.y;
-								x_inc--;
 							}
 							break;
 			case RIGHT:		if(selected_piece.x < COLS - 2){
@@ -456,9 +404,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -467,14 +412,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x - 1, selected_piece.y);
 								choice2 = new Point(selected_piece.x + 2, selected_piece.y);
-							} else if(before){
-								cur_x = selected_piece.x - 1;
-								cur_y = selected_piece.y;
-								x_inc--;
-							} else {
-								cur_x = selected_piece.x + 2;
-								cur_y = selected_piece.y;
-								x_inc++;
 							}
 							break;
 			case DOWNLEFT:	if(selected_piece.y < ROWS - 2 && selected_piece.x > 1){
@@ -496,9 +433,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -507,16 +441,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x + 1, selected_piece.y - 1);
 								choice2 = new Point(selected_piece.x - 2, selected_piece.y + 2);
-							} else if(before){
-								cur_x = selected_piece.x + 1;
-								cur_y = selected_piece.y - 1;
-								x_inc++;
-								y_inc--;
-							} else {
-								cur_x = selected_piece.x - 2;
-								cur_y = selected_piece.y + 2;
-								x_inc--;
-								y_inc++;
 							}
 							break;
 			case DOWN:		if(selected_piece.y < ROWS - 2){
@@ -538,9 +462,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -549,14 +470,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x, selected_piece.y - 1);
 								choice2 = new Point(selected_piece.x, selected_piece.y + 2);
-							} else if(before){
-								cur_x = selected_piece.x;
-								cur_y = selected_piece.y - 1;
-								y_inc--;
-							} else {
-								cur_x = selected_piece.x;
-								cur_y = selected_piece.y + 2;
-								y_inc++;
 							}
 							break;
 			case DOWNRIGHT:	if(selected_piece.y < ROWS - 2 && selected_piece.x < COLS - 2){
@@ -578,9 +491,6 @@ public class GamePanel extends JPanel{
 									if(!valid_move){
 										blank = true;
 										innate = true;
-									} else {
-										cur_x = selected_piece.x;
-										cur_y = selected_piece.y;
 									}
 								}
 								break;
@@ -589,16 +499,6 @@ public class GamePanel extends JPanel{
 								overrideDir = dir;
 								choice1 = new Point(selected_piece.x - 1, selected_piece.y - 1);
 								choice2 = new Point(selected_piece.x + 2, selected_piece.y + 2);
-							} else if(before){
-								cur_x = selected_piece.x - 1;
-								cur_y = selected_piece.y - 1;
-								x_inc--;
-								y_inc--;
-							} else {
-								cur_x = selected_piece.x + 2;
-								cur_y = selected_piece.y + 2;
-								x_inc++;
-								y_inc++;
 							}
 							break;
 			default:		break;
@@ -645,117 +545,29 @@ public class GamePanel extends JPanel{
 			overrideMode = false;
 			dir = overrideDir;
 			switch(dir){
-			case UPLEFT:		row = selected_piece.y - 1;
-								col = selected_piece.x - 1;
-								if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = 1;
-								y_inc = 1;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = -1;
-								y_inc = -1;
-							}
+			case UPLEFT:	row = selected_piece.y - 1;
+							col = selected_piece.x - 1;
 							break;
 			case UP:		row = selected_piece.y - 1;
 							col = selected_piece.x;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = 0;
-								y_inc = 1;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = 0;
-								y_inc = -1;
-							}
 							break;
 			case UPRIGHT:	row = selected_piece.y - 1;
 							col = selected_piece.x + 1;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = -1;
-								y_inc = 1;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = 1;
-								y_inc = -1;
-							}
 							break;				
 			case LEFT:		row = selected_piece.y;
 							col = selected_piece.x - 1;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = 1;
-								y_inc = 0;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = -1;
-								y_inc = 0;
-							}
 							break;
 			case RIGHT:		row = selected_piece.y;
 							col = selected_piece.x + 1;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = -1;
-								y_inc = 0;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = 1;
-								y_inc = 0;
-							}
 							break;
 			case DOWNLEFT:	row = selected_piece.y + 1;
 							col = selected_piece.x - 1;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = 1;
-								y_inc = -1;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = -1;
-								y_inc = 1;
-							}
 							break;				
 			case DOWN:		row = selected_piece.y + 1;
 							col = selected_piece.x;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = 0;
-								y_inc = -1;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = 0;
-								y_inc = 1;
-							}
 							break;				
 			case DOWNRIGHT:	row = selected_piece.y + 1;
 							col = selected_piece.x + 1;
-							if(before){
-								cur_x = choice1.x;
-								cur_y = choice1.y;
-								x_inc = -1;
-								y_inc = -1;
-							} else {
-								cur_x = choice2.x;
-								cur_y = choice2.y;
-								x_inc = 1;
-								y_inc = 1;
-							}
 							break;		
 			default:		break;
 			}
@@ -1627,6 +1439,7 @@ public class GamePanel extends JPanel{
 			if(AImoves.chained_spots.size() != 0){
 				selected_piece = AImoves.chained_spots.get(0);
 			}
+			paintComponent(this.getGraphics());
 			try{
 				Thread.sleep(100);
 			} catch(InterruptedException ex){
@@ -1635,7 +1448,7 @@ public class GamePanel extends JPanel{
 			
 			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
 				selected_piece = AImoves.chained_spots.get(moving+1);
-				interpretMove(chained_spots.get(moving),chained_spots.get(moving+1), AImoves.moves.get(moving));
+				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
 				try{
 					Thread.sleep(100);
 				} catch(InterruptedException ex){
@@ -1771,6 +1584,7 @@ public class GamePanel extends JPanel{
 					if(AImoves.chained_spots.size() != 0){
 						selected_piece = AImoves.chained_spots.get(0);
 					}
+					paintComponent(this.getGraphics());
 					try{
 						Thread.sleep(100);
 					} catch(InterruptedException ex){
@@ -1799,6 +1613,7 @@ public class GamePanel extends JPanel{
 					if(AImoves.chained_spots.size() != 0){
 						selected_piece = AImoves.chained_spots.get(0);
 					}
+					paintComponent(this.getGraphics());
 					try{
 						Thread.sleep(100);
 					} catch(InterruptedException ex){
@@ -1807,7 +1622,7 @@ public class GamePanel extends JPanel{
 					
 					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
 						selected_piece = AImoves.chained_spots.get(moving+1);
-						interpretMove(chained_spots.get(moving),chained_spots.get(moving+1), AImoves.moves.get(moving));
+						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
 						try{
 							Thread.sleep(100);
 						} catch(InterruptedException ex){
