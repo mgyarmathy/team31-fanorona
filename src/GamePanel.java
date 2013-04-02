@@ -38,7 +38,7 @@ public class GamePanel extends JPanel{
 	private Color opponentColor = Color.BLACK;
 	private String playerName = "Player 1";
 	
-	private Piece[][] board = new Piece[ROWS][COLS];
+	Piece[][] board = new Piece[ROWS][COLS];
 	private Rectangle[][] buttons = new Rectangle[ROWS][COLS];
 	private Rectangle SacButton = new Rectangle();
 	private Point selected_piece = null;

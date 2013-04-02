@@ -84,11 +84,12 @@ public class FanoronaServer extends JFrame implements Runnable{
 			System.err.println("server: unable to get client output stream");
 			System.exit(1);
 		}
+		
 		int ROWS = 5;
 		int COLS = 9;
 		String firstMove = "B";
 		int timer_msecs = 0000;
-		
+		boolean AIControl = false;
 		sendMessage(sockOutput, "WELCOME");
 	    
 		sendMessage(sockOutput, "INFO " + COLS + " " + ROWS + " " + firstMove + " " + timer_msecs);
@@ -122,14 +123,21 @@ public class FanoronaServer extends JFrame implements Runnable{
 			if(board.Player==1){
 				// make white move by AI
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				while(!board.Player1newmove){
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+				if(AIControl){ //AI determines move
+					AI computer = new AI(board.board, GamePanel.Piece.PLAYER);
+					AIBoard AImoves = computer.getMove();
+					//perform AI moves on local board
+					
 				}
-						
+				else{ //player determines move
+					while(!board.Player1newmove){
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}			
 				sendMessage(sockOutput, board.Player1move);
 				board.Player1newmove = false;
 				String ok = receiveMessage(sockInput);
@@ -253,14 +261,21 @@ public class FanoronaServer extends JFrame implements Runnable{
 					break;
 				}
 				
-				// make white move by AI
+				// make black move by AI
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				while(!board.Player2newmove){
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// Auto-generated catch block
-						e.printStackTrace();
+				if(AIControl){ //AI determines move
+					AI computer = new AI(board.board, GamePanel.Piece.OPPONENT);
+					AIBoard AImoves = computer.getMove();
+					//perform AI moves on local board
+					
+				}
+				else{ //player determines move
+					while(!board.Player2newmove){
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 						

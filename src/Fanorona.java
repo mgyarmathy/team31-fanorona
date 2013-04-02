@@ -16,6 +16,8 @@ public class Fanorona extends JFrame implements Runnable{
 	private InputStream c_sockInput = null;
 	private OutputStream c_sockOutput = null;
 	
+	boolean AIControl = false;
+	
 	
 	public Fanorona(){
 		super("Team 31 - Fanorona");
@@ -355,11 +357,19 @@ public class Fanorona extends JFrame implements Runnable{
 			if(board.Player==1){
 				// make white move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				while(!board.Player1newmove){
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+				if(AIControl){ //AI determines move
+					AI computer = new AI(board.board, GamePanel.Piece.PLAYER);
+					AIBoard AImoves = computer.getMove();
+					//perform AI moves on local board
+					
+				}
+				else{ //player determines move
+					while(!board.Player1newmove){
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 						
@@ -483,14 +493,21 @@ public class Fanorona extends JFrame implements Runnable{
 					break;
 				}
 				
-				// make white move by ai
+				// make black move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				while(!board.Player2newmove){
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// Auto-generated catch block
-						e.printStackTrace();
+				if(AIControl){ //AI determines move
+					AI computer = new AI(board.board, GamePanel.Piece.OPPONENT);
+					AIBoard AImoves = computer.getMove();
+					//perform AI moves on local board
+					
+				}
+				else{ //player determines move
+					while(!board.Player2newmove){
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 						
