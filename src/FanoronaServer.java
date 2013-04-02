@@ -87,11 +87,13 @@ public class FanoronaServer extends JFrame implements Runnable{
 		int ROWS = 5;
 		int COLS = 9;
 		String firstMove = "B";
-		int timer_msecs = 20000;
+		int timer_msecs = 0000;
 		
 		sendMessage(sockOutput, "WELCOME");
 	    
 		sendMessage(sockOutput, "INFO " + COLS + " " + ROWS + " " + firstMove + " " + timer_msecs);
+		
+		
 		
 		String ready = receiveMessage(sockInput);
 		System.out.println(ready);
@@ -105,6 +107,10 @@ public class FanoronaServer extends JFrame implements Runnable{
 		content.add(info, BorderLayout.EAST);
 		content.add(stopw, BorderLayout.SOUTH);
 		pack();
+		
+		board.servermode=true;
+		if(firstMove.equals("B"))board.Player=1;
+		else board.Player=2;
 		
 		
 		
@@ -121,7 +127,7 @@ public class FanoronaServer extends JFrame implements Runnable{
 		
 		
 		while(true){
-			if(firstMove== "B"){
+			if(board.Player==1){
 				// make white move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 				while(!board.Player1newmove){
@@ -172,7 +178,7 @@ public class FanoronaServer extends JFrame implements Runnable{
 					break;
 				}
 			}
-			if(firstMove== "W"){
+			if(board.Player==2){
 			
 				String playerMove = receiveMessage(sockInput);
 				info.write(playerMove);
@@ -213,7 +219,7 @@ public class FanoronaServer extends JFrame implements Runnable{
 				
 				// make white move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				while(!board.Player1newmove){
+				while(!board.Player2newmove){
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {

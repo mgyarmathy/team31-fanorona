@@ -334,6 +334,10 @@ public class Fanorona extends JFrame implements Runnable{
 		}
 		else { System.err.println("error: server did not give INFO"); System.exit(1);}
 		System.out.println(gameInfo);
+		
+		board.servermode=true;
+		if(firstMove.equals("W")) board.Player=1;
+		else board.Player=2;
 
 		//send READY to server for game to begin
 		sendMessage(c_sockOutput, "READY");
@@ -348,7 +352,7 @@ public class Fanorona extends JFrame implements Runnable{
 		System.out.println(begin);
 		
 		while(true){
-			if(firstMove== "B"){
+			if(board.Player==1){
 				// make white move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 				while(!board.Player1newmove){
@@ -399,7 +403,7 @@ public class Fanorona extends JFrame implements Runnable{
 					break;
 				}
 			}
-			if(firstMove== "W"){
+			if(board.Player==2){
 			
 				String playerMove = receiveMessage(c_sockInput);
 				info.write(playerMove);
@@ -437,7 +441,7 @@ public class Fanorona extends JFrame implements Runnable{
 				
 				// make white move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				while(!board.Player1newmove){
+				while(!board.Player2newmove){
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {

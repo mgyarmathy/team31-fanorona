@@ -16,6 +16,10 @@ public class GamePanel extends JPanel{
 	static int WHITE = 0;
 	
 	
+	boolean servermode=false;
+	int Player=0;
+	
+	
 	int AImode = 0;
 	
 	int PlayerPieceCount, OppPieceCount, EmptyPieceCount;
@@ -23,7 +27,7 @@ public class GamePanel extends JPanel{
 	
 	static int Diag = 0;
 	
-	String Player1move,Player2move;
+	String Player1move="",Player2move="";
 	boolean Player1newmove=false,Player2newmove=false; 
 	
 	boolean win,draw;
@@ -65,6 +69,11 @@ public class GamePanel extends JPanel{
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				
+				if(servermode && TurnCount%2+1!=Player){
+					info.write("Not your turn");
+					return;
+				}
 				
 				if(AImode == 1 && TurnCount%2 == BLACK){
 					return;
