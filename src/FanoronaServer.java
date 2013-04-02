@@ -9,9 +9,9 @@ import javax.swing.JFrame;
 
 public class FanoronaServer extends JFrame implements Runnable{
 	//establish server port
-	GamePanel board;
-	InfoPanel info;
-	Stopwatch stopw;
+	private GamePanel board;
+	private InfoPanel info;
+	private Stopwatch stopw;
 	
 	public FanoronaServer(){
 		super("Team 31 - Fanorona Server");

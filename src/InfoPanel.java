@@ -4,7 +4,7 @@ import java.awt.*;
 
 //InfoPanel displays information about the current game
 public class InfoPanel extends JPanel{
-	int i=0;
+	private int i=0;
 	public boolean initial = false;
 	
 	Container Q;

@@ -8,13 +8,13 @@ import java.net.*;
 
 public class Fanorona extends JFrame implements Runnable{
 	
-	GamePanel board;
-	InfoPanel info;
-	Stopwatch stopw;
+	private GamePanel board;
+	private InfoPanel info;
+	private Stopwatch stopw;
 	
-	Socket c_socket = null;
-	InputStream c_sockInput = null;
-	OutputStream c_sockOutput = null;
+	private Socket c_socket = null;
+	private InputStream c_sockInput = null;
+	private OutputStream c_sockOutput = null;
 	
 	
 	public Fanorona(){
@@ -369,11 +369,19 @@ public class Fanorona extends JFrame implements Runnable{
 		}
 		
 		//player makes move...
-		board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5,tokens[0]);
-		sendMessage(c_sockOutput, "A 6 4 5 5");
+		//board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5,tokens[0]);
+		//sendMessage(c_sockOutput, "A 6 4 5 5");
+		while(true){
+			if(board.Player1newmove){
+				sendMessage(c_sockOutput, board.Player1move);
+				board.Player1newmove = false;
+				String ok = receiveMessage(c_sockInput);
+				System.out.println(ok);
+			}
+			if(board.win) break;
+		}
 		//then gets server OK
-		String ok = receiveMessage(c_sockInput);
-		System.out.println(ok);
+		
 		
 		/*if(firstMove.equals("W")){
 			while(true){
