@@ -356,7 +356,7 @@ public class Fanorona extends JFrame implements Runnable{
 			int toCol = Integer.parseInt(tokens[3]);
 			int toRow = Integer.parseInt(tokens[4]);
 			System.out.println(serverMove);
-			board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow);
+			board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,tokens[0]);
 			board.animate();
 			sendMessage(c_sockOutput, "OK"); //confirm move
 		}
@@ -369,7 +369,7 @@ public class Fanorona extends JFrame implements Runnable{
 		}
 		
 		//player makes move...
-		board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5);
+		board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5,tokens[0]);
 		sendMessage(c_sockOutput, "A 6 4 5 5");
 		//then gets server OK
 		String ok = receiveMessage(c_sockInput);

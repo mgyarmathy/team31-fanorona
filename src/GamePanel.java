@@ -207,6 +207,9 @@ public class GamePanel extends JPanel{
 	public int serverSacrificePiece(Point sel_piece){
 		selected_piece = sel_piece;
 		
+		// if returning -1 invalid move
+		// if returning -99 big error!
+		
 		if(overrideMode || chain_piece){
 			info.write("Cannot sacrifice a piece now.");
 			return -1;
