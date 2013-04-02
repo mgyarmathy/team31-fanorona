@@ -348,12 +348,15 @@ public class Fanorona extends JFrame implements Runnable{
 		String serverMove = receiveMessage(c_sockInput);
 		String[] tokens = serverMove.split("\\s+");
 		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
+			int ROWS = board.getNumberOfRows();
 			int fromCol = Integer.parseInt(tokens[1]);
 			int fromRow = Integer.parseInt(tokens[2]);
 			int toCol = Integer.parseInt(tokens[3]);
 			int toRow = Integer.parseInt(tokens[4]);
 			System.out.println(serverMove);
 			//TODO: perform piece movement and update client board appropriately
+			//board.serverMovePiece(new Point(board.getNumberofCols() - 6, board.getNumberOfRows() - 3), 5, 3);
+			board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow);
 			sendMessage(c_sockOutput, "OK"); //confirm move
 		}
 		else if(tokens[0].equals("S")){

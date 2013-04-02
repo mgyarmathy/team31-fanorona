@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 // GamePanel displays the current state of the board.
@@ -1635,6 +1638,21 @@ public class GamePanel extends JPanel{
 		else if(draw) { info.write("Draw"); stopw.timeStop(); }
 		else if(OppPieceCount == 0) { info.write("Player 1 Wins!"); stopw.timeStop(); }
 		else { info.write("Player 2 Wins!"); stopw.timeStop(); }
+	}
+	
+	public void writeMove(OutputStream output, String move){
+		byte[] buf = new byte[1024];
+	    char[] charArray = move.toCharArray();
+	    for(int i = 0; i<charArray.length; i++){
+	    	buf[i] = (byte)charArray[i];
+	    }
+	    buf[charArray.length] = (byte)' ';
+	    try {
+			output.write(buf, 0, buf.length);
+		} catch (IOException e1) {
+			System.err.println("server: unable to write to output stream");
+			System.exit(1);
+		}
 	}
 	
 	

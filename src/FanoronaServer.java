@@ -87,7 +87,7 @@ public class FanoronaServer implements Runnable{
 		//capture_move   ::==  A position position | W position position
 				//paika_move     ::==  P position position
 				//sacrifice_move ::==  S position
-		sendMessage(sockOutput, "A 6 3 5 3"); //server sends first move
+		sendMessage(sockOutput, "A 5 2 5 3"); //server sends first move
 		String ok = receiveMessage(sockInput);
 		System.out.println(ok);
 		String playerMove = receiveMessage(sockInput);
