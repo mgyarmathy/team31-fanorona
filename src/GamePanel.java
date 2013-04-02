@@ -1541,6 +1541,15 @@ public class GamePanel extends JPanel{
 		AImode = 2;
 	}
 	
+	public void animate(){
+		paintComponent(this.getGraphics());
+		try{
+			Thread.sleep(300);
+		} catch(InterruptedException ex){
+			Thread.currentThread().interrupt();
+		}
+	}
+	
 	public void countPieces(){
 		stopw.timeStop();
 		previous_direction = Direction.DUMMY;
@@ -1583,28 +1592,30 @@ public class GamePanel extends JPanel{
 					
 					if(AImoves.chained_spots.size() != 0){
 						selected_piece = AImoves.chained_spots.get(0);
+<<<<<<< HEAD
 					}
 					paintComponent(this.getGraphics());
 					try{
 						Thread.sleep(100);
 					} catch(InterruptedException ex){
 						Thread.currentThread().interrupt();
+=======
+						animate();
+>>>>>>> slowed down computer movements to show moves easier
 					}
 					
 					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
 						selected_piece = AImoves.chained_spots.get(moving+1);
+						animate();
 						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
-						try{
-							Thread.sleep(100);
-						} catch(InterruptedException ex){
-							Thread.currentThread().interrupt();
-						}
-						paintComponent(this.getGraphics());
+						animate();
+						
 					}
 					
 					selected_piece = null;
-					paintComponent(this.getGraphics());
+					animate();
 					countPieces();
+					
 				}
 				if(TurnCount%2 == 0 && AImode == 2){
 					AI computer = new AI(board, Piece.PLAYER);
@@ -1612,16 +1623,21 @@ public class GamePanel extends JPanel{
 					
 					if(AImoves.chained_spots.size() != 0){
 						selected_piece = AImoves.chained_spots.get(0);
+<<<<<<< HEAD
 					}
 					paintComponent(this.getGraphics());
 					try{
 						Thread.sleep(100);
 					} catch(InterruptedException ex){
 						Thread.currentThread().interrupt();
+=======
+						animate();
+>>>>>>> slowed down computer movements to show moves easier
 					}
 					
 					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
 						selected_piece = AImoves.chained_spots.get(moving+1);
+<<<<<<< HEAD
 						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), AImoves.moves.get(moving));
 						try{
 							Thread.sleep(100);
@@ -1629,10 +1645,15 @@ public class GamePanel extends JPanel{
 							Thread.currentThread().interrupt();
 						}
 						paintComponent(this.getGraphics());
+=======
+						animate();
+						interpretMove(chained_spots.get(moving),chained_spots.get(moving+1), AImoves.moves.get(moving));
+						animate();
+>>>>>>> slowed down computer movements to show moves easier
 					}
 					
 					selected_piece = null;
-					paintComponent(this.getGraphics());
+					animate();
 					countPieces();
 				}
 			}
