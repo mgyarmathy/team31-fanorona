@@ -1,10 +1,23 @@
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Point;
 import java.io.*;
 import java.net.*;
 
+import javax.swing.JFrame;
 
-public class FanoronaServer implements Runnable{
+
+public class FanoronaServer extends JFrame implements Runnable{
 	//establish server port
-	public FanoronaServer(){}
+	GamePanel board;
+	InfoPanel info;
+	Stopwatch stopw;
+	
+	public FanoronaServer(){
+		super("Team 31 - Fanorona Server");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(false);
+	}
 	
 	public void sendMessage(OutputStream s_socketOutput, String message){
 		byte[] buf = new byte[1024];
@@ -83,23 +96,42 @@ public class FanoronaServer implements Runnable{
 		String ready = receiveMessage(sockInput);
 		System.out.println(ready);
 		
+		Container content = getContentPane();
+		info = new InfoPanel();
+		stopw = new Stopwatch(timer_msecs); new Thread(stopw).start();
+		board = new GamePanel(info,stopw);
+		stopw.addboard(board);
+		content.add(board, BorderLayout.CENTER);	
+		content.add(info, BorderLayout.EAST);
+		content.add(stopw, BorderLayout.SOUTH);
+		pack();
+		
+		
 		sendMessage(sockOutput, "BEGIN");
+		board.newGame();
+		setVisible(true);
 		//capture_move   ::==  A position position | W position position
 				//paika_move     ::==  P position position
 				//sacrifice_move ::==  S position
-		sendMessage(sockOutput, "A 5 2 5 3"); //server sends first move
+		int fromCol = 5;
+		int fromRow = 2;
+		int toCol = 5;
+		int toRow = 3;
+		board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow);
+		sendMessage(sockOutput, "A" + " " + fromCol + " " + fromRow + " " + toCol + " " + toRow); //server sends first move
 		String ok = receiveMessage(sockInput);
 		System.out.println(ok);
 		String playerMove = receiveMessage(sockInput);
 		//parse player move
 		String[] tokens = playerMove.split("\\s+");
 		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-			int fromCol = Integer.parseInt(tokens[1]);
-			int fromRow = Integer.parseInt(tokens[2]);
-			int toCol = Integer.parseInt(tokens[3]);
-			int toRow = Integer.parseInt(tokens[4]);
+			int fCol = Integer.parseInt(tokens[1]);
+			int fRow = Integer.parseInt(tokens[2]);
+			int tCol = Integer.parseInt(tokens[3]);
+			int tRow = Integer.parseInt(tokens[4]);
 			System.out.println(playerMove);
 			//TODO: perform piece movement and update client board appropriately
+			board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow);
 			sendMessage(sockOutput, "OK"); //confirm move
 		}
 		else if(tokens[0].equals("S")){

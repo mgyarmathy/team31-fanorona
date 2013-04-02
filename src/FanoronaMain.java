@@ -6,10 +6,12 @@ public class FanoronaMain {
 
 	public static void main(String[] args) {
 		FanoronaServer fserver = new FanoronaServer();
-		new Thread(fserver).start();
+		Thread server = new Thread(fserver);
+		server.start();
 		
 		Fanorona fclient = new Fanorona();
-		new Thread(fclient).start();
+		Thread client = new Thread(fclient);
+		client.start();
 	}
 
 }

@@ -275,6 +275,8 @@ public class Fanorona extends JFrame implements Runnable{
 
 		byte[] buf = new byte[1024];
 		char[] message;
+		int ROWS = 5;
+		int COLS = 9;
 		
 		//connect to server over localhost
 		try {
@@ -311,8 +313,8 @@ public class Fanorona extends JFrame implements Runnable{
 		String firstMove = "W";
 		if(gameInfo.startsWith("INFO")) { //parse game INFO
 			String[] tokens = gameInfo.split("\\s+");
-			int cols = Integer.parseInt(tokens[1]);
-			int rows = Integer.parseInt(tokens[2]);
+			COLS = Integer.parseInt(tokens[1]);
+			ROWS = Integer.parseInt(tokens[2]);
 			firstMove = tokens[3]; //either W or B
 			int clockTime = Integer.parseInt(tokens[4]);
 			Container content = getContentPane();
@@ -324,8 +326,8 @@ public class Fanorona extends JFrame implements Runnable{
 			content.add(info, BorderLayout.EAST);
 			content.add(stopw, BorderLayout.SOUTH);
 			pack();
-			if(cols % 2 == 1 && rows % 2 == 1){
-				board.setBoardSize(rows, cols);
+			if(COLS % 2 == 1 && ROWS % 2 == 1){
+				board.setBoardSize(ROWS, COLS);
 			}
 			else { System.err.println("error: invalid board size from server"); System.exit(1);}
 			
@@ -348,15 +350,14 @@ public class Fanorona extends JFrame implements Runnable{
 		String serverMove = receiveMessage(c_sockInput);
 		String[] tokens = serverMove.split("\\s+");
 		if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-			int ROWS = board.getNumberOfRows();
+			
 			int fromCol = Integer.parseInt(tokens[1]);
 			int fromRow = Integer.parseInt(tokens[2]);
 			int toCol = Integer.parseInt(tokens[3]);
 			int toRow = Integer.parseInt(tokens[4]);
 			System.out.println(serverMove);
-			//TODO: perform piece movement and update client board appropriately
-			//board.serverMovePiece(new Point(board.getNumberofCols() - 6, board.getNumberOfRows() - 3), 5, 3);
 			board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow);
+			board.animate();
 			sendMessage(c_sockOutput, "OK"); //confirm move
 		}
 		else if(tokens[0].equals("S")){
@@ -368,7 +369,8 @@ public class Fanorona extends JFrame implements Runnable{
 		}
 		
 		//player makes move...
-		sendMessage(c_sockOutput, "A 6 2 6 3");
+		board.serverMovePiece(new Point(6-1, ROWS - 4), 5-1, ROWS-5);
+		sendMessage(c_sockOutput, "A 6 4 5 5");
 		//then gets server OK
 		String ok = receiveMessage(c_sockInput);
 		System.out.println(ok);
