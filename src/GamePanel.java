@@ -30,6 +30,8 @@ public class GamePanel extends JPanel{
 	String Player1move="",Player2move="";
 	boolean Player1newmove=false,Player2newmove=false; 
 	
+	boolean P1AI=false,P2AI=false;
+	
 	boolean win,draw;
 	
 	static enum Piece {PLAYER, OPPONENT, EMPTY, SACRIFICE};
@@ -71,14 +73,25 @@ public class GamePanel extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
+				/*if(servermode && P1AI){
+					info.write("Computer is playing");
+					return;
+				}*/
+				
+				/*if(servermode && P2AI){
+					info.write("Computer is playing");
+					return;
+				}*/
+				
+				
 				if(servermode && TurnCount%2+1!=Player){
 					info.write("Not your turn");
 					return;
 				}
 				
-				if(AImode == 1 && TurnCount%2 == BLACK){
+				if(P1AI && TurnCount%2 == WHITE){
 					return;
-				} else if (AImode == 2){
+				} else if (P2AI && TurnCount%2 == BLACK ){
 					return;
 				}
 				info.initial=true;// initial print for info panel stop
@@ -255,7 +268,6 @@ public class GamePanel extends JPanel{
 		
 		return 0;
 	}
-	
 	
 	public int movePiece(int col, int row){
 		
@@ -1643,12 +1655,24 @@ public class GamePanel extends JPanel{
 		else return("Player 2's Turn");
 	}
 	
-	public void setHumans(){
-		AImode = 0;
+	public void setP1Humans(){
+		P1AI=false;
+		//AImode = 0;
 	}
 	
-	public void setHumanAI(){
-		AImode = 1;
+	public void setP1HumanAI(){
+		P1AI=true;
+		//AImode = 1;
+	}
+	
+	public void setP2Humans(){
+		P2AI=false;
+		//AImode = 0;
+	}
+	
+	public void setP2HumanAI(){
+		P2AI=true;
+		//AImode = 1;
 	}
 	
 	public void setAIs(){
@@ -1672,6 +1696,111 @@ public class GamePanel extends JPanel{
 		} catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
 		}
+	}
+	
+	public void Player2AImove(){
+			AI computer = new AI(board, Piece.OPPONENT);
+			AIBoard AImoves = computer.getMove();
+			
+			if(AImoves.chained_spots.size() != 0){
+				selected_piece = AImoves.chained_spots.get(0);
+				animate();
+
+			}
+			
+			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+				if(moving > 0){
+					if(TurnCount%2==WHITE){ 
+						Player1move+=" + ";
+					}
+					else{
+						Player2move+=" + ";
+					}
+				}
+				//selected_piece = AImoves.chained_spots.get(moving+1);
+				//animate();
+				boolean after = true;
+				boolean before = true;
+				if(AImoves.moves.get(moving) == Type.WITHDRAW){
+					after = false;
+				} else if(AImoves.moves.get(moving) == Type.ADVANCE){
+					before = false;
+				} else {
+					before = false;
+					after = false;
+				}
+				
+				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+				printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
+				selected_piece = AImoves.chained_spots.get(moving+1);
+				animate();
+				
+			}
+			
+			if(TurnCount%2==WHITE){
+				Player1newmove=true;
+				Player2move="";
+			}
+			else{
+				Player2newmove=true;
+				Player1move="";
+			}
+			countPieces();
+			selected_piece = null;
+			paintComponent(this.getGraphics());
+			
+		
+	}
+		
+	public void Player1AImove(){
+			AI computer = new AI(board, Piece.PLAYER);
+			AIBoard AImoves = computer.getMove();
+			
+			if(AImoves.chained_spots.size() != 0){
+				selected_piece = AImoves.chained_spots.get(0);
+				animate();
+			}
+			
+			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
+				if(moving > 0){
+					if(TurnCount%2==WHITE){ 
+						Player1move+=" + ";
+					}
+					else{
+						Player2move+=" + ";
+					}
+				}
+				//selected_piece = AImoves.chained_spots.get(moving+1);
+				//animate();
+				boolean after = true;
+				boolean before = true;
+				if(AImoves.moves.get(moving) == Type.WITHDRAW){
+					after = false;
+				} else if(AImoves.moves.get(moving) == Type.ADVANCE){
+					before = false;
+				} else {
+					before = false;
+					after = false;
+				}
+				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
+				printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
+				selected_piece = AImoves.chained_spots.get(moving+1);
+				animate();
+			}
+			
+			
+			if(TurnCount%2==WHITE){
+				Player1newmove=true;
+				Player2move="";
+			}
+			else{
+				Player2newmove=true;
+				Player1move="";
+			}
+			countPieces();
+			selected_piece = null;
+			paintComponent(this.getGraphics());
+			
 	}
 	
 	public void countPieces(){
@@ -1701,6 +1830,8 @@ public class GamePanel extends JPanel{
 		
 		if(!draw && !win){
 			info.write(printTurn());
+			
+			//**************************************************************************************
 			if(TurnCount%2 == WHITE && sacrificeP != null){
 				board[sacrificeP.y][sacrificeP.x] = Piece.EMPTY;
 				sacrificeP = null;
@@ -1709,92 +1840,15 @@ public class GamePanel extends JPanel{
 				board[sacrificeO.y][sacrificeO.x] = Piece.EMPTY;
 				sacrificeO = null;
 			}
-			if(AImode != 0){
-				if(TurnCount%2 == BLACK){
-					AI computer = new AI(board, Piece.OPPONENT);
-					AIBoard AImoves = computer.getMove();
-					
-					if(AImoves.chained_spots.size() != 0){
-						selected_piece = AImoves.chained_spots.get(0);
-						animate();
-
-					}
-					
-					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-						if(moving > 0){
-							if(TurnCount%2==WHITE){ 
-								Player1move+=" + ";
-							}
-							else{
-								Player2move+=" + ";
-							}
-						}
-						//selected_piece = AImoves.chained_spots.get(moving+1);
-						//animate();
-						boolean after = true;
-						boolean before = true;
-						if(AImoves.moves.get(moving) == Type.WITHDRAW){
-							after = false;
-						} else if(AImoves.moves.get(moving) == Type.ADVANCE){
-							before = false;
-						} else {
-							before = false;
-							after = false;
-						}
-						
-						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
-						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
-						selected_piece = AImoves.chained_spots.get(moving+1);
-						animate();
-						
-					}
-					
-					selected_piece = null;
-					paintComponent(this.getGraphics());
-					countPieces();
-					
-				}
-				if(TurnCount%2 == WHITE && AImode == 2){
-					AI computer = new AI(board, Piece.PLAYER);
-					AIBoard AImoves = computer.getMove();
-					
-					if(AImoves.chained_spots.size() != 0){
-						selected_piece = AImoves.chained_spots.get(0);
-						animate();
-					}
-					
-					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-						if(moving > 0){
-							if(TurnCount%2==WHITE){ 
-								Player1move+=" + ";
-							}
-							else{
-								Player2move+=" + ";
-							}
-						}
-						//selected_piece = AImoves.chained_spots.get(moving+1);
-						//animate();
-						boolean after = true;
-						boolean before = true;
-						if(AImoves.moves.get(moving) == Type.WITHDRAW){
-							after = false;
-						} else if(AImoves.moves.get(moving) == Type.ADVANCE){
-							before = false;
-						} else {
-							before = false;
-							after = false;
-						}
-						interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
-						printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
-						selected_piece = AImoves.chained_spots.get(moving+1);
-						animate();
-					}
-					
-					selected_piece = null;
-					paintComponent(this.getGraphics());
-					countPieces();
-				}
+			
+			if(!servermode && P1AI && TurnCount%2 == WHITE){
+				Player1AImove();
 			}
+			else if( !servermode &&P2AI && TurnCount%2 == BLACK){
+				Player2AImove();
+			} 
+			
+			//*************************************************************************
 			stopw.timeStart();
 		}
 		else if(draw) { info.write("Draw"); stopw.timeStop(); }

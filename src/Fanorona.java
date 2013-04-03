@@ -194,43 +194,56 @@ public class Fanorona extends JFrame implements Runnable{
 			}
 		});
 		
-		JMenu playerMenu = new JMenu("Players");
-		JMenuItem HvH = new JMenuItem("Human vs Human");
-		HvH.addActionListener(new ActionListener() {
+		JMenu player1Menu = new JMenu("Player1");
+		JMenuItem H1 = new JMenuItem("Human");
+		H1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             { 
             	info.initial=false;
-            	board.setHumans();
+            	board.setP2Humans();
                 board.newGame();
                
             }
         });
 		
-		JMenuItem HvC = new JMenuItem("Human vs Computer");
-		HvC.addActionListener(new ActionListener() {
+		JMenuItem C1 = new JMenuItem("Computer");
+		C1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             { 
             	info.initial=false;
-            	board.setHumanAI();
+            	board.setP1HumanAI();
+                board.newGame();
+               
+            }
+        });
+		JMenu player2Menu = new JMenu("Player2");
+		JMenuItem H2 = new JMenuItem("Human");
+		H1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	info.initial=false;
+            	board.setP2Humans();
                 board.newGame();
                
             }
         });
 		
-		JMenuItem CvC = new JMenuItem("Computer vs Computer");
-		CvC.addActionListener(new ActionListener() {
+		JMenuItem C2 = new JMenuItem("Computer");
+		C1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             { 
             	info.initial=false;
-            	board.setAIs();
+            	board.setP2HumanAI();
                 board.newGame();
                
             }
         });
 		
-		playerMenu.add(HvH);
-		playerMenu.add(HvC);
-		playerMenu.add(CvC);
+		
+		player1Menu.add(H1);
+		player1Menu.add(C1);
+		player2Menu.add(H2);
+		player2Menu.add(C2);
 		
 		options.add(boardSize);
 		options.add(playerName);
@@ -238,7 +251,8 @@ public class Fanorona extends JFrame implements Runnable{
 		options.add(mute);
 		menuBar.add(fileMenu);
 		menuBar.add(options);
-		menuBar.add(playerMenu);
+		menuBar.add(player1Menu);
+		menuBar.add(player2Menu);
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
@@ -338,8 +352,8 @@ public class Fanorona extends JFrame implements Runnable{
 		System.out.println(gameInfo);
 		
 		board.servermode=true;
-		if(firstMove.equals("W")) board.Player=1;
-		else board.Player=2;
+		if(firstMove.equals("W")){board.Player=1;}
+		else {board.Player=2;}
 
 		//send READY to server for game to begin
 		sendMessage(c_sockOutput, "READY");
@@ -357,45 +371,11 @@ public class Fanorona extends JFrame implements Runnable{
 			if(board.Player==1){
 				// make white move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				if(AIControl){ //AI determines move
-					AI computer = new AI(board.board, GamePanel.Piece.PLAYER);
-					AIBoard AImoves = computer.getMove();
-					//perform AI moves on local board
-					if(AImoves.chained_spots.size() != 0){
-						board.selected_piece = AImoves.chained_spots.get(0);
-						board.animate();
-					}
-					
-					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-						if(moving > 0){
-							if(board.TurnCount%2==board.WHITE){ 
-								board.Player1move+=" + ";
-							}
-							else{
-								board.Player2move+=" + ";
-							}
-						}
-						//selected_piece = AImoves.chained_spots.get(moving+1);
-						//animate();
-						boolean after = true;
-						boolean before = true;
-						if(AImoves.moves.get(moving) == GamePanel.Type.WITHDRAW){
-							after = false;
-						} else if(AImoves.moves.get(moving) == GamePanel.Type.ADVANCE){
-							before = false;
-						} else {
-							before = false;
-							after = false;
-						}
-						
-						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
-						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
-						board.selected_piece = AImoves.chained_spots.get(moving+1);
-						board.animate();
-					}
-					
+
+				if(board.P1AI){ //AI determines move
+					board.Player1AImove();
 				}
-				else{ //player determines move
+				//player determines move
 					while(!board.Player1newmove){
 						try {
 							Thread.sleep(500);
@@ -403,7 +383,7 @@ public class Fanorona extends JFrame implements Runnable{
 							e.printStackTrace();
 						}
 					}
-				}
+				
 						
 				sendMessage(c_sockOutput, board.Player1move);
 				board.Player1newmove = false;
@@ -527,45 +507,11 @@ public class Fanorona extends JFrame implements Runnable{
 				
 				// make black move by ai
 				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-				if(AIControl){ //AI determines move
-					AI computer = new AI(board.board, GamePanel.Piece.OPPONENT);
-					AIBoard AImoves = computer.getMove();
-					//perform AI moves on local board
-					if(AImoves.chained_spots.size() != 0){
-						board.selected_piece = AImoves.chained_spots.get(0);
-						board.animate();
-					}
-					
-					for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-						if(moving > 0){
-							if(board.TurnCount%2==board.WHITE){ 
-								board.Player1move+=" + ";
-							}
-							else{
-								board.Player2move+=" + ";
-							}
-						}
-						//selected_piece = AImoves.chained_spots.get(moving+1);
-						//animate();
-						boolean after = true;
-						boolean before = true;
-						if(AImoves.moves.get(moving) == GamePanel.Type.WITHDRAW){
-							after = false;
-						} else if(AImoves.moves.get(moving) == GamePanel.Type.ADVANCE){
-							before = false;
-						} else {
-							before = false;
-							after = false;
-						}
-						
-						board.interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
-						board.printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
-						board.selected_piece = AImoves.chained_spots.get(moving+1);
-						board.animate();
-					}
-					
+
+				if(board.P2AI){ //AI determines move
+					board.Player2AImove();
 				}
-				else{ //player determines move
+				//player determines move
 					while(!board.Player2newmove){
 						try {
 							Thread.sleep(500);
@@ -573,7 +519,7 @@ public class Fanorona extends JFrame implements Runnable{
 							e.printStackTrace();
 						}
 					}
-				}
+				
 						
 				sendMessage(c_sockOutput, board.Player2move);
 				board.Player2newmove = false;
