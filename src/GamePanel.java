@@ -1541,52 +1541,21 @@ public class GamePanel extends JPanel{
 		chain_piece = false;
 		previous_direction = Direction.DUMMY;
 		
+		Player1move="";Player2move="";
+		Player1newmove=false;Player2newmove=false; 
+		
 		win = false;
 		draw = false;
 		
 		if(TurnCount == 0 && info.getGraphics()!= null) info.write(printTurn());
 		if(stopw.getGraphics()!=null) { stopw.timeReset(); }
-		if(AImode == 2){
-			AI computer = new AI(board, Piece.PLAYER);
-			AIBoard AImoves = computer.getMove();
-			
-			if(AImoves.chained_spots.size() != 0){
-				selected_piece = AImoves.chained_spots.get(0);
-				animate();
-			}
-			
-			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-				if(moving > 0){
-					if(TurnCount%2==WHITE){ 
-						Player1move+=" + ";
-					}
-					else{
-						Player2move+=" + ";
-					}
-				}
-				//selected_piece = AImoves.chained_spots.get(moving+1);
-				//animate();
-				boolean after = true;
-				boolean before = true;
-				if(AImoves.moves.get(moving) == Type.WITHDRAW){
-					after = false;
-				} else if(AImoves.moves.get(moving) == Type.ADVANCE){
-					before = false;
-				} else {
-					before = false;
-					after = false;
-				}
-				
-				interpretMove(AImoves.chained_spots.get(moving),AImoves.chained_spots.get(moving+1), after);
-				printMove(AImoves.chained_spots.get(moving), AImoves.chained_spots.get(moving+1), after, before);
-				selected_piece = AImoves.chained_spots.get(moving+1);
-				animate();
-			}
-			
-			selected_piece = null;
-			paintComponent(this.getGraphics());
-			countPieces();
+		if(!servermode && P1AI && TurnCount%2 == WHITE){
+			Player1AImove();
 		}
+		else if( !servermode &&P2AI && TurnCount%2 == BLACK){
+			Player2AImove();
+		} 
+		
 	}
 	
 	public void drawButtons(Graphics g){
@@ -1844,7 +1813,7 @@ public class GamePanel extends JPanel{
 			if(!servermode && P1AI && TurnCount%2 == WHITE){
 				Player1AImove();
 			}
-			else if( !servermode &&P2AI && TurnCount%2 == BLACK){
+			else if( !servermode && P2AI && TurnCount%2 == BLACK){
 				Player2AImove();
 			} 
 			

@@ -91,6 +91,10 @@ public class Stopwatch extends JPanel implements Runnable {
 			return time;
 		}
 		
+		public int getInterval(){
+			return interval;
+		}
+		
 		public void killStopwatch(){
 			kill_thread = true;
 		}

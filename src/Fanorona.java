@@ -6,15 +6,23 @@ import java.io.*;
 import java.net.*;
 
 
-public class Fanorona extends JFrame implements Runnable{
+public class Fanorona extends JFrame{
+	
+	int ROWS;
+	int COLS;
+	
+	FanoronaServer fserver;
+	Client fclient;
+	String SocketString = "localhost";
+	int SocketPort = 4555;
+	
+	int clockTime=0;
 	
 	private GamePanel board;
 	private InfoPanel info;
 	private Stopwatch stopw;
 	
-	private Socket c_socket = null;
-	private InputStream c_sockInput = null;
-	private OutputStream c_sockOutput = null;
+	
 	
 	boolean AIControl = false;
 	
@@ -23,7 +31,17 @@ public class Fanorona extends JFrame implements Runnable{
 		super("Team 31 - Fanorona");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addMenuBar();
-		setVisible(false);
+		
+		Container content = getContentPane();
+		info = new InfoPanel();
+		stopw = new Stopwatch(clockTime); new Thread(stopw).start();
+		board = new GamePanel(info,stopw);
+		stopw.addboard(board);
+		content.add(board, BorderLayout.CENTER);	
+		content.add(info, BorderLayout.EAST);
+		content.add(stopw, BorderLayout.SOUTH);
+		pack();
+		setVisible(true);
 	}
 	
 	public void addMenuBar(){
@@ -200,7 +218,7 @@ public class Fanorona extends JFrame implements Runnable{
             public void actionPerformed(ActionEvent e)
             { 
             	info.initial=false;
-            	board.setP2Humans();
+            	board.setP1Humans();
                 board.newGame();
                
             }
@@ -218,7 +236,7 @@ public class Fanorona extends JFrame implements Runnable{
         });
 		JMenu player2Menu = new JMenu("Player2");
 		JMenuItem H2 = new JMenuItem("Human");
-		H1.addActionListener(new ActionListener() {
+		H2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             { 
             	info.initial=false;
@@ -229,7 +247,7 @@ public class Fanorona extends JFrame implements Runnable{
         });
 		
 		JMenuItem C2 = new JMenuItem("Computer");
-		C1.addActionListener(new ActionListener() {
+		C2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             { 
             	info.initial=false;
@@ -238,6 +256,48 @@ public class Fanorona extends JFrame implements Runnable{
                
             }
         });
+		
+		JMenu connection = new JMenu("Connection");
+		JMenuItem none = new JMenuItem("None");
+		none.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	if(fserver!=null) fserver.terminate();
+            	
+            	if(fclient!=null) fclient.terminate();
+            	
+            	board.servermode=false;
+               
+            }
+        });
+		JMenuItem server = new JMenuItem("Server");
+		server.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	fserver = new FanoronaServer(SocketPort,board,info);
+        		Thread server = new Thread(fserver);
+        		server.start();
+                //board.newGame();
+               
+            }
+        });
+		
+		JMenuItem client = new JMenuItem("Client");
+		client.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            { 
+            	fclient = new Client(SocketString,SocketPort,board,info);
+            	Thread client = new Thread(fclient);
+        		client.start();
+                //board.newGame();
+               
+            }
+        });
+		
+		
+		connection.add(none);
+		connection.add(server);
+		connection.add(client);
 		
 		
 		player1Menu.add(H1);
@@ -253,317 +313,10 @@ public class Fanorona extends JFrame implements Runnable{
 		menuBar.add(options);
 		menuBar.add(player1Menu);
 		menuBar.add(player2Menu);
+		menuBar.add(connection);
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		setJMenuBar(menuBar);
 	}
 	
-	public void sendMessage(OutputStream c_socketOutput, String message){
-		byte[] buf = new byte[1024];
-	    char[] charArray = message.toCharArray();
-	    for(int i = 0; i<charArray.length; i++){
-	    	buf[i] = (byte)charArray[i];
-	    }
-	    buf[charArray.length] = (byte)' ';
-	    try {
-			c_socketOutput.write(buf, 0, buf.length);
-		} catch (IOException e1) {
-			System.err.println("server: unable to write to output stream");
-			System.exit(1);
-		}
-		
-	}
-	
-	public String receiveMessage(InputStream c_socketInput){
-		byte[] buf = new byte[1024];
-		try {
-			c_socketInput.read(buf, 0, buf.length);
-		} catch (IOException e) {
-			System.err.println("Client unable to read"); 
-			System.exit(1);
-		}
-		String message = new String(buf);
-		return message;
-	}
-
-	@Override
-	public void run() {
-
-		//byte[] buf = new byte[1024];
-		//char[] message;
-		int ROWS = 5;
-		int COLS = 9;
-		
-		//connect to server over localhost
-		try {
-			c_socket = new Socket("localhost", 4555);
-		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host: FanoronaServer."); 
-			System.exit(1);
-		} catch(IOException e){
-			System.err.println("Couldn't get I/O for the connection to: FanoronaServer.");
-			System.exit(1);
-		}
-		
-		//get input/output streams from socket
-		try {
-			c_sockInput = c_socket.getInputStream();
-		} catch (IOException e) {
-			System.err.println("Client unable to get input stream"); 
-			System.exit(1);
-		}
-		try {
-			c_sockOutput = c_socket.getOutputStream();
-		} catch (IOException e) {
-			System.err.println("Client unable to get output stream"); 
-			System.exit(1);
-		}
-		
-		//read WELCOME message from server
-		String welcome = receiveMessage(c_sockInput);
-		if(!welcome.startsWith("WELCOME")){ System.out.println("error: server did not WELCOME"); }
-		System.out.println(welcome);
-		
-		//read INFO from server
-		String gameInfo = receiveMessage(c_sockInput);
-		String firstMove = "W";
-		if(gameInfo.startsWith("INFO")) { //parse game INFO
-			String[] tokens = gameInfo.split("\\s+");
-			COLS = Integer.parseInt(tokens[1]);
-			ROWS = Integer.parseInt(tokens[2]);
-			firstMove = tokens[3]; //either W or B
-			int clockTime = Integer.parseInt(tokens[4]);
-			Container content = getContentPane();
-			info = new InfoPanel();
-			stopw = new Stopwatch(clockTime); new Thread(stopw).start();
-			board = new GamePanel(info,stopw);
-			stopw.addboard(board);
-			content.add(board, BorderLayout.CENTER);	
-			content.add(info, BorderLayout.EAST);
-			content.add(stopw, BorderLayout.SOUTH);
-			pack();
-			if(COLS % 2 == 1 && ROWS % 2 == 1){
-				board.setBoardSize(ROWS, COLS);
-			}
-			else { System.err.println("error: invalid board size from server"); System.exit(1);}
-			
-		}
-		else { System.err.println("error: server did not give INFO"); System.exit(1);}
-		System.out.println(gameInfo);
-		
-		board.servermode=true;
-		if(firstMove.equals("W")){board.Player=1;}
-		else {board.Player=2;}
-
-		//send READY to server for game to begin
-		sendMessage(c_sockOutput, "READY");
-		
-		//receive BEGIN, and game begins
-		String begin = receiveMessage(c_sockInput);
-		if(begin.startsWith("BEGIN")){
-			board.newGame();
-			setVisible(true);
-		}
-		else { System.err.println("error: server did not send BEGIN message"); System.exit(1);}
-		System.out.println(begin);
-		
-		while(true){
-			if(board.Player==1){
-				// make white move by ai
-				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-
-				if(board.P1AI){ //AI determines move
-					board.Player1AImove();
-				}
-				//player determines move
-					while(!board.Player1newmove){
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				
-						
-				sendMessage(c_sockOutput, board.Player1move);
-				board.Player1newmove = false;
-				String ok = receiveMessage(c_sockInput);
-				System.out.println(ok);
-				//check to see if move caused WIN/DRAW
-				if(board.win) {
-					sendMessage(c_sockOutput, "LOSER");
-					info.write("YOU WIN");
-					break;
-				}
-				if(board.draw){
-					sendMessage(c_sockOutput, "DRAW");
-					info.write("Game ends in DRAW");
-					break;
-				}
-					
-				String playerMove = receiveMessage(c_sockInput);
-				info.write(playerMove);
-				//parse player move
-				int goodmove = 0;
-				String[] tokens = playerMove.split("\\s+");
-				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					for(int i = 0; i<tokens.length; i=i+6){
-						String dir = tokens[i];
-						int fCol = Integer.parseInt(tokens[i+1]);
-						int fRow = Integer.parseInt(tokens[i+2]);
-						int tCol = Integer.parseInt(tokens[i+3]);
-						int tRow = Integer.parseInt(tokens[i+4]);
-						//tokens[i+5] = "+"
-						goodmove = board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
-					}
-					
-					System.out.println(playerMove);
-					sendMessage(c_sockOutput, "OK"); //confirm move
-					if(goodmove<0) {
-						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
-					}
-				}
-				else if(tokens[0].equals("S")){
-					int sacCol = Integer.parseInt(tokens[1]);
-					int sacRow = Integer.parseInt(tokens[2]);
-					System.out.println(playerMove);
-					//perform sacrifice on that specific piece
-					goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
-					sendMessage(c_sockOutput, "OK"); //confirm move
-					if(goodmove<0) {
-						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
-					}
-				}
-				else if(tokens[0].equals("ILLEGAL")){
-					break;
-				}
-				else if(tokens[0].equals("TIME")){
-				}
-				else if(tokens[0].equals("LOSER")){
-					info.write("YOU LOSE");
-					break;
-				}
-				else if(tokens[0].equals("WINNER")){
-				}
-				else if(tokens[0].equals("TIE")){
-					break;
-				}
-			}
-			if(board.Player==2){
-			
-				String playerMove = receiveMessage(c_sockInput);
-				info.write(playerMove);
-				//parse player move
-				int goodmove = 0;
-				String[] tokens = playerMove.split("\\s+");
-				if(tokens[0].equals("A") || tokens[0].equals("W") || tokens[0].equals("P")){
-					for(int i = 0; i<tokens.length; i=i+6){
-						String dir = tokens[i];
-						int fCol = Integer.parseInt(tokens[i+1]);
-						int fRow = Integer.parseInt(tokens[i+2]);
-						int tCol = Integer.parseInt(tokens[i+3]);
-						int tRow = Integer.parseInt(tokens[i+4]);
-						//tokens[i+5] = "+"
-						goodmove = board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
-					}
-					
-					System.out.println(playerMove);
-					sendMessage(c_sockOutput, "OK"); //confirm move
-					if(goodmove<0) {
-						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
-					}
-				}
-				else if(tokens[0].equals("S")){
-					int sacCol = Integer.parseInt(tokens[1]);
-					int sacRow = Integer.parseInt(tokens[2]);
-					System.out.println(playerMove);
-					//perform sacrifice on that specific piece
-					goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
-					sendMessage(c_sockOutput, "OK"); //confirm move
-					if(goodmove<0) {
-						sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-						sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
-					}
-				}
-				else if(tokens[0].equals("ILLEGAL")){
-					break;
-				}
-				else if(tokens[0].equals("TIME")){
-					System.out.println("Time up");
-					break;
-				}
-				else if(tokens[0].equals("LOSER")){
-					info.write("YOU LOSE");
-					break;
-				}
-				else if(tokens[0].equals("WINNER")){
-				}
-				else if(tokens[0].equals("TIE")){
-					break;
-				}
-				
-				// make black move by ai
-				//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-
-				if(board.P2AI){ //AI determines move
-					board.Player2AImove();
-				}
-				//player determines move
-					while(!board.Player2newmove){
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				
-						
-				sendMessage(c_sockOutput, board.Player2move);
-				board.Player2newmove = false;
-				String ok = receiveMessage(c_sockInput);
-				System.out.println(ok);
-				//check to see if move caused WIN/DRAW
-				if(board.win) {
-					sendMessage(c_sockOutput, "LOSER");
-					info.write("YOU WIN");
-					break;
-				}
-				if(board.draw){
-					sendMessage(c_sockOutput, "DRAW");
-					info.write("Game ends in DRAW");
-					break;
-				}
-			}
-		}		
-		
-		//close socket at end of session
-		try {
-			c_socket.close();
-		} catch (IOException e) {
-			System.err.println("Client unable to close client socket"); 
-			System.exit(1);
-		}
-		
-	}
-	
-	
 }
-
-//snippet to handle multiple moves
-//String dir = tokens[0];
-//example string: A 5 4 5 3 + 5 3 4 3 +  4  3  3  3 
-//indices         0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
-//and for one move: A 5 4 5 3
-//indices			0 1 2 3 4
-//for(int i = 1; i<tokens.length; i=i+5){
-//	int fCol = Integer.parseInt(tokens[i]);
-//	int fRow = Integer.parseInt(tokens[i+1]);
-//	int tCol = Integer.parseInt(tokens[i+2]);
-//	int tRow = Integer.parseInt(tokens[i+3]);
-	//tokens[i+4] = "+"
-//	board.serverMovePiece(new Point(fCol-1, ROWS - fRow), tCol-1, ROWS-tRow, dir);
-//}
-
