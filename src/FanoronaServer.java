@@ -193,7 +193,7 @@ public class FanoronaServer implements Runnable{
 							if(stopServer) break;
 							
 							String playerMove = receiveMessage(sockInput);
-							info.write(playerMove);
+							//info.write(playerMove);
 							//parse player move
 							
 							int goodmove=0;	
@@ -254,7 +254,7 @@ public class FanoronaServer implements Runnable{
 						if(board.Player==2){
 							if(stopServer) break;
 							String playerMove = receiveMessage(sockInput);
-							info.write(playerMove);
+							//info.write(playerMove);
 							//parse player move
 							int goodmove = 0;
 							String[] tokens = playerMove.split("\\s+");

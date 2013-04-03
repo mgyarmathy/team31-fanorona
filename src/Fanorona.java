@@ -51,8 +51,11 @@ public class Fanorona extends JFrame{
 		newGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             { 
-            	info.initial=false;
-                board.newGame();
+            	
+            	if(!board.servermode){
+            		info.initial=false;
+            		board.newGame();
+            	}
                
             }
         });

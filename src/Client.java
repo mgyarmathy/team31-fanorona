@@ -209,7 +209,7 @@ public class Client extends Thread{
 									if(stopClient)break;
 										
 									String playerMove = receiveMessage(c_sockInput);
-									info.write(playerMove);
+									//info.write(playerMove);
 									//parse player move
 									int goodmove = 0;
 									String[] tokens = playerMove.split("\\s+");
@@ -263,7 +263,7 @@ public class Client extends Thread{
 								
 									if(stopClient)break;
 									String playerMove = receiveMessage(c_sockInput);
-									info.write(playerMove);
+									//info.write(playerMove);
 									//parse player move
 									int goodmove = 0;
 									String[] tokens = playerMove.split("\\s+");
