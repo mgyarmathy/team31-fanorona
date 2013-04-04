@@ -280,6 +280,7 @@ public class Fanorona extends JFrame{
             	fserver = new FanoronaServer(SocketPort,board,info);
         		Thread server = new Thread(fserver);
         		server.start();
+        		board.servermode=true;
                 //board.newGame();
                
             }
@@ -292,6 +293,7 @@ public class Fanorona extends JFrame{
             	fclient = new Client(SocketString,SocketPort,board,info);
             	Thread client = new Thread(fclient);
         		client.start();
+        		board.servermode=true;
                 //board.newGame();
                
             }

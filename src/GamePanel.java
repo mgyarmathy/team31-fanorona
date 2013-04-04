@@ -222,8 +222,7 @@ public class GamePanel extends JPanel{
 				
 				movedata = movePiece(choiceMoveCol,choiceMoveRow);
 			}
-		}
-		
+		}	
 		return movedata;
 	}
 	
@@ -251,24 +250,39 @@ public class GamePanel extends JPanel{
 			// sacrifice move string
 			if(TurnCount%2==WHITE){ 
 				Player1move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
+				countPieces();
 				Player1newmove=true;
 				Player2move="";
 			}
 			else{
 				Player2move+="S "+Integer.toString(selected_piece.x+1)+" "+Integer.toString(ROWS-selected_piece.y);
+				countPieces();
 				Player2newmove=true;
 				Player1move="";
 			}
 			// send move to server **************************************
 			
 			selected_piece = null;
-			countPieces();
+			
 			info.write("Piece has been sacrificed to block moves.");
 		}
 		
 		return 0;
 	}
 	
+	
+	public void resetmovestuff(){
+		selected_piece = null;
+		choice1 = null;
+		choice2 = null;
+		sacrificeP = null;
+		sacrificeO = null;
+		chained_spots = new ArrayList<Point>();
+		chain_piece = false;
+		previous_direction = Direction.DUMMY;
+		overrideMode = false;
+		overrideDir = Direction.DUMMY;
+	}
 	public int movePiece(int col, int row){
 		
 		// 0 successful move
@@ -644,7 +658,19 @@ public class GamePanel extends JPanel{
 					info.write("Chain Ended.");
 					chain_piece = false;
 					chained_spots.clear();
-					countPieces();
+					
+					printMove(selected_piece, new Point(col,row), after, before);
+					
+					if(TurnCount%2==WHITE){
+						countPieces();
+						Player1newmove=true;
+						Player2move="";
+					}
+					else{
+						countPieces();
+						Player2newmove=true;
+						Player1move="";
+					}
 				}
 				return 0;
 			} else {
@@ -690,8 +716,6 @@ public class GamePanel extends JPanel{
 			char c2=(char) (row+65);
 			info.write(Character.toString(c)+Integer.toString(selected_piece.x+1)+" moved to "+Character.toString(c2)+Integer.toString(col+1));
 			
-			
-			
 			printMove(selected_piece, new Point(col,row), after, before);
 				
 			//board[row][col] = color;
@@ -717,15 +741,7 @@ public class GamePanel extends JPanel{
 					chain_piece = true;
 					
 					// server chain move string stuff ****************************************
-					if(TurnCount%2==WHITE){ 
-						Player1move+=" + ";
-					}
-					else{
-						Player2move+=" + ";
-					}
 					//************************************************************************
-
-					
 				previous_direction = dir;
 				stopw.timeReset();
 				stopw.timeStart();
@@ -739,17 +755,16 @@ public class GamePanel extends JPanel{
 				
 				// set move new and clear other player move string ****************************************************
 				if(TurnCount%2==WHITE){
+					countPieces();
 					Player1newmove=true;
 					Player2move="";
 				}
 				else{
+					countPieces();
 					Player2newmove=true;
 					Player1move="";
 				}
 				//send move to other player function ******************************************************************
-			
-				
-				countPieces();
 				selected_piece = null;
 			}
 		}
@@ -757,28 +772,35 @@ public class GamePanel extends JPanel{
 	}
 	
 	public void printMove(Point start, Point end, boolean after, boolean before){
-		//TODO:detect advance/withdraw/paika ********************************************************
+		//:detect advance/withdraw/paika ********************************************************
 		if(!after && !before){	
 			if(TurnCount%2==WHITE){ 
+				if(!Player1move.equals("")){ Player1move+=" + ";}
 				Player1move+="P "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
 			}
 			else{
+				if(!Player2move.equals("")){ Player2move+=" + ";}
 				Player2move+="P "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
 			}
 		}
 		else if(after){
-			if(TurnCount%2==WHITE){ 
+			if(TurnCount%2==WHITE){
+				if(!Player1move.equals("")){ Player1move+=" + ";}
 				Player1move+="A "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
 			}
 			else{
+				if(!Player2move.equals("")){ Player2move+=" + ";}
 				Player2move+="A "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
 			}
 		}
 		else {
-			if(TurnCount%2==WHITE){ 
+			if(TurnCount%2==WHITE){
+				if(!Player1move.equals("")){ Player1move+=" + ";}
+			
 				Player1move+="W "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
 			}
 			else{
+				if(!Player2move.equals("")){ Player2move+=" + ";}
 				Player2move+="W "+Integer.toString(start.x+1)+" "+Integer.toString(ROWS-start.y)+" "+Integer.toString(end.x+1)+" "+Integer.toString(ROWS-end.y);
 			}
 		}
@@ -1678,14 +1700,6 @@ public class GamePanel extends JPanel{
 			}
 			
 			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-				if(moving > 0){
-					if(TurnCount%2==WHITE){ 
-						Player1move+=" + ";
-					}
-					else{
-						Player2move+=" + ";
-					}
-				}
 				//selected_piece = AImoves.chained_spots.get(moving+1);
 				//animate();
 				boolean after = true;
@@ -1707,14 +1721,16 @@ public class GamePanel extends JPanel{
 			}
 			
 			if(TurnCount%2==WHITE){
+				countPieces();
 				Player1newmove=true;
 				Player2move="";
 			}
 			else{
+				countPieces();
 				Player2newmove=true;
 				Player1move="";
 			}
-			countPieces();
+			
 			selected_piece = null;
 			paintComponent(this.getGraphics());
 			
@@ -1731,14 +1747,7 @@ public class GamePanel extends JPanel{
 			}
 			
 			for(int moving = 0; moving < AImoves.chained_spots.size()-1; moving++){
-				if(moving > 0){
-					if(TurnCount%2==WHITE){ 
-						Player1move+=" + ";
-					}
-					else{
-						Player2move+=" + ";
-					}
-				}
+				
 				//selected_piece = AImoves.chained_spots.get(moving+1);
 				//animate();
 				boolean after = true;
@@ -1759,14 +1768,16 @@ public class GamePanel extends JPanel{
 			
 			
 			if(TurnCount%2==WHITE){
+				countPieces();
+				
 				Player1newmove=true;
 				Player2move="";
 			}
 			else{
+				countPieces();
 				Player2newmove=true;
 				Player1move="";
 			}
-			countPieces();
 			selected_piece = null;
 			paintComponent(this.getGraphics());
 			
@@ -1795,7 +1806,9 @@ public class GamePanel extends JPanel{
 		
 		if(TurnCount == 10*ROWS-1) draw = true;
 		if(OppPieceCount == 0 || PlayerPieceCount == 0) win = true;
-		if(!draw && !win) TurnCount++;
+		if(!draw && !win) {
+			TurnCount++;
+		}
 		
 		if(!draw && !win){
 			info.write(printTurn());

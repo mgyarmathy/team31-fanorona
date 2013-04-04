@@ -189,9 +189,11 @@ public class Client extends Thread{
 											if(stopClient)break;
 										}
 										if(stopClient)break;
-											
+										
+									board.Player1newmove = false;		
 									sendMessage(c_sockOutput, board.Player1move);
-									board.Player1newmove = false;
+									
+									
 									String ok = receiveMessage(c_sockInput);
 									System.out.println(ok);
 									//check to see if move caused WIN/DRAW
@@ -201,12 +203,14 @@ public class Client extends Thread{
 										break;
 									}
 									if(board.draw){
-										sendMessage(c_sockOutput, "DRAW");
+										sendMessage(c_sockOutput, "TIE");
 										info.write("Game ends in DRAW");
 										break;
 									}
 									
 									if(stopClient)break;
+									
+									
 										
 									String playerMove = receiveMessage(c_sockInput);
 									//info.write(playerMove);
@@ -227,8 +231,8 @@ public class Client extends Thread{
 										System.out.println(playerMove);
 										sendMessage(c_sockOutput, "OK"); //confirm move
 										if(goodmove<0) {
-											sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-											sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+											sendMessage(c_sockOutput, "ILLEGAL"); break;//check if move legal
+											//sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
 										}
 									}
 									else if(tokens[0].equals("S")){
@@ -239,24 +243,44 @@ public class Client extends Thread{
 										goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
 										sendMessage(c_sockOutput, "OK"); //confirm move
 										if(goodmove<0) {
-											sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-											sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+											sendMessage(c_sockOutput, "ILLEGAL"); break;//check if move legal
+											//sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
 										}
 									}
 									else if(tokens[0].equals("ILLEGAL")){
+										info.write("that move is not valid");
 										break;
 									}
 									else if(tokens[0].equals("TIME")){
+										info.write("Time up");
+										break;
 									}
 									else if(tokens[0].equals("LOSER")){
 										info.write("YOU LOSE");
 										break;
 									}
 									else if(tokens[0].equals("WINNER")){
-									}
-									else if(tokens[0].equals("TIE")){
+										info.write("YOU WIN");
 										break;
 									}
+									else if(tokens[0].equals("TIE")){
+										info.write("Game ends in DRAW");
+										break;
+									}
+									
+									
+									while(board.TurnCount%2==1 && !board.draw && !board.win){
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										board.countPieces();
+										//board.resetmovestuff();
+										if(stopClient) break;
+									}
+									
 									if(stopClient)break;
 								}
 								if(board.Player==2){
@@ -281,8 +305,8 @@ public class Client extends Thread{
 										System.out.println(playerMove);
 										sendMessage(c_sockOutput, "OK"); //confirm move
 										if(goodmove<0) {
-											sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-											sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+											sendMessage(c_sockOutput, "ILLEGAL"); break; //check if move legal
+											//sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
 										}
 									}
 									else if(tokens[0].equals("S")){
@@ -293,15 +317,16 @@ public class Client extends Thread{
 										goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
 										sendMessage(c_sockOutput, "OK"); //confirm move
 										if(goodmove<0) {
-											sendMessage(c_sockOutput, "ILLEGAL"); //check if move legal
-											sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
+											sendMessage(c_sockOutput, "ILLEGAL"); break; //check if move legal
+											//sendMessage(c_sockOutput, "LOSER"); //inform server that they lost
 										}
 									}
 									else if(tokens[0].equals("ILLEGAL")){
+										info.write("that move is not valid");
 										break;
 									}
 									else if(tokens[0].equals("TIME")){
-										System.out.println("Time up");
+										info.write("Time up");
 										break;
 									}
 									else if(tokens[0].equals("LOSER")){
@@ -309,8 +334,11 @@ public class Client extends Thread{
 										break;
 									}
 									else if(tokens[0].equals("WINNER")){
+										info.write("YOU WIN");
+										break;
 									}
 									else if(tokens[0].equals("TIE")){
+										info.write("Game ends in DRAW");
 										break;
 									}
 									
@@ -318,6 +346,19 @@ public class Client extends Thread{
 									// make black move by ai
 									//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
 					
+									while(board.TurnCount%2==0 && !board.draw && !board.win){
+										//info.write("waiting P2");
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										board.countPieces();
+										//board.resetmovestuff();
+										if(stopClient) break;
+									}
+									
 									if(board.P2AI){ //AI determines move
 										board.Player2AImove();
 									}
@@ -332,9 +373,12 @@ public class Client extends Thread{
 											if(stopClient)break;
 										}
 									
-											
+									//info.write(board.Player2move);
+									board.Player2newmove = false;	
+									
 									sendMessage(c_sockOutput, board.Player2move);
-									board.Player2newmove = false;
+									
+									
 									String ok = receiveMessage(c_sockInput);
 									System.out.println(ok);
 									//check to see if move caused WIN/DRAW
@@ -344,7 +388,7 @@ public class Client extends Thread{
 										break;
 									}
 									if(board.draw){
-										sendMessage(c_sockOutput, "DRAW");
+										sendMessage(c_sockOutput, "TIE");
 										info.write("Game ends in DRAW");
 										break;
 									}

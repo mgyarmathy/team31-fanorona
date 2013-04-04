@@ -163,7 +163,6 @@ public class FanoronaServer implements Runnable{
 			
 							if(board.P1AI){ //AI determines move
 								board.Player1AImove();
-			
 							}
 							//player determines move
 								while(!board.Player1newmove){
@@ -175,9 +174,13 @@ public class FanoronaServer implements Runnable{
 									if(stopServer) break;
 								}
 								if(stopServer) break;
-										
+							board.Player1newmove = false;	
+								
+							
+							//info.write(board.Player1move);			
 							sendMessage(sockOutput, board.Player1move);
-							board.Player1newmove = false;
+							
+							
 							String ok = receiveMessage(sockInput);
 							System.out.println(ok);
 							if(board.win) {
@@ -186,7 +189,7 @@ public class FanoronaServer implements Runnable{
 								break;
 							}
 							if(board.draw){
-								sendMessage(sockOutput, "DRAW");
+								sendMessage(sockOutput, "TIE");
 								info.write("Game ends in DRAW");
 								break;
 							}
@@ -213,8 +216,8 @@ public class FanoronaServer implements Runnable{
 								System.out.println(playerMove);
 								sendMessage(sockOutput, "OK"); //confirm move received
 								if(goodmove<0) {
-									sendMessage(sockOutput, "ILLEGAL"); //check if move legal
-									sendMessage(sockOutput, "LOSER"); //inform server that they lost
+									sendMessage(sockOutput, "ILLEGAL"); break; //check if move legal
+									//sendMessage(sockOutput, "LOSER"); //inform server that they lost
 								}
 							}
 							else if(tokens[0].equals("S")){
@@ -225,14 +228,16 @@ public class FanoronaServer implements Runnable{
 								goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
 								sendMessage(sockOutput, "OK"); //confirm move received
 								if(goodmove<0) {
-									sendMessage(sockOutput, "ILLEGAL"); //check if move legal
-									sendMessage(sockOutput, "LOSER"); //inform server that they lost
+									sendMessage(sockOutput, "ILLEGAL");  break;//check if move legal
+									//sendMessage(sockOutput, "LOSER"); //inform server that they lost
 								}
 							}
 							else if(tokens[0].equals("ILLEGAL")){
+								info.write("that move is not valid");
 								break;
 							}
 							else if(tokens[0].equals("TIME")){
+								info.write("Time up");
 								break;
 							}
 							else if(tokens[0].equals("LOSER")){
@@ -240,10 +245,26 @@ public class FanoronaServer implements Runnable{
 								break;
 							}
 							else if(tokens[0].equals("WINNER")){
+								info.write("YOU WIN");
 								break;
 							}
 							else if(tokens[0].equals("TIE")){
+								info.write("Game ends in DRAW");
 								break;
+							}
+							
+							while(board.TurnCount%2==1 && !board.draw && !board.win){
+								//info.write("waiting P1");
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							
+								board.countPieces();
+								//board.resetmovestuff();
+								if(stopServer) break;
 							}
 							
 							
@@ -271,8 +292,8 @@ public class FanoronaServer implements Runnable{
 								if(stopServer) break;
 								System.out.println(playerMove);
 								sendMessage(sockOutput, "OK"); //confirm move
-								if(goodmove<0) sendMessage(sockOutput, "ILLEGAL"); //check if move legal
-								if(board.stopw.isTimeUp()) sendMessage(sockOutput, "TIME"); //check time expired
+								if(goodmove<0) {sendMessage(sockOutput, "ILLEGAL"); break; } //check if move legal
+								if(board.stopw.isTimeUp()) {sendMessage(sockOutput, "TIME"); break;} //check time expired
 							}
 							else if(tokens[0].equals("S")){
 								int sacCol = Integer.parseInt(tokens[1]);
@@ -281,14 +302,15 @@ public class FanoronaServer implements Runnable{
 								//perform sacrifice on that specific piece
 								goodmove = board.serverSacrificePiece(new Point(sacCol-1, ROWS - sacRow));
 								sendMessage(sockOutput, "OK"); //confirm move
-								if(goodmove<0) sendMessage(sockOutput, "ILLEGAL"); //check if move legal
-								if(board.stopw.isTimeUp()) sendMessage(sockOutput, "TIME"); //check time expired
+								if(goodmove<0) {sendMessage(sockOutput, "ILLEGAL"); break; } //check if move legal
+								if(board.stopw.isTimeUp()) {sendMessage(sockOutput, "TIME"); break;} //check time expired
 							}
 							else if(tokens[0].equals("ILLEGAL")){
+								info.write("that move is not valid");
 								break;
 							}
 							else if(tokens[0].equals("TIME")){
-								System.out.println("Time up");
+								info.write("Time up");
 								break;
 							}
 							else if(tokens[0].equals("LOSER")){
@@ -296,14 +318,29 @@ public class FanoronaServer implements Runnable{
 								break;
 							}
 							else if(tokens[0].equals("WINNER")){
+								info.write("YOU WIN");
+								break;
 							}
 							else if(tokens[0].equals("TIE")){
+								info.write("Game ends in DRAW");
 								break;
 							}
 							if(stopServer) break;
 							// make black move by AI
 							//board.serverMovePiece(new Point(fromCol-1, ROWS - fromRow), toCol-1, ROWS-toRow,"A");
-			
+							
+							while(board.TurnCount%2==0 && !board.draw && !board.win){
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								board.countPieces();
+								//board.resetmovestuff();
+								if(stopServer) break;
+							}
+							
 							if(board.P2AI){ //AI determines move
 								board.Player2AImove();
 							}
@@ -317,18 +354,22 @@ public class FanoronaServer implements Runnable{
 									if(stopServer) break;
 								}
 							}
-							if(stopServer) break;		
-							sendMessage(sockOutput, board.Player2move);
+							if(stopServer) break;
 							board.Player2newmove = false;
+							
+							sendMessage(sockOutput, board.Player2move);
+							
 							String ok = receiveMessage(sockInput);
 							System.out.println(ok);
 							//check to see if move caused WIN/DRAW
 							if(board.win) {
 								sendMessage(sockOutput, "LOSER");
+								//info.write("YOU LOSE");
 								break;
 							}
 							if(board.draw){
-								sendMessage(sockOutput, "DRAW");
+								sendMessage(sockOutput, "TIE");
+								//info.write("Game ends in DRAW");
 								break;
 							}
 						}
